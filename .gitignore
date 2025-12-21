@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+.vs/
+bin/
+obj/
+*.user
+*.suo
+=======
 ## Visual Studio Temp- och byggfiler
 Visual Studio 2015/2017/2019/2022
 .vs/
@@ -31,3 +38,4 @@ project.assets.json
 ## Övrigt skräp
 .DS_Store
 Thumbs.db
+>>>>>>> main
