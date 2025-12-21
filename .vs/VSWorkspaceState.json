@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\.github",
+    "\\bin",
+    "\\Controllers",
+    "\\Models",
+    "\\obj",
+    "\\Properties",
+    "\\Views",
+    "\\wwwroot"
+  ],
+  "SelectedNode": "\\wwwroot",
+  "PreviewInSolutionExplorer": false
+}
