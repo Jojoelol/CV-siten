@@ -1,24 +1,33 @@
+## Visual Studio Temp- och byggfiler
+Visual Studio 2015/2017/2019/2022
 .vs/
-bin/
-<<<<<<< HEAD
-
-.vs/CV-siten.slnx/FileContentIndex/45c9dbd0-d847-4308-bb0e-0ffc28429b7c.vsidx
-.vs/CV-siten.slnx/FileContentIndex/771c97d4-1e12-4f76-93b9-f21bd8873de8.vsidx
-.vs/slnx.sqlite
-.vs/VSWorkspaceState.json
-obj/CV-siten.csproj.nuget.dgspec.json
-obj/CV-siten.csproj.nuget.g.props
-obj/CV-siten.csproj.nuget.g.targets
-obj/Debug/net8.0/CV-siten.AssemblyInfo.cs
-obj/Debug/net8.0/CV-siten.AssemblyInfoInputs.cache
-obj/Debug/net8.0/CV-siten.assets.cache
-obj/Debug/net8.0/CV-siten.GeneratedMSBuildEditorConfig.editorconfig
-obj/Debug/net8.0/CV-siten.GlobalUsings.g.cs
-obj/Debug/net8.0/rpswa.dswa.cache.json
-obj/project.assets.json
-obj/project.nuget.cache
-=======
-obj/
+[Bb]in/
+[Oo]bj/
 *.user
 *.suo
->>>>>>> 15e069faaf5091f9cab56d2be39f440cb5e2dd98
+*.userosscache
+*.sln.docstates
+
+## NuGet-paket
+# Ignorera hela mappen 'packages' om ni inte vill checka in alla .nupkg-filer
+packages/*
+# Men tillåt .config-filen för att veta vilka paket som behövs
+!packages/repositories.config
+# Ignorera de filer NuGet skapar vid återställning
+project.assets.json
+*.nuget.g.props
+*.nuget.g.targets
+
+## SQL Server filer
+*.mdf
+*.ldf
+*.ndf
+
+## User-specific filer (som t.ex. sökvägar i din bild)
+*.user
+*.userprefs
+*.docstates
+
+## Övrigt skräp
+.DS_Store
+Thumbs.db
