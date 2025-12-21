@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CV-siten")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+02d1e9c340a36021a227641d941274278eba8bf2")]
 [assembly: System.Reflection.AssemblyProductAttribute("CV-siten")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CV-siten")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
