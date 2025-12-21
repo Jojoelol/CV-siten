@@ -1,6 +1,6 @@
 .vs/
-obj/
 bin/
+<<<<<<< HEAD
 
 .vs/CV-siten.slnx/FileContentIndex/45c9dbd0-d847-4308-bb0e-0ffc28429b7c.vsidx
 .vs/CV-siten.slnx/FileContentIndex/771c97d4-1e12-4f76-93b9-f21bd8873de8.vsidx
@@ -17,3 +17,8 @@ obj/Debug/net8.0/CV-siten.GlobalUsings.g.cs
 obj/Debug/net8.0/rpswa.dswa.cache.json
 obj/project.assets.json
 obj/project.nuget.cache
+=======
+obj/
+*.user
+*.suo
+>>>>>>> 15e069faaf5091f9cab56d2be39f440cb5e2dd98
