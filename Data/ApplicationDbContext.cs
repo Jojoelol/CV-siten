@@ -12,5 +12,7 @@ namespace CV_siten.Data
         }
 
         public DbSet<Person> Persons { get; set; }
+        public DbSet<Meddelande> Messages { get; set; }
+        public DbSet<Projekt> Projects { get; set; }
     }
 }
