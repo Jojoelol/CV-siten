@@ -1,48 +1,71 @@
-﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
-
-a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+﻿/* 1. Sidans struktur */
+main {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
-a {
-  color: #0077cc;
+/* 2. Header & Innehåll */
+.main-header {
+    padding: 20px 50px;
+    border-bottom: 2px solid #ddd;
+    background-color: white;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+/* 3. Sökfältet */
+.search-bar {
+    display: flex;
+    gap: 10px;
 }
 
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
-}
+    .search-bar input {
+        width: 300px;
+        padding: 8px 20px;
+        border: 2px solid #000;
+        outline: none;
+    }
 
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
-}
+    /* 4. Gemensam stil för Knappar (Sök & Logga in) */
+    .login button,
+    .search-bar button {
+        display: inline-block;
+        padding: 8px 20px;
+        border: 2px solid #000;
+        background-color: white;
+        color: #000 !important; /* !important tvingar bort Bootstraps blå färg */
+        text-decoration: none !important; /* Tar bort understrykning */
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
 
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
-}
+        /* Hover-effekt för båda knapparna */
+        .login button:hover,
+        .search-bar button:hover {
+            background-color: #000;
+            color: #fff !important;
+        }
 
+/* 5. Footer */
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+    background-color: #b91717;
+    color: white;
+    padding: 20px 0;
+    width: 100%;
+    text-align: center;
+    /* Säkerhetsåtgärder för att "klistra" den i botten */
+    margin-top: auto;
+    border: none;
+    display: block; /* Ändra från flow-root till block för test */
 }
+
+    .footer div {
+        margin: 0;
+        padding: 0;
+    }
