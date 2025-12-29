@@ -1,8 +1,27 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Startsida";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="background">
+    <div class="yellow-box welcome-area">
+        <p>Välkommen till vår CV site...</p>
+    </div>
+
+    <div class="yellow-box profile-area">
+        <div class="profile-grid" asp-controller="Home" asp-action="Profile" method="get">
+            <div class="name-title-pic">
+                <p class="name">Namn</p>
+                <p class="title">Titel</p>
+                <div class="pic-placeholder">Profilbild</div>
+            </div>
+
+            <div class="white-box desc-box">Kort beskrivning</div>
+
+            <div class="projects-list">
+                <div class="project-pill">Projekt #1</div>
+                <div class="project-pill">Projekt #2</div>
+                <div class="project-pill">Projekt #3</div>
+            </div>
+        </div>
+    </div>
 </div>
