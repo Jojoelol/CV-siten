@@ -1,10 +1,22 @@
-﻿@{
-    ViewData["Title"] = "Logga in";
-}
-<h1>@ViewData["Title"]</h1>
-<div class="login-box">
+﻿@model CV_siten.Models.LoginViewModel
 
+<div class="yellow-box welcome-area" style="max-width: 500px; margin: 20px auto;">
+    <h2>Inloggning</h2>
+    <form asp-controller="Home" asp-action="Login" method="post">
+        <div class="form-group">
+            <label>E-post</label>
+            <input asp-for="Email" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Lösenord</label>
+            <input asp-for="Losenord" type="password" class="form-control" required />
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Logga in</button>
+    </form>
+
+    @if (ViewBag.Error != null)
+    {
+        <p style="color: red; margin-top: 10px;">@ViewBag.Error</p>
+    }
 </div>
-
-<p>Detta är loginsidan</p>
-
