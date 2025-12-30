@@ -3,13 +3,15 @@ main {
     flex: 1 0 auto;
     display: flex;
     flex-direction: column;
+    background-color: #f4f7f6; /* Ljus bakgrund för att framhäva innehållet */
 }
 
 /* 2. Header & Innehåll */
 .main-header {
     padding: 20px 50px;
-    border-bottom: 2px solid #ddd;
-    background-color: white;
+    border-bottom: 3px solid #3498db; /* Ljusblå accentlinje */
+    background-color: #ecf0f1; 
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Ger lite djup */
 }
 
 .header-content {
@@ -18,54 +20,72 @@ main {
     align-items: center;
 }
 
+.logo {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1.2rem;
+}
+
 /* 3. Sökfältet */
 .search-bar {
     display: flex;
     gap: 10px;
 }
 
-    .search-bar input {
-        width: 300px;
-        padding: 8px 20px;
-        border: 2px solid #000;
-        outline: none;
-    }
-
-    /* 4. Gemensam stil för Knappar (Sök & Logga in) */
-    .login button,
-    .search-bar button {
-        display: inline-block;
-        padding: 8px 20px;
-        border: 2px solid #000;
-        background-color: white;
-        color: #000 !important; /* !important tvingar bort Bootstraps blå färg */
-        text-decoration: none !important; /* Tar bort understrykning */
-        font-size: 14px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-        /* Hover-effekt för båda knapparna */
-        .login button:hover,
-        .search-bar button:hover {
-            background-color: #000;
-            color: #fff !important;
-        }
-
-/* 5. Footer */
-.footer {
-    background-color: #b91717;
-    color: white;
-    padding: 20px 0;
-    width: 100%;
-    text-align: center;
-    /* Säkerhetsåtgärder för att "klistra" den i botten */
-    margin-top: auto;
-    border: none;
-    display: block; /* Ändra från flow-root till block för test */
+.search-bar input {
+    width: 300px;
+    padding: 8px 20px;
+    border: 2px solid #dee2e6; /* Mjukare grå kant */
+    border-radius: 4px; /* Lite mjukare hörn */
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-    .footer div {
-        margin: 0;
-        padding: 0;
-    }
+.search-bar input:focus {
+    border-color: #3498db; /* Blå kant när man skriver */
+}
+
+/* 4. Gemensam stil för Knappar (Sök & Logga in) */
+.login button,
+.search-bar button {
+    display: inline-block;
+    padding: 8px 25px;
+    border: 2px solid #3498db; /* Blå ram istället för svart */
+    background-color: transparent;
+    color: #3498db !important;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none !important;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Hover-effekt för båda knapparna */
+.login button:hover,
+.search-bar button:hover {
+    background-color: #3498db;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+.footer {
+    /* Ljusgrå bakgrund som bryter av mot den mörka .background sektionen */
+    background-color: #ecf0f1; 
+    /* Mörkblå text för att matcha temat och vara lättläst */
+    color: #2c3e50; 
+    padding: 25px 0;
+    width: 100%;
+    text-align: center;
+    margin-top: auto;
+    /* En subtil mörkare grå linje för att definiera kanten */
+    border-top: 1px solid #bdc3c7; 
+    display: block;
+}
+
+.footer div {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}

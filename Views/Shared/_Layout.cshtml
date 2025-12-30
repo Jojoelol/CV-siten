@@ -11,9 +11,13 @@
 <body>
     <header class="main-header">
         <div class="header-content">
-            <div class="logo">Logga</div>
+			<div class="logo">
+				<a asp-controller="Home" asp-action="Index">
+					<img src="~/images/logo.png" alt="CV-siten Logotyp" style="height: 45px; width: auto;" asp-append-version="true" />
+				</a>
+			</div>
             <form class="search-bar" asp-controller="Home" asp-action="Search" method="get">
-                <input type="text" name="q" placeholder="Sök konsulter eller projekt...">
+				<input type="text" name="q" placeholder="..." />
                 <button type="submit">Sök</button>
             </form>
             <form class="login" asp-controller="Home" asp-action="Login" method="get">
@@ -27,7 +31,7 @@
     </main>
 
     <footer class="footer">
-        <div>&copy; 2025 - CV_siten</div>
+        <div>&#169; 2025 - CV_siten</div>
     </footer>
 </body>
 </html>
