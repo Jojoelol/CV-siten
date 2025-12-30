@@ -86,6 +86,18 @@ main {
 .footer div {
     margin: 0;
     padding: 0;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* I _Layout.cshtml.css */
+.logged-in-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logged-in-text {
+    color: #333; /* Här styr du färgen (byt ut mot t.ex. black eller #000) */
     font-weight: 500;
 }

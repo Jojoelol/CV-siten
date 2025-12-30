@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSession(); // Aktiverar sessionshantering
+builder.Services.AddHttpContextAccessor(); // Gör det lättare att nå sessionen i vyer
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -21,6 +24,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseSession(); // Säger till appen att faktiskt använda sessioner
 
 app.UseRouting();
 

@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="sv">
 <head>
     <meta charset="utf-8" />
@@ -11,18 +14,37 @@
 <body>
     <header class="main-header">
         <div class="header-content">
-			<div class="logo">
-				<a asp-controller="Home" asp-action="Index">
-					<img src="~/images/logo.png" alt="CV-siten Logotyp" style="height: 45px; width: auto;" asp-append-version="true" />
-				</a>
-			</div>
+            <div class="logo">
+                <a asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" alt="CV-siten Logotyp" style="height: 45px; width: auto;" asp-append-version="true" />
+                </a>
+            </div>
             <form class="search-bar" asp-controller="Home" asp-action="Search" method="get">
-				<input type="text" name="q" placeholder="..." />
+                <input type="text" name="q" placeholder="" />
                 <button type="submit">Sök</button>
             </form>
-            <form class="login" asp-controller="Home" asp-action="Login" method="get">
-                <button type="submit">Logga in</button>
-            </form>
+
+            @* Här börjar logiken för inloggad/utloggad *@
+            @{
+                var anvandareId = HttpContextAccessor.HttpContext?.Session.GetInt32("AnvandareId");
+                var anvandareNamn = HttpContextAccessor.HttpContext?.Session.GetString("AnvandareNamn");
+            }
+
+            @if (anvandareId != null)
+            {
+                <div class="logged-in-info">
+                    <span class="logged-in-text">Inloggad som: @anvandareNamn</span>
+                    <form class="login" asp-controller="Home" asp-action="Logout" method="post">
+                        <button type="submit">Logga ut</button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <form class="login" asp-controller="Home" asp-action="Login" method="get">
+                    <button type="submit">Logga in</button>
+                </form>
+            }
         </div>
     </header>
 
@@ -33,5 +55,6 @@
     <footer class="footer">
         <div>&#169; 2025 - CV_siten</div>
     </footer>
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
