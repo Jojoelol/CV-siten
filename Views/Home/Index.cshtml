@@ -10,7 +10,7 @@
     <div class="yellow-box profile-area">
         <div class="profile-grid" asp-controller="Home" asp-action="Profile" method="get">
             <div class="name-title-pic">
-                <p class="name">Namn</p>
+                <p class="name">@(Model?.Fornamn ?? "Okänd") @(Model?.Efternamn ?? "Användare")</p>
                 <p class="title">Titel</p>
                 <div class="pic-placeholder">Profilbild</div>
             </div>
