@@ -30,12 +30,19 @@
                 var anvandareNamn = HttpContextAccessor.HttpContext?.Session.GetString("AnvandareNamn");
             }
 
+
+
             @if (anvandareId != null)
             {
                 <div class="logged-in-info">
                     <span class="logged-in-text">Inloggad som: @anvandareNamn</span>
 
                     @* Redigera profil-knapp med samma styling som logga in *@
+
+                    <form class="login" asp-controller="Account" asp-action="Edit" method="get">
+                        <button type="submit">Min profil</button>
+                    </form>
+
                     <form class="login" asp-controller="Account" asp-action="Edit" method="get">
                         <button type="submit">Redigera profil</button>
                     </form>
@@ -43,6 +50,8 @@
                     <form class="login" asp-controller="Account" asp-action="Logout" method="post">
                         <button type="submit">Logga ut</button>
                     </form>
+
+
                 </div>
             }
             else
