@@ -1,0 +1,34 @@
+﻿@model CV_siten.Models.EditAccountViewModel
+
+<div class="yellow-box welcome-area" style="max-width: 600px; margin: 20px auto; padding: 30px;">
+    <h2>Redigera profil</h2>
+    <hr />
+    <form asp-action="Edit" method="post">
+        <div class="form-group mb-3">
+            <label asp-for="Fornamn"></label>
+            <input asp-for="Fornamn" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="Efternamn"></label>
+            <input asp-for="Efternamn" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="Yrkestitel"></label>
+            <input asp-for="Yrkestitel" class="form-control" />
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="Beskrivning"></label>
+            <textarea asp-for="Beskrivning" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="Losenord"></label>
+            <textarea asp-for="Losenord" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Spara ändringar</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Avbryt</a>
+    </form>
+</div>

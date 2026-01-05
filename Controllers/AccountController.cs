@@ -37,7 +37,58 @@ namespace CV_siten.Controllers
             ViewBag.Error = "Felaktig e-post eller lösenord.";
             return View(model);
         }
+        // GET: Account/Edit
+        public IActionResult Edit()
+        {
+            // Hämta inloggad användares ID från sessionen
+            var userId = HttpContext.Session.GetInt32("AnvandareId");
+            if (userId == null) return RedirectToAction("Login");
 
+            var user = _context.Persons.Find(userId);
+            if (user == null) return NotFound();
+
+            // Fyll modellen med befintlig data från databasen
+            var model = new EditAccountViewModel
+            {
+                Fornamn = user.Fornamn,
+                Efternamn = user.Efternamn,
+                Email = user.Email,
+                Telefonnummer = user.Telefonnummer,
+                Yrkestitel = user.Yrkestitel,
+                Beskrivning = user.Beskrivning,
+                Losenord = user.Losenord
+            };
+
+            return View("EditAccount", model);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(EditAccountViewModel model)
+        {
+            var userId = HttpContext.Session.GetInt32("AnvandareId");
+            if (userId == null) return RedirectToAction("Login");
+
+            if (ModelState.IsValid)
+            {
+                var user = _context.Persons.Find(userId);
+                if (user == null) return NotFound();
+
+                // Uppdatera personens uppgifter
+                user.Fornamn = model.Fornamn;
+                user.Efternamn = model.Efternamn;
+                user.Email = model.Email;
+                user.Telefonnummer = model.Telefonnummer;
+                user.Yrkestitel = model.Yrkestitel;
+                user.Beskrivning = model.Beskrivning;
+
+                _context.Update(user);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Profilen har uppdaterats.";
+                return RedirectToAction("Index", "Home");
+            }
+            return View("EditAccount", model);
+        }
         public IActionResult Logout()
         {
             // Rensar inloggningsdatan

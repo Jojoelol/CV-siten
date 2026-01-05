@@ -18,9 +18,20 @@
             <div class="white-box desc-box">Kort beskrivning</div>
 
             <div class="projects-list">
-                <div class="project-pill">Projekt #1</div>
-                <div class="project-pill">Projekt #2</div>
-                <div class="project-pill">Projekt #3</div>
+                @if (ViewBag.SenasteProjekt != null)
+                {
+                    <div class="project-pill">
+                        <strong>Senaste:</strong> @ViewBag.SenasteProjekt.Projektnamn
+                    </div>
+                    @* Här kan du även visa beskrivningen om du vill *@
+                    <div style="font-size: 0.8em; color: gray;">
+                        @ViewBag.SenasteProjekt.Beskrivning
+                    </div>
+                }
+                else
+                {
+                    <div class="project-pill">Inga projekt hittades</div>
+                }
             </div>
         </div>
     </div>

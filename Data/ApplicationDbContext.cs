@@ -20,6 +20,20 @@ namespace CV_siten.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Konfigurera den nya kopplingstabellen
+            modelBuilder.Entity<PersonProjekt>()
+                .HasKey(pp => new { pp.PersonId, pp.ProjektId }); // Sammansatt nyckel
+
+            modelBuilder.Entity<PersonProjekt>()
+                .HasOne(pp => pp.Person)
+                .WithMany(p => p.PersonProjekt)
+                .HasForeignKey(pp => pp.PersonId);
+
+            modelBuilder.Entity<PersonProjekt>()
+                .HasOne(pp => pp.Projekt)
+                .WithMany(p => p.PersonProjekt)
+                .HasForeignKey(pp => pp.ProjektId);
+
             // Här skapar vi testpersonen som följer med i koden
             modelBuilder.Entity<Person>().HasData(new Person
             {
@@ -33,6 +47,18 @@ namespace CV_siten.Data
                 Aktivtkonto = true,
                 Telefonnummer = 0701234567,
                 BildUrl = ""
+            });
+
+            modelBuilder.Entity<Projekt>().HasData(new Projekt
+            {
+                Id = 1,
+                Projektnamn = "Globalt CV-System",
+                Beskrivning = "Ett system byggt i .NET 8 med SQL Server.",
+                Startdatum = DateTimeOffset.Now,
+                Slutdatum = DateTimeOffset.Now.AddMonths(1),
+                Typ = "Webbutveckling",
+                Status = "Pågående",
+                Fil = "exempel.pdf" // Det nya fältet
             });
         }
     }

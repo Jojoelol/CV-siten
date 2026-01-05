@@ -34,7 +34,12 @@
             {
                 <div class="logged-in-info">
                     <span class="logged-in-text">Inloggad som: @anvandareNamn</span>
-                    @* ÄNDRAT: asp-controller="Account" istället för Home *@
+
+                    @* Redigera profil-knapp med samma styling som logga in *@
+                    <form class="login" asp-controller="Account" asp-action="Edit" method="get">
+                        <button type="submit">Redigera profil</button>
+                    </form>
+
                     <form class="login" asp-controller="Account" asp-action="Logout" method="post">
                         <button type="submit">Logga ut</button>
                     </form>
@@ -42,7 +47,7 @@
             }
             else
             {
-                @* ÄNDRAT: asp-controller="Account" istället för Home *@
+                @* Ursprunglig logga in-knapp *@
                 <form class="login" asp-controller="Account" asp-action="Login" method="get">
                     <button type="submit">Logga in</button>
                 </form>
