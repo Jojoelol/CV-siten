@@ -4,6 +4,7 @@ using CV_siten.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251230134614_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,21 +110,6 @@ namespace CV_siten.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Persons");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Aktivtkonto = true,
-                            Beskrivning = "Detta är en testprofil skapad via kod.",
-                            BildUrl = "",
-                            Efternamn = "Test",
-                            Email = "test@test.se",
-                            Fornamn = "Oscar",
-                            Losenord = "123",
-                            Telefonnummer = 701234567,
-                            Yrkestitel = "Systemutvecklare"
-                        });
                 });
 
             modelBuilder.Entity("CV_siten.Models.Projekt", b =>
