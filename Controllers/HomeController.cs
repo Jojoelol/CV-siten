@@ -18,15 +18,15 @@ namespace CV_siten.Controllers
 
         public IActionResult Index()
         {
-            // Hämtar den första personen för att visa på startsidan
+            // Hämta profilen till Model
             var profil = _context.Persons.FirstOrDefault();
 
-            // Hämtar det senaste projektet baserat på Id
+            // Hämta senaste projektet till ViewBag
             ViewBag.SenasteProjekt = _context.Projekt
                                              .OrderByDescending(p => p.Id)
                                              .FirstOrDefault();
 
-            return View(profil);
+            return View(profil); // Skickar profil till @model
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

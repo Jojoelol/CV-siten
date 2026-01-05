@@ -1,0 +1,61 @@
+﻿@model CV_siten.Models.EditAccountViewModel
+
+<div class="yellow-box welcome-area" style="max-width: 600px; margin: 20px auto; padding: 30px;">
+    <h2>Redigera profil</h2>
+    <hr />
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Fornamn" class="form-label"></label>
+            <input asp-for="Fornamn" class="form-control" />
+            <span asp-validation-for="Fornamn" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Efternamn" class="form-label"></label>
+            <input asp-for="Efternamn" class="form-control" />
+            <span asp-validation-for="Efternamn" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Telefonnummer" class="form-label"></label>
+            <input asp-for="Telefonnummer" class="form-control" />
+            <span asp-validation-for="Telefonnummer" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Yrkestitel" class="form-label"></label>
+            <input asp-for="Yrkestitel" class="form-control" />
+            <span asp-validation-for="Yrkestitel" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="Beskrivning" class="form-label"></label>
+            <textarea asp-for="Beskrivning" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Beskrivning" class="text-danger"></span>
+        </div>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Spara ändringar</button>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Avbryt</a>
+        </div>
+
+        <div class="form-group mt-3">
+            <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-warning">Ändra lösenord</a>
+        </div>
+    </form>
+</div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

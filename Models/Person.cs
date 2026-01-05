@@ -12,5 +12,7 @@
         public string Beskrivning { get; set; }
         public string Yrkestitel { get; set; }
         public bool Aktivtkonto { get; set; }
+
+        public virtual ICollection<PersonProjekt> PersonProjekt { get; set; } = new List<PersonProjekt>();
     }
 }

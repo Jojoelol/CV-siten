@@ -4,6 +4,7 @@ using CV_siten.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260105114030_AddPersonProjektModel")]
+    partial class AddPersonProjektModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,10 +158,6 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Fil")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Projektnamn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -186,10 +185,9 @@ namespace CV_siten.Migrations
                         {
                             Id = 1,
                             Beskrivning = "Ett system byggt i .NET 8 med SQL Server.",
-                            Fil = "exempel.pdf",
                             Projektnamn = "Globalt CV-System",
-                            Slutdatum = new DateTimeOffset(new DateTime(2026, 2, 5, 12, 48, 29, 860, DateTimeKind.Unspecified).AddTicks(4001), new TimeSpan(0, 1, 0, 0, 0)),
-                            Startdatum = new DateTimeOffset(new DateTime(2026, 1, 5, 12, 48, 29, 860, DateTimeKind.Unspecified).AddTicks(3916), new TimeSpan(0, 1, 0, 0, 0)),
+                            Slutdatum = new DateTimeOffset(new DateTime(2026, 2, 5, 12, 40, 29, 718, DateTimeKind.Unspecified).AddTicks(8547), new TimeSpan(0, 1, 0, 0, 0)),
+                            Startdatum = new DateTimeOffset(new DateTime(2026, 1, 5, 12, 40, 29, 718, DateTimeKind.Unspecified).AddTicks(8470), new TimeSpan(0, 1, 0, 0, 0)),
                             Status = "Pågående",
                             Typ = "Webbutveckling"
                         });

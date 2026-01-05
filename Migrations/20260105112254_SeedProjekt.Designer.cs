@@ -4,6 +4,7 @@ using CV_siten.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260105112254_SeedProjekt")]
+    partial class SeedProjekt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,25 +127,6 @@ namespace CV_siten.Migrations
                         });
                 });
 
-            modelBuilder.Entity("CV_siten.Models.PersonProjekt", b =>
-                {
-                    b.Property<int>("PersonId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProjektId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Roll")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PersonId", "ProjektId");
-
-                    b.HasIndex("ProjektId");
-
-                    b.ToTable("PersonProjekt");
-                });
-
             modelBuilder.Entity("CV_siten.Models.Projekt", b =>
                 {
                     b.Property<int>("Id")
@@ -152,10 +136,6 @@ namespace CV_siten.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Beskrivning")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Fil")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -186,42 +166,42 @@ namespace CV_siten.Migrations
                         {
                             Id = 1,
                             Beskrivning = "Ett system byggt i .NET 8 med SQL Server.",
-                            Fil = "exempel.pdf",
                             Projektnamn = "Globalt CV-System",
-                            Slutdatum = new DateTimeOffset(new DateTime(2026, 2, 5, 12, 48, 29, 860, DateTimeKind.Unspecified).AddTicks(4001), new TimeSpan(0, 1, 0, 0, 0)),
-                            Startdatum = new DateTimeOffset(new DateTime(2026, 1, 5, 12, 48, 29, 860, DateTimeKind.Unspecified).AddTicks(3916), new TimeSpan(0, 1, 0, 0, 0)),
+                            Slutdatum = new DateTimeOffset(new DateTime(2026, 2, 5, 12, 22, 53, 141, DateTimeKind.Unspecified).AddTicks(4377), new TimeSpan(0, 1, 0, 0, 0)),
+                            Startdatum = new DateTimeOffset(new DateTime(2026, 1, 5, 12, 22, 53, 141, DateTimeKind.Unspecified).AddTicks(4280), new TimeSpan(0, 1, 0, 0, 0)),
                             Status = "Pågående",
                             Typ = "Webbutveckling"
                         });
                 });
 
-            modelBuilder.Entity("CV_siten.Models.PersonProjekt", b =>
+            modelBuilder.Entity("PersonProjekt", b =>
                 {
-                    b.HasOne("CV_siten.Models.Person", "Person")
-                        .WithMany("PersonProjekt")
-                        .HasForeignKey("PersonId")
+                    b.Property<int>("PersonerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjektId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PersonerId", "ProjektId");
+
+                    b.HasIndex("ProjektId");
+
+                    b.ToTable("PersonProjekt");
+                });
+
+            modelBuilder.Entity("PersonProjekt", b =>
+                {
+                    b.HasOne("CV_siten.Models.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CV_siten.Models.Projekt", "Projekt")
-                        .WithMany("PersonProjekt")
+                    b.HasOne("CV_siten.Models.Projekt", null)
+                        .WithMany()
                         .HasForeignKey("ProjektId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Person");
-
-                    b.Navigation("Projekt");
-                });
-
-            modelBuilder.Entity("CV_siten.Models.Person", b =>
-                {
-                    b.Navigation("PersonProjekt");
-                });
-
-            modelBuilder.Entity("CV_siten.Models.Projekt", b =>
-                {
-                    b.Navigation("PersonProjekt");
                 });
 #pragma warning restore 612, 618
         }
