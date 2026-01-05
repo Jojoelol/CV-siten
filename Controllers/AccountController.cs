@@ -2,6 +2,7 @@
 using CV_siten.Models;
 using CV_siten.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace CV_siten.Controllers
 {
@@ -23,12 +24,11 @@ namespace CV_siten.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel model)
         {
-            // Letar efter matchande användare i SQL Server
             var user = _context.Persons.FirstOrDefault(p => p.Email == model.Email && p.Losenord == model.Losenord);
 
             if (user != null)
             {
-                // Sparar användarens uppgifter i sessionen
+                // Vi använder "AnvandareId" konsekvent i hela controllern
                 HttpContext.Session.SetInt32("AnvandareId", user.Id);
                 HttpContext.Session.SetString("AnvandareNamn", user.Fornamn);
                 return RedirectToAction("Index", "Home");
@@ -37,17 +37,16 @@ namespace CV_siten.Controllers
             ViewBag.Error = "Felaktig e-post eller lösenord.";
             return View(model);
         }
-        // GET: Account/Edit
+
+        // --- REDIGERA PROFIL ---
         public IActionResult Edit()
         {
-            // Hämta inloggad användares ID från sessionen
             var userId = HttpContext.Session.GetInt32("AnvandareId");
             if (userId == null) return RedirectToAction("Login");
 
             var user = _context.Persons.Find(userId);
             if (user == null) return NotFound();
 
-            // Fyll modellen med befintlig data från databasen
             var model = new EditAccountViewModel
             {
                 Fornamn = user.Fornamn,
@@ -56,7 +55,6 @@ namespace CV_siten.Controllers
                 Telefonnummer = user.Telefonnummer,
                 Yrkestitel = user.Yrkestitel,
                 Beskrivning = user.Beskrivning,
-                Losenord = user.Losenord
             };
 
             return View("EditAccount", model);
@@ -73,7 +71,6 @@ namespace CV_siten.Controllers
                 var user = _context.Persons.Find(userId);
                 if (user == null) return NotFound();
 
-                // Uppdatera personens uppgifter
                 user.Fornamn = model.Fornamn;
                 user.Efternamn = model.Efternamn;
                 user.Email = model.Email;
@@ -89,11 +86,48 @@ namespace CV_siten.Controllers
             }
             return View("EditAccount", model);
         }
-        public IActionResult Logout()
+
+        // --- ÄNDRA LÖSENORD ---
+        [HttpGet]
+        public IActionResult ChangePassword()
         {
-            // Rensar inloggningsdatan
-            HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
+            var userId = HttpContext.Session.GetInt32("AnvandareId");
+            if (userId == null) return RedirectToAction("Login");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // ÄNDRAT: Hämtar nu från "AnvandareId" för att matcha Login-metoden
+            var userId = HttpContext.Session.GetInt32("AnvandareId");
+            if (userId == null) return RedirectToAction("Login");
+
+            var user = await _context.Persons.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            // Kontrollera att det nuvarande lösenordet stämmer
+            if (user.Losenord != model.OldPassword)
+            {
+                ModelState.AddModelError("OldPassword", "Det nuvarande lösenordet är felaktigt.");
+                return View(model);
+            }
+
+            // Uppdatera lösenordet
+            user.Losenord = model.NewPassword;
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Ditt lösenord har ändrats!";
+
+            // ÄNDRAT: Redirect till "Edit" eftersom det är så din metod heter
+            return RedirectToAction("Edit");
         }
 
         // --- SKAPA KONTO ---
@@ -107,7 +141,6 @@ namespace CV_siten.Controllers
         {
             if (ModelState.IsValid)
             {
-                // 1. Kontrollera om e-posten redan finns
                 var emailExists = _context.Persons.Any(p => p.Email == model.Email);
                 if (emailExists)
                 {
@@ -115,7 +148,6 @@ namespace CV_siten.Controllers
                     return View(model);
                 }
 
-                // 2. Skapa ett nytt Person-objekt
                 var nyPerson = new Person
                 {
                     Fornamn = model.Fornamn,
@@ -129,7 +161,6 @@ namespace CV_siten.Controllers
                     BildUrl = ""
                 };
 
-                // 3. Spara i databasen
                 _context.Persons.Add(nyPerson);
                 _context.SaveChanges();
 
@@ -138,6 +169,12 @@ namespace CV_siten.Controllers
             }
 
             return View(model);
+        }
+
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
     }
 }
