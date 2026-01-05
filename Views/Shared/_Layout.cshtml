@@ -34,14 +34,16 @@
             {
                 <div class="logged-in-info">
                     <span class="logged-in-text">Inloggad som: @anvandareNamn</span>
-                    <form class="login" asp-controller="Home" asp-action="Logout" method="post">
+                    @* ÄNDRAT: asp-controller="Account" istället för Home *@
+                    <form class="login" asp-controller="Account" asp-action="Logout" method="post">
                         <button type="submit">Logga ut</button>
                     </form>
                 </div>
             }
             else
             {
-                <form class="login" asp-controller="Home" asp-action="Login" method="get">
+                @* ÄNDRAT: asp-controller="Account" istället för Home *@
+                <form class="login" asp-controller="Account" asp-action="Login" method="get">
                     <button type="submit">Logga in</button>
                 </form>
             }

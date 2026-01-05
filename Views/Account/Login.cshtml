@@ -2,7 +2,7 @@
 
 <div class="yellow-box welcome-area" style="max-width: 500px; margin: 20px auto;">
     <h2>Inloggning</h2>
-    <form asp-controller="Home" asp-action="Login" method="post">
+    <form asp-controller="Account" asp-action="Login" method="post">
         <div class="form-group">
             <label>E-post</label>
             <input asp-for="Email" class="form-control" required />
@@ -16,7 +16,7 @@
     </form>
 
     <div class="mt-3 text-center">
-        <p>Saknar du konto? <a asp-controller="Home" asp-action="CreateAccount">Skapa ett konto här</a></p>
+        <p>Saknar du konto? <a asp-controller="Account" asp-action="CreateAccount">Skapa ett konto här</a></p>
     </div>
 
     @if (ViewBag.Error != null)
