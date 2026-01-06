@@ -12,6 +12,6 @@
         public string Typ { get; set; }
         public string Status { get; set; }
 
-        public string Fil { get; set; }
+       // public string Fil { get; set; }
     }
 }
