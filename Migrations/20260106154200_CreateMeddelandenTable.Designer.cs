@@ -4,6 +4,7 @@ using CV_siten.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260106154200_CreateMeddelandenTable")]
+    partial class CreateMeddelandenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,7 +95,6 @@ namespace CV_siten.Migrations
                             Id = "test-user-1",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "aeee2718-5ec0-478a-9a26-362ef8ad1688",
-                            ConcurrencyStamp = "ec478fe8-5a79-4816-9faf-d6aa6118e163",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -101,9 +103,6 @@ namespace CV_siten.Migrations
                             PasswordHash = "AQAAAAIAAYagAAAAEMvsvgXB1n5Z7eHDODZ0f7bzXVFsbIxDj5GjQ4P2tkWS8r6j6+H/wTa/8Z7qJQzCrg==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "b5deac2c-51ff-4d8a-948a-0e33c92be10c",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL5NJXAtBufgI75K1OUv8M7fNB7rq2yv5lscNS2u9jGaoOhaSghxSOtGXsyKz7ptIg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "3d559754-b6a0-4c01-997f-b9e12608d38c",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -126,38 +125,6 @@ namespace CV_siten.Migrations
                     b.ToTable("CVer");
                 });
 
-            modelBuilder.Entity("CV_siten.Models.Meddelande", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("ArLast")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("AvsandareNamn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Innehall")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MottagareId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Tidsstampel")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MottagareId");
-
-                    b.ToTable("Meddelanden");
-                });
-
             modelBuilder.Entity("CV_siten.Models.Person", b =>
                 {
                     b.Property<int>("Id")
@@ -170,12 +137,11 @@ namespace CV_siten.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Beskrivning")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BildUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CvUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Efternamn")
@@ -190,10 +156,11 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Telefonnummer")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Telefonnummer")
+                        .HasColumnType("int");
 
                     b.Property<string>("Yrkestitel")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -212,7 +179,7 @@ namespace CV_siten.Migrations
                             Efternamn = "Test",
                             Fornamn = "Joel",
                             IdentityUserId = "test-user-1",
-                            Telefonnummer = "0701234567",
+                            Telefonnummer = 701234567,
                             Yrkestitel = "Systemutvecklare"
                         });
                 });
@@ -252,7 +219,7 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("Slutdatum")
+                    b.Property<DateTimeOffset>("Slutdatum")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("Startdatum")
@@ -443,17 +410,6 @@ namespace CV_siten.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("CV_siten.Models.Meddelande", b =>
-                {
-                    b.HasOne("CV_siten.Models.Person", "Mottagare")
-                        .WithMany()
-                        .HasForeignKey("MottagareId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Mottagare");
                 });
 
             modelBuilder.Entity("CV_siten.Models.Person", b =>
