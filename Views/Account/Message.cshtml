@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Mina meddelanden";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="yellow-box p-4" style="border: 2px solid #ffd800; border-radius: 8px; background-color: #fffbe6;">
+                <h2 class="mb-4">Mina meddelanden</h2>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Från</th>
+                                <th>Meddelande</th>
+                                <th>Datum</th>
+                                <th>Status</th>
+                                <th>Åtgärd</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-light">
+                                <td><strong>System</strong></td>
+                                <td>Välkommen till CV-siten! Hoppas du ska trivas.</td>
+                                <td>@DateTime.Now.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td><span class="badge bg-primary">Nytt</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-dark">Läs</button>
+                                    <button class="btn btn-sm btn-outline-danger">Ta bort</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-5">
+                                    <i>Du har inga fler meddelanden just nu.</i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
