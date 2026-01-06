@@ -4,6 +4,7 @@ using CV_siten.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CV_siten.Controllers
 {
@@ -137,5 +138,78 @@ namespace CV_siten.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        // --- VISA PROFIL ---
+        public async Task<IActionResult> Profile(int? id)
+        {
+            // 1. Bestäm vilket ID som ska visas. 
+            // Om id saknas i URL:en, kolla om det finns en inloggad användare i sessionen.
+            int? targetUserId = id ?? HttpContext.Session.GetInt32("AnvandareId");
+
+            if (targetUserId == null)
+            {
+                // Om inget ID skickats med och ingen är inloggad, skicka till Login
+                return RedirectToAction("Login");
+            }
+
+            // 2. Hämta personen från databasen. 
+            // Vi använder .Include för att även hämta kopplingen till projekt 
+            // och sedan .ThenInclude för att hämta själva projekt-datan.
+            var person = await _context.Persons
+                .Include(p => p.PersonProjekt)
+                    .ThenInclude(pp => pp.Projekt)
+                .FirstOrDefaultAsync(p => p.Id == targetUserId);
+
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            // 3. Skicka person-objektet till vyn
+            return View(person);
+        }
+
+        // Lägg till i AccountController.cs
+        public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
+        {
+            // 1. Identifiera vilken person som ska visas
+            int? targetUserId = id ?? HttpContext.Session.GetInt32("AnvandareId");
+            if (targetUserId == null) return RedirectToAction("Login");
+
+            // 2. Hämta personen och dess projekt från databasen
+            var person = await _context.Persons
+                .Include(p => p.PersonProjekt)
+                    .ThenInclude(pp => pp.Projekt)
+                .FirstOrDefaultAsync(p => p.Id == targetUserId);
+
+            if (person == null) return NotFound();
+
+            // 3. Logik för sökning i projektlistan
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                // Vi filtrerar listan i minnet (eftersom vi redan hämtat personen)
+                person.PersonProjekt = person.PersonProjekt
+                    .Where(pp => pp.Projekt.Projektnamn.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // 4. Logik för sortering
+            person.PersonProjekt = sortBy switch
+            {
+                "status" => person.PersonProjekt.OrderBy(pp => pp.Projekt.Status).ToList(),
+                "tid" => person.PersonProjekt.OrderByDescending(pp => pp.Projekt.Startdatum).ToList(),
+                _ => person.PersonProjekt.OrderBy(pp => pp.Projekt.Projektnamn).ToList()
+            };
+
+            // Skicka med söksträngen tillbaka till vyn så den syns i sökfältet
+            ViewBag.CurrentSearch = searchString;
+
+            return View(person);
+        }
+
+
+
+
     }
 }
