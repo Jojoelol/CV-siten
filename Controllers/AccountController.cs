@@ -54,6 +54,7 @@ namespace CV_siten.Controllers
                     Yrkestitel = model.Yrkestitel,
                     Beskrivning = model.Beskrivning ?? "", // Fixar förra felet
                     BildUrl = "", // LÄGG TILL DENNA RAD för att fixa nuvarande fel
+                    CvUrl = "",
                     AktivtKonto = true,
                     IdentityUserId = user.Id
                 };

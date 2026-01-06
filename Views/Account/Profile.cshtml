@@ -22,13 +22,40 @@
             </div>
 
             <div class="sidebar-actions">
-                <a href="#" class="btn-action btn-primary">Ladda upp mitt CV</a>
+                @if (string.IsNullOrEmpty(Model.CvUrl))
+                {
+                    <form id="cvUploadForm" asp-controller="Project" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
+                        <input type="hidden" name="personId" value="@Model.Id" />
+                        <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
+                    </form>
+
+                    <button type="button" class="btn-action btn-primary" onclick="document.getElementById('cvFileInput').click();" style="width: 100%; border: none; cursor: pointer;">
+                        Ladda upp mitt CV
+                    </button>
+                }
+                else
+                {
+                    @* Här ligger knapparna nu bredvid varandra *@
+                    <div style="display: flex; gap: 10px; align-items: stretch;">
+
+                        <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary" style="text-decoration: none; flex: 1; display: flex; align-items: center; justify-content: center; text-align: center;">
+                            Visa mitt CV
+                        </a>
+
+                        <form asp-controller="Project" asp-action="DeleteCv" method="post" onsubmit="return confirm('Är du säker på att du vill ta bort ditt CV?');" style="flex: 1;">
+                            <input type="hidden" name="personId" value="@Model.Id" />
+                            <button type="submit" class="btn-action" style="background-color: #e74c3c; color: white; border: none; width: 100%; height: 100%; cursor: pointer;">
+                                Ta bort CV
+                            </button>
+                        </form>
+
+                    </div>
+                }
             </div>
         </div>
     </aside>
 
     <section class="profile-main-content">
-
         <form asp-action="Profile" method="get" class="content-toolbar">
             <input type="hidden" name="id" value="@Model.Id" />
 
@@ -59,9 +86,12 @@
                 <div class="projects-list">
                     @foreach (var pp in Model.PersonProjekt)
                     {
-                        <div class="project-pill">
+                        @* Vi gör hela pillen till en länk *@
+                        <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Projekt.Id"
+                           class="project-pill"
+                           style="text-decoration: none; color: inherit; display: inline-block; cursor: pointer; transition: background-color 0.2s;">
                             @pp.Projekt.Projektnamn
-                        </div>
+                        </a>
                     }
                 </div>
             }
