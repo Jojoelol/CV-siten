@@ -29,16 +29,12 @@
                 <div class="logged-in-info">
                     <span class="logged-in-text">Inloggad som: @User.Identity.Name</span>
 
-                    <form class="login" asp-controller="Account" asp-action="Edit" method="get">
+                    <form class="login" asp-controller="Account" asp-action="Profile" method="get">
                         <button type="submit">Min profil</button>
                     </form>
 
                     <form class="login" asp-controller="Message" asp-action="Message" method="get">
                         <button type="submit">Meddelanden</button>
-                    </form>
-
-                    <form class="login" asp-controller="Account" asp-action="Edit" method="get">
-                        <button type="submit">Redigera profil</button>
                     </form>
 
                     <form class="login" asp-controller="Account" asp-action="Logout" method="post">
