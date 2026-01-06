@@ -120,9 +120,10 @@ namespace CV_siten.Controllers
 
             var result = await _signInManager.PasswordSignInAsync(
                 model.Email,
-                model.Losenord,
-                false,
-                false);
+                model.Losenord, 
+                isPersistent: false, // <-- DEN HÄR ÄR AVGÖRANDE
+                lockoutOnFailure: false
+                );
 
             if (result.Succeeded)
                 return RedirectToAction("Index", "Home");
