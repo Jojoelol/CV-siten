@@ -58,7 +58,7 @@ namespace CV_siten.Data
                 Slutdatum = DateTimeOffset.Now.AddMonths(1),
                 Typ = "Webbutveckling",
                 Status = "Pågående",
-                Fil = "exempel.pdf" // Det nya fältet
+                //Fil = "exempel.pdf" // Det nya fältet
             });
         }
     }
