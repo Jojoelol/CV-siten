@@ -30,7 +30,23 @@
         {
             @foreach (var pers in personer)
             {
-                <button class="searchedResult">@pers.Fornamn @pers.Efternamn (@pers.Yrkestitel)</button>
+
+            <button class="profile-container">
+                <div class="imgBox">
+                    <img src="~/images/@(string.IsNullOrEmpty(pers.BildUrl) ? "defaultPicture.jpg" : pers.BildUrl)"
+                         alt="Profilbild" class="profilePicture" />
+                </div>
+
+                <div class="nameDescBox">
+                    <h3 class="searchedName">@pers.Fornamn @pers.Efternamn</h3>
+                    <p class="jobTitle">(@pers.Yrkestitel)</p>
+                </div>
+
+                <div class="descriptionBox">
+                    <p class="description">@pers.Beskrivning</p>
+                </div>
+            </button>
+                
             }
         }
         else
