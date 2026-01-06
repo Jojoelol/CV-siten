@@ -1,4 +1,4 @@
-﻿namespace CV_siten.Models
+﻿namespace CV_siten.Models.ViewModels.Account
 {
     public class LoginViewModel
     {

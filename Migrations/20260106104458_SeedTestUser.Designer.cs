@@ -4,6 +4,7 @@ using CV_siten.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260106104458_SeedTestUser")]
+    partial class SeedTestUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,15 +94,15 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5fd5baa1-318c-425f-bd1e-adf7f9d1b66b",
+                            ConcurrencyStamp = "381d47db-9b30-4b11-ac27-0620c105f749",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKI7xmOvLGH2mYVgwH/R/WxoWV4NeLJnatD/Nmo7J/YxTRFM6L0z7FXgoqS45URruA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPkckbddLBBI+Xd8YJaxA0s6Rjlol1Ohf02FGKXMZmiSp+Ek36jtCNCAwl/2CO6PRg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "04f2c671-3f29-4ea5-ae83-df9a0963a886",
+                            SecurityStamp = "2fb71647-5991-4a3e-a62b-c87f6176bfef",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
