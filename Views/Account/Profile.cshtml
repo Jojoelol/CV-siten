@@ -22,7 +22,7 @@
             </div>
 
             <div class="sidebar-actions">
-                <a href="#" class="btn-action btn-primary">Ladda ned @Model.Fornamn's CV</a>
+                <a href="#" class="btn-action btn-primary">Ladda upp mitt CV</a>
             </div>
         </div>
     </aside>
@@ -46,7 +46,9 @@
             </div>
 
             <button type="submit" class="btn-action btn-primary">Sök</button>
-            <button type="button" class="btn-action btn-outline">Lägg till projekt</button>
+            <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline" style="text-decoration: none; display: inline-block; text-align: center;">
+                Lägg till projekt
+            </a>
         </form>
 
         <div class="projects-container">

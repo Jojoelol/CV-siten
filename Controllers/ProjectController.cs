@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CV_siten.Controllers
 {
-    public class ProjektController : Controller
+    public class ProjectController : Controller
     {
         private readonly ApplicationDbContext _context;
 
-        public ProjektController(ApplicationDbContext context)
+        public ProjectController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -35,6 +35,13 @@ namespace CV_siten.Controllers
             }
 
             return View(projekt);
+        }
+
+        [HttpGet]
+        public IActionResult AddProject()
+        {
+            // Detta öppnar filen Views/Projekt/AddProject.cshtml
+            return View();
         }
     }
 }
