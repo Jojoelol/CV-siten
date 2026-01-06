@@ -52,9 +52,10 @@ namespace CV_siten.Controllers
                     Fornamn = model.Fornamn,
                     Efternamn = model.Efternamn,
                     Yrkestitel = model.Yrkestitel,
-                    Beskrivning = model.Beskrivning ?? "", // Fixar förra felet
-                    BildUrl = "", // LÄGG TILL DENNA RAD för att fixa nuvarande fel
+                    Beskrivning = model.Beskrivning ?? "", 
+                    BildUrl = "", 
                     AktivtKonto = true,
+                    Telefonnummer = model.Telefonnummer,
                     IdentityUserId = user.Id
                 };
 
