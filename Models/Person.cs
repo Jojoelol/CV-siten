@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public string Fornamn { get; set; }
         public string Efternamn { get; set; }
-        public int Telefonnummer { get; set; }
+        public string Telefonnummer { get; set; }
         public string BildUrl { get; set; }
         public string Beskrivning { get; set; }
         public string Yrkestitel { get; set; }
