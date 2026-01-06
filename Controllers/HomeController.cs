@@ -1,4 +1,6 @@
 using CV_siten.Data;
+using CV_siten.Data.Data;
+using CV_siten.Data.Models;
 using CV_siten.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

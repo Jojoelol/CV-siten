@@ -1,6 +1,7 @@
-﻿using CV_siten.Data;
-using CV_siten.Models;
-using CV_siten.Models.ViewModels;
+﻿using CV_siten.Data.Data;   // Peikar på ApplicationDbContext
+using CV_siten.Data.Models; // Peikar på Message, Person och ApplicationUser
+using CV_siten.Data.Models.ViewModels;
+using CV_siten.Models.ViewModels; // Innehåller SendMessage (och ev. din omdöpta MessageViewModel)
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace CV_siten.Controllers
         {
             var me = await GetMyPersonAsync();
 
-            var messages = await _db.Messages
+            var messages = await _db.Set<Message>() // FIX: Use Set<Message>() instead of _db.Messages
                 .Where(m => m.MottagareId == me.Id)
                 .Include(m => m.Avsandare)
                 .OrderByDescending(m => m.Tidsstampel)
@@ -83,7 +84,7 @@ namespace CV_siten.Controllers
                 ArLast = false
             };
 
-            _db.Messages.Add(entity);
+            _db.Set<Message>().Add(entity);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Inbox));
@@ -94,7 +95,7 @@ namespace CV_siten.Controllers
         {
             var me = await GetMyPersonAsync();
 
-            var msg = await _db.Messages.FirstOrDefaultAsync(m => m.Id == id && m.MottagareId == me.Id);
+            var msg = await _db.Set<Message>().FirstOrDefaultAsync(m => m.Id == id && m.MottagareId == me.Id);
             if (msg == null) return NotFound();
 
             msg.ArLast = true;

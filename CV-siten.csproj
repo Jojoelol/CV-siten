@@ -7,7 +7,9 @@
     <RootNamespace>CV_siten</RootNamespace>
   </PropertyGroup>
 
+
   <ItemGroup>
+	  <ProjectReference Include="..\CV_siten.Data\CV_siten.Data.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.22" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />

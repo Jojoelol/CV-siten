@@ -1,4 +1,5 @@
 ﻿using CV_siten.Data;
+using CV_siten.Data.Data;
 using CV_siten.Data.Models;
 using CV_siten.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;

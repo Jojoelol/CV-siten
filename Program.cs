@@ -1,7 +1,7 @@
 // 1. UPPDATERADE USING-DIREKTIV
 // Du behöver nu peka på de nya namespacen i ditt .Data-projekt.
 // (Justera dessa om du valde andra namn på dina namespaces)
-using Cv_siten.Data.Data;   // För ApplicationDbContext
+using CV_siten.Data.Data;   // För ApplicationDbContext
 using CV_siten.Data.Models; // För ApplicationUser och andra modeller
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
