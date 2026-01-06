@@ -4,6 +4,7 @@ using CV_siten.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CV_siten.Controllers
 {
@@ -141,5 +142,59 @@ namespace CV_siten.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+
+
+        // --- VISA PROFIL ---
+
+        [Authorize]
+        public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
+        {
+            Person person;
+
+            // 1. Hämta rätt person (antingen via ID i URL eller inloggad användare)
+            if (id.HasValue)
+            {
+                person = await _context.Persons
+                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+            }
+            else
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return RedirectToAction("Login");
+
+                person = await _context.Persons
+                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
+                    .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+            }
+
+            if (person == null) return NotFound();
+
+            // 2. Logik för sökning (filtrering av projektlistan)
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                person.PersonProjekt = person.PersonProjekt
+                    .Where(pp => pp.Projekt.Projektnamn.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // 3. Logik för sortering
+            person.PersonProjekt = sortBy switch
+            {
+                "status" => person.PersonProjekt.OrderBy(pp => pp.Projekt.Status).ToList(),
+                "tid" => person.PersonProjekt.OrderByDescending(pp => pp.Projekt.Startdatum).ToList(),
+                _ => person.PersonProjekt.OrderBy(pp => pp.Projekt.Projektnamn).ToList()
+            };
+
+            // Skicka med söksträngen så den stannar kvar i sökfältet efter omladdning
+            ViewBag.CurrentSearch = searchString;
+
+            // Denna rad tvingar programmet att hitta vyn i rätt mapp
+            return View("~/Views/Account/Profile.cshtml", person);
+        }
+
+
+
+
     }
 }
