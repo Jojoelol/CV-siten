@@ -6,36 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CV_siten.Migrations
 {
     /// <inheritdoc />
-    public partial class SeedTestUser : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Projekt",
-                keyColumn: "Id",
-                keyValue: 1);
-
-            migrationBuilder.DropColumn(
-                name: "Email",
-                table: "Persons");
-
-            migrationBuilder.DropColumn(
-                name: "Losenord",
-                table: "Persons");
-
-            migrationBuilder.RenameColumn(
-                name: "Aktivtkonto",
-                table: "Persons",
-                newName: "AktivtKonto");
-
-            migrationBuilder.AddColumn<string>(
-                name: "IdentityUserId",
-                table: "Persons",
-                type: "nvarchar(450)",
-                nullable: false,
-                defaultValue: "");
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -73,6 +48,53 @@ namespace CV_siten.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CVer",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Filnamn = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CVer", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Meddelanden",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Innehall = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tidsstampel = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ArLast = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Meddelanden", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Projekt",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Projektnamn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Beskrivning = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Startdatum = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    Slutdatum = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    Typ = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fil = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projekt", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -181,22 +203,66 @@ namespace CV_siten.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Persons",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Fornamn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Efternamn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Telefonnummer = table.Column<int>(type: "int", nullable: false),
+                    BildUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Beskrivning = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Yrkestitel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AktivtKonto = table.Column<bool>(type: "bit", nullable: false),
+                    IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Persons", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Persons_AspNetUsers_IdentityUserId",
+                        column: x => x.IdentityUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PersonProjekt",
+                columns: table => new
+                {
+                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    ProjektId = table.Column<int>(type: "int", nullable: false),
+                    Roll = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PersonProjekt", x => new { x.PersonId, x.ProjektId });
+                    table.ForeignKey(
+                        name: "FK_PersonProjekt_Persons_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Persons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PersonProjekt_Projekt_ProjektId",
+                        column: x => x.ProjektId,
+                        principalTable: "Projekt",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "381d47db-9b30-4b11-ac27-0620c105f749", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEPkckbddLBBI+Xd8YJaxA0s6Rjlol1Ohf02FGKXMZmiSp+Ek36jtCNCAwl/2CO6PRg==", null, false, "2fb71647-5991-4a3e-a62b-c87f6176bfef", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "4d7dfc89-ec98-454d-b145-5c76c5a49789", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEOUxY+9VOr+PhkOQi6WustdeglJXmj1yziEETYMxFY2pX0Kgjrk5Yu8iSDXHTeVWLQ==", null, false, "7d16287c-a6d0-4f79-9a23-de085d2654ab", false, "test@test.se" });
 
-            migrationBuilder.UpdateData(
+            migrationBuilder.InsertData(
                 table: "Persons",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "Fornamn", "IdentityUserId" },
-                values: new object[] { "Joel", "test-user-1" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Persons_IdentityUserId",
-                table: "Persons",
-                column: "IdentityUserId");
+                columns: new[] { "Id", "AktivtKonto", "Beskrivning", "BildUrl", "Efternamn", "Fornamn", "IdentityUserId", "Telefonnummer", "Yrkestitel" },
+                values: new object[] { 1, true, "Detta är en testprofil skapad via kod.", "", "Test", "Joel", "test-user-1", 701234567, "Systemutvecklare" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -237,22 +303,20 @@ namespace CV_siten.Migrations
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Persons_AspNetUsers_IdentityUserId",
+            migrationBuilder.CreateIndex(
+                name: "IX_PersonProjekt_ProjektId",
+                table: "PersonProjekt",
+                column: "ProjektId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Persons_IdentityUserId",
                 table: "Persons",
-                column: "IdentityUserId",
-                principalTable: "AspNetUsers",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                column: "IdentityUserId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Persons_AspNetUsers_IdentityUserId",
-                table: "Persons");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -269,49 +333,25 @@ namespace CV_siten.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "CVer");
+
+            migrationBuilder.DropTable(
+                name: "Meddelanden");
+
+            migrationBuilder.DropTable(
+                name: "PersonProjekt");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Persons");
+
+            migrationBuilder.DropTable(
+                name: "Projekt");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Persons_IdentityUserId",
-                table: "Persons");
-
-            migrationBuilder.DropColumn(
-                name: "IdentityUserId",
-                table: "Persons");
-
-            migrationBuilder.RenameColumn(
-                name: "AktivtKonto",
-                table: "Persons",
-                newName: "Aktivtkonto");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Email",
-                table: "Persons",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Losenord",
-                table: "Persons",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.UpdateData(
-                table: "Persons",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "Email", "Fornamn", "Losenord" },
-                values: new object[] { "test@test.se", "Oscar", "123" });
-
-            migrationBuilder.InsertData(
-                table: "Projekt",
-                columns: new[] { "Id", "Beskrivning", "Fil", "Projektnamn", "Slutdatum", "Startdatum", "Status", "Typ" },
-                values: new object[] { 1, "Ett system byggt i .NET 8 med SQL Server.", "exempel.pdf", "Globalt CV-System", new DateTimeOffset(new DateTime(2026, 2, 5, 12, 48, 29, 860, DateTimeKind.Unspecified).AddTicks(4001), new TimeSpan(0, 1, 0, 0, 0)), new DateTimeOffset(new DateTime(2026, 1, 5, 12, 48, 29, 860, DateTimeKind.Unspecified).AddTicks(3916), new TimeSpan(0, 1, 0, 0, 0)), "Pågående", "Webbutveckling" });
         }
     }
 }

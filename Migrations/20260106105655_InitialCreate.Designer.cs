@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260106105017_FixPersonSeed")]
-    partial class FixPersonSeed
+    [Migration("20260106105655_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,15 +94,15 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "5fd5baa1-318c-425f-bd1e-adf7f9d1b66b",
+                            ConcurrencyStamp = "4d7dfc89-ec98-454d-b145-5c76c5a49789",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKI7xmOvLGH2mYVgwH/R/WxoWV4NeLJnatD/Nmo7J/YxTRFM6L0z7FXgoqS45URruA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOUxY+9VOr+PhkOQi6WustdeglJXmj1yziEETYMxFY2pX0Kgjrk5Yu8iSDXHTeVWLQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "04f2c671-3f29-4ea5-ae83-df9a0963a886",
+                            SecurityStamp = "7d16287c-a6d0-4f79-9a23-de085d2654ab",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260106104458_SeedTestUser")]
+    [Migration("20260106105918_SeedTestUser")]
     partial class SeedTestUser
     {
         /// <inheritdoc />
@@ -94,15 +94,15 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "381d47db-9b30-4b11-ac27-0620c105f749",
+                            ConcurrencyStamp = "c326557f-10cc-425d-bd82-5160d6ebe9c9",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPkckbddLBBI+Xd8YJaxA0s6Rjlol1Ohf02FGKXMZmiSp+Ek36jtCNCAwl/2CO6PRg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFt9hDcB8ikP7LMEqgXaJwWN/OftWIk7c4XJrQG2xb1vK2039Eaw1m7dEq/CD5+msQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2fb71647-5991-4a3e-a62b-c87f6176bfef",
+                            SecurityStamp = "62214848-1922-4eef-97fc-9c2937e44c55",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });

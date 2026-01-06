@@ -24,20 +24,10 @@
                 <button type="submit">Sök</button>
             </form>
 
-            @* Här börjar logiken för inloggad/utloggad *@
-            @{
-                var anvandareId = HttpContextAccessor.HttpContext?.Session.GetInt32("AnvandareId");
-                var anvandareNamn = HttpContextAccessor.HttpContext?.Session.GetString("AnvandareNamn");
-            }
-
-
-
-            @if (anvandareId != null)
+            @if (User.Identity.IsAuthenticated)
             {
                 <div class="logged-in-info">
-                    <span class="logged-in-text">Inloggad som: @anvandareNamn</span>
-
-                    @* Redigera profil-knapp med samma styling som logga in *@
+                    <span class="logged-in-text">Inloggad som: @User.Identity.Name</span>
 
                     <form class="login" asp-controller="Account" asp-action="Edit" method="get">
                         <button type="submit">Min profil</button>
@@ -50,17 +40,15 @@
                     <form class="login" asp-controller="Account" asp-action="Logout" method="post">
                         <button type="submit">Logga ut</button>
                     </form>
-
-
                 </div>
             }
             else
             {
-                @* Ursprunglig logga in-knapp *@
                 <form class="login" asp-controller="Account" asp-action="Login" method="get">
                     <button type="submit">Logga in</button>
                 </form>
             }
+
         </div>
     </header>
 
