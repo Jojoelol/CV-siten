@@ -25,13 +25,13 @@ namespace CV_siten.Controllers
 
         //REGISTRERING
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult CreateAccount()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel model)
+        public async Task<IActionResult> CreateAccount(CreateAccountViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -48,9 +48,12 @@ namespace CV_siten.Controllers
             {
                 var person = new Person
                 {
-                    Fornamn = "",
-                    Efternamn = "",
-                    AktivtKonto  = true,
+                    Fornamn = model.Fornamn,
+                    Efternamn = model.Efternamn,
+                    Yrkestitel = model.Yrkestitel,
+                    Beskrivning = model.Beskrivning ?? "", // Fixar förra felet
+                    BildUrl = "", // LÄGG TILL DENNA RAD för att fixa nuvarande fel
+                    AktivtKonto = true,
                     IdentityUserId = user.Id
                 };
 
@@ -121,7 +124,7 @@ namespace CV_siten.Controllers
             var result = await _signInManager.PasswordSignInAsync(
                 model.Email,
                 model.Losenord, 
-                isPersistent: false, // <-- DEN HÄR ÄR AVGÖRANDE
+                isPersistent: false, 
                 lockoutOnFailure: false
                 );
 
