@@ -210,7 +210,7 @@ body {
 }
 
 /* Knappar */
-/*.btn-action {
+.btn-action {
     padding: 10px 20px;
     border-radius: 4px;
     font-weight: 600;
@@ -220,7 +220,7 @@ body {
     transition: 0.3s;
     font-size: 0.9rem;
     text-align: center;
-}*/
+}
 
 .btn-primary {
     background-color: #3498db;
