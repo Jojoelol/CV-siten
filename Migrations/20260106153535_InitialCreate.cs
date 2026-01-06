@@ -64,21 +64,6 @@ namespace CV_siten.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Meddelanden",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Innehall = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Tidsstampel = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    ArLast = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Meddelanden", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Projekt",
                 columns: table => new
                 {
@@ -87,10 +72,9 @@ namespace CV_siten.Migrations
                     Projektnamn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Beskrivning = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Startdatum = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Slutdatum = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    Slutdatum = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     Typ = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Fil = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -211,11 +195,12 @@ namespace CV_siten.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Fornamn = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Efternamn = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Telefonnummer = table.Column<int>(type: "int", nullable: false),
-                    BildUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Beskrivning = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Yrkestitel = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Telefonnummer = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BildUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Beskrivning = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Yrkestitel = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AktivtKonto = table.Column<bool>(type: "bit", nullable: false),
+                    CvUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -225,6 +210,29 @@ namespace CV_siten.Migrations
                         name: "FK_Persons_AspNetUsers_IdentityUserId",
                         column: x => x.IdentityUserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Meddelanden",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Innehall = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tidsstampel = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ArLast = table.Column<bool>(type: "bit", nullable: false),
+                    AvsandareNamn = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MottagareId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Meddelanden", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Meddelanden_Persons_MottagareId",
+                        column: x => x.MottagareId,
+                        principalTable: "Persons",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -257,12 +265,12 @@ namespace CV_siten.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "4d7dfc89-ec98-454d-b145-5c76c5a49789", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEOUxY+9VOr+PhkOQi6WustdeglJXmj1yziEETYMxFY2pX0Kgjrk5Yu8iSDXHTeVWLQ==", null, false, "7d16287c-a6d0-4f79-9a23-de085d2654ab", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "ec478fe8-5a79-4816-9faf-d6aa6118e163", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEL5NJXAtBufgI75K1OUv8M7fNB7rq2yv5lscNS2u9jGaoOhaSghxSOtGXsyKz7ptIg==", null, false, "3d559754-b6a0-4c01-997f-b9e12608d38c", false, "test@test.se" });
 
             migrationBuilder.InsertData(
                 table: "Persons",
-                columns: new[] { "Id", "AktivtKonto", "Beskrivning", "BildUrl", "Efternamn", "Fornamn", "IdentityUserId", "Telefonnummer", "Yrkestitel" },
-                values: new object[] { 1, true, "Detta är en testprofil skapad via kod.", "", "Test", "Joel", "test-user-1", 701234567, "Systemutvecklare" });
+                columns: new[] { "Id", "AktivtKonto", "Beskrivning", "BildUrl", "CvUrl", "Efternamn", "Fornamn", "IdentityUserId", "Telefonnummer", "Yrkestitel" },
+                values: new object[] { 1, true, "Detta är en testprofil skapad via kod.", "", null, "Test", "Joel", "test-user-1", "0701234567", "Systemutvecklare" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -302,6 +310,11 @@ namespace CV_siten.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Meddelanden_MottagareId",
+                table: "Meddelanden",
+                column: "MottagareId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PersonProjekt_ProjektId",

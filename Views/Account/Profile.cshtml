@@ -1,0 +1,101 @@
+﻿@model CV_siten.Models.Person
+
+<div class="profile-page-wrapper">
+    <aside class="profile-sidebar">
+        <div class="sidebar-card">
+            <div class="pic-placeholder">
+                @if (!string.IsNullOrEmpty(Model.BildUrl))
+                {
+                    <img src="@Model.BildUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+                }
+                else
+                {
+                    <span style="color: #2c3e50;">Profilbild</span>
+                }
+            </div>
+
+            <div class="profile-info-text">
+                <h2 class="profile-name">@Model.Fornamn @Model.Efternamn</h2>
+                <p class="profile-title">@Model.Yrkestitel</p>
+                <div class="profile-bio">
+                    <p>@(string.IsNullOrEmpty(Model.Beskrivning) ? "Ingen beskrivning tillgänglig." : Model.Beskrivning)</p>
+                </div>
+            </div>
+
+            <div class="sidebar-actions-container">
+                @if (string.IsNullOrEmpty(Model.CvUrl))
+                {
+                    <form id="cvUploadForm" asp-controller="Project" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
+                        <input type="hidden" name="personId" value="@Model.Id" />
+                        <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
+                    </form>
+
+                    <button type="button" class="btn-action btn-primary" onclick="document.getElementById('cvFileInput').click();">
+                        Ladda upp mitt CV
+                    </button>
+                }
+                else
+                {
+                    <div class="cv-button-row">
+                        <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary">Visa CV</a>
+
+                        <form asp-controller="Project" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');">
+                            <input type="hidden" name="personId" value="@Model.Id" />
+                            <button type="submit" class="btn-action btn-danger">Ta bort</button>
+                        </form>
+                    </div>
+                }
+
+                <a asp-controller="Account" asp-action="EditAccount" class="btn-action btn-secondary-outline">
+                    Redigera profil
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <section class="profile-main-content">
+        <form asp-action="Profile" method="get" class="content-toolbar">
+            <input type="hidden" name="id" value="@Model.Id" />
+
+            <div class="search-box">
+                <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
+                       placeholder="Sök efter projekt..." class="form-control-custom">
+            </div>
+
+            <div class="sort-box">
+                <select name="sortBy" class="form-select-custom" onchange="this.form.submit()">
+                    <option value="">Sortera efter...</option>
+                    <option value="status">Status</option>
+                    <option value="tid">Tid</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn-action btn-primary">Sök</button>
+
+            <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline" style="text-decoration:none;">
+                Lägg till projekt
+            </a>
+        </form>
+
+        <div class="projects-container">
+            <h3 class="section-title">Mina Projekt</h3>
+
+            @if (Model.PersonProjekt != null && Model.PersonProjekt.Any())
+            {
+                <div class="projects-list">
+                    @foreach (var pp in Model.PersonProjekt)
+                    {
+                        <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Projekt.Id"
+                           class="project-pill" style="text-decoration:none; color:inherit;">
+                            @pp.Projekt.Projektnamn
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <p style="color: #7f8c8d; font-style: italic;">Inga projekt hittades för denna profil.</p>
+            }
+        </div>
+    </section>
+</div>

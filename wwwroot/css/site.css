@@ -5,7 +5,7 @@ html, body {
     height: 100%;
     width: 100%;
     /* Bakgrunden utanför huvudcontainern görs ljust grå för djup */
-    background-color: #f4f7f6; 
+    background-color: #f4f7f6;
 }
 
 body {
@@ -20,7 +20,7 @@ body {
 
 .background {
     /* Ändrad från stark grön till en professionell mörkblå/stålgrå */
-    background-color: #2c3e50; 
+    background-color: #2c3e50;
     padding: 60px 10%;
     width: 100%;
     min-height: 100%;
@@ -31,7 +31,7 @@ body {
     /* Ändrad från gul till vit för en ren "papperskänsla" på CV:t */
     background-color: #ffffff;
     /* Mjukare kantfärg än ren svart */
-    border: 1px solid #dee2e6; 
+    border: 1px solid #dee2e6;
     padding: 30px;
     margin: 0 auto 40px auto;
     border-radius: 8px;
@@ -96,27 +96,345 @@ body {
 /* Projekt-listan [cite: 84] */
 .projects-list {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     flex-wrap: wrap;
     gap: 15px;
 }
 
 .project-pill {
     border-radius: 12px;
-    width: 180px; 
+    width: 180px;
     height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
     /* Primär blå färg för projektkort */
-    background: #3498db; 
+    background: #3498db;
     border: none;
     color: white;
     font-weight: 500;
     transition: transform 0.2s; /* Liten interaktionseffekt */
 }
 
-.project-pill:hover {
-    transform: translateY(-5px); /* Lyfter vid hover för bättre UX */
-    background: #2980b9;
+    .project-pill:hover {
+        transform: translateY(-5px); /* Lyfter vid hover för bättre UX */
+        background: #2980b9;
+    }
+
+
+
+/* MIN PROFIL*/
+
+/* Container för hela profilsidan */
+/* Lägg till i site.css om de inte redan är där */
+.profile-page-wrapper {
+    display: flex;
+    height: calc(100vh - 80px); /* Justera efter din headers höjd */
+    overflow: hidden;
 }
+
+.profile-sidebar {
+    flex: 0 0 350px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+.profile-main-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto; /* Detta gör att endast högersidan scrollar */
+    background-color: #f4f7f6;
+}
+
+.sidebar-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.profile-name {
+    margin-top: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.profile-title {
+    color: #3498db;
+    margin-bottom: 20px;
+}
+
+/* Höger del: Scrollbar */
+/*.profile-main-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: scroll;*/ /* Gör denna del scrollbar */
+/*background-color: #f4f7f6;*/
+}
+
+/* Verktygsfältet */
+.content-toolbar {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.form-control-custom, .form-select-custom {
+    padding: 8px 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    outline: none;
+}
+
+.search-box {
+    flex: 2;
+}
+
+.sort-box {
+    flex: 1;
+}
+
+.search-box input {
+    width: 100%;
+}
+
+.sort-box select {
+    width: 100%;
+}
+
+/* Knappar */
+.btn-action {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 2px solid #3498db;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white !important;
+}
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+
+.btn-outline {
+    background-color: transparent;
+    color: #3498db !important;
+}
+
+    .btn-outline:hover {
+        background-color: #3498db;
+        color: white !important;
+    }
+
+.section-title {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #3498db;
+    display: inline-block;
+}
+
+/* Unik huvudcontainer för att undvika krockar */
+.sr-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 40px auto 15px auto; /* Centrerar knappen horisontellt */
+    background-color: #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 800px;
+    height: 350px;
+    text-align: left;
+    font-family: "Lucida Console", "Courier New", monospace;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    text-decoration: none;
+    color: #333;
+}
+    .sr-profile-card:hover {
+        transform: scale(1.02);
+        text-decoration: none;
+        color: #333;
+    }
+
+
+    .sr-results-list {
+        display: flex; /* Aktiverar flexbox */
+        flex-direction: row; /* Lägger elementen horisontellt (standard) */
+        flex-wrap: wrap; /* Gör att de hoppar ner på ny rad om de inte får plats */
+        justify-content: center; /* Centrerar hela raden av knappar på sidan */
+        gap: 20px; /* Skapar mellanrum mellan knapparna */
+        padding: 20px;
+        width: 100%;
+    }
+
+    .sr-profile-card:hover {
+        transform: scale(1.02);
+        text-decoration: none;
+        color: #333;
+    }
+
+.sr-results-list {
+    display: flex; /* Aktiverar flexbox */
+    flex-direction: row; /* Lägger elementen horisontellt (standard) */
+    flex-wrap: wrap; /* Gör att de hoppar ner på ny rad om de inte får plats */
+    justify-content: center; /* Centrerar hela raden av knappar på sidan */
+    gap: 20px; /* Skapar mellanrum mellan knapparna */
+    padding: 20px;
+    width: 100%;
+}
+
+
+/* Unik bildbox */
+.sr-img-wrapper {
+    flex: 0 0 15rem;
+    height: 320px;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.sr-profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Unik namnbox (Gula rutan) */
+.sr-identity-box {
+    flex: 0 0 250px;
+    background-color: #fffde7;
+    border: 2px solid #fbc02d;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.sr-full-name {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.sr-job-title {
+    margin: 5px 0 0 0;
+    font-size: 1rem;
+}
+
+/* Unik beskrivningsbox (Höger) */
+.sr-bio-container {
+    flex: 1;
+    background-color: #f5f5f5;
+    border-left: 5px solid #fbc02d;
+    padding: 15px;
+    height: 320px;
+    display: flex;
+    align-items: center;
+    border-radius: 0 8px 8px 0;
+}
+
+.sr-bio-text {
+    margin: 0;
+    line-height: 1.6; /* Förbättrar läsbarhet [cite: 58] */
+    text-align: left;
+}
+
+.sr-matchPerson{
+    position:absolute;
+}
+
+.sr-main {
+    background-color: #2c3e50;
+}
+
+.sr-no-results {
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    width: 100%;
+    margin-top: 50px; /* Ger lite avstånd från rubriken */
+
+}
+
+
+.profile-sidebar {
+    flex: 0 0 350px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 40px 25px; / Ökad padding för mer luft /
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+
+.sidebar-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+
+.profile-info-text {
+    text-align: center;
+    margin-bottom: 25px; / Skapar avstånd ner till knapparna /
+    width: 100%;
+}
+
+.profile-bio {
+    margin-top: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #ecf0f1;
+    word-wrap: break-word; / Förhindrar att lång text skjuter ut /
+}
+
+
+.sidebar-actions-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; / EXAKT avstånd mellan varje knapprad /
+}
+
+
+.cv-button-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.cv-button-row form {
+    flex: 1;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 15px;
+    min-height: 45px; / Säkerställer att knapparna har en bra storlek
+border-radius: 6px;
+font-weight: 600;
+text-decoration: none !important;
+transition: all 0.2s ease;
+cursor: pointer;
+}
+
+

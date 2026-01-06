@@ -78,7 +78,7 @@ namespace CV_siten.Data
                 Yrkestitel = "Systemutvecklare",
                 Beskrivning = "Detta är en testprofil skapad via kod.",
                 AktivtKonto = true,
-                Telefonnummer = 0701234567,
+                Telefonnummer = "0701234567",
                 BildUrl = "",
                 IdentityUserId = "test-user-1" // Koppling till ApplicationUser
             });

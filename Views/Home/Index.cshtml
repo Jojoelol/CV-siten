@@ -1,38 +1,81 @@
-﻿@{
+﻿@model IEnumerable<CV_siten.Models.Person>
+
+@{
     ViewData["Title"] = "Startsida";
 }
 
-<div class="background">
-    <div class="yellow-box welcome-area">
-        <p>Välkommen till vår CV site...</p>
+<div class="background" style="padding: 20px; min-height: 100vh;">
+    <div class="welcome-area mb-4" style="background-color: white; border-radius: 12px; padding: 30px; border-left: 8px solid #002d5a; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h2 style="color: #002d5a; font-weight: bold;">Välkommen till CV-siten</h2>
+        <p style="color: #444; font-size: 1.1rem; margin-bottom: 0;">Här kan du hitta kompetenta utvecklare och spännande projekt.</p>
     </div>
 
-    <div class="yellow-box profile-area">
-        <div class="profile-grid" asp-controller="Home" asp-action="Profile" method="get">
-            <div class="name-title-pic">
-                <p class="name">@(Model?.Fornamn ?? "Okänd") @(Model?.Efternamn ?? "Användare")</p>
-                <p class="title">Titel</p>
-                <div class="pic-placeholder">Profilbild</div>
-            </div>
+    <div class="project-highlight-area mb-5" style="background-color: #f8f9fa; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h4 style="color: #002d5a; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 20px;">Senaste projektet</h4>
+        @if (ViewBag.SenasteProjekt != null)
+        {
+            <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6;">
+                <h5 style="color: #0056b3; font-weight: bold;">@ViewBag.SenasteProjekt.Projektnamn</h5>
+                <p style="color: #555;">@ViewBag.SenasteProjekt.Beskrivning</p>
+                @* Hitta denna rad i din Index.cshtml *@
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <small class="text-muted">Startade: @ViewBag.SenasteProjekt.Startdatum.ToString("yyyy-MM-dd")</small>
 
-            <div class="white-box desc-box">Kort beskrivning</div>
-
-            <div class="projects-list">
-                @if (ViewBag.SenasteProjekt != null)
-                {
-                    <div class="project-pill">
-                        <strong>Senaste:</strong> @ViewBag.SenasteProjekt.Projektnamn
-                    </div>
-                    @* Här kan du även visa beskrivningen om du vill *@
-                    <div style="font-size: 0.8em; color: gray;">
-                        @ViewBag.SenasteProjekt.Beskrivning
-                    </div>
-                }
-                else
-                {
-                    <div class="project-pill">Inga projekt hittades</div>
-                }
+                    @* ÄNDRA HÄR: asp-action ska vara ProjectDetails och controllern ska vara Project *@
+                    <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@ViewBag.SenasteProjekt.Id" class="btn btn-sm btn-outline-primary">
+                        Läs mer
+                    </a>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <p class="text-center text-muted">Inga projekt registrerade ännu.</p>
+        }
+    </div>
+
+    <h4 class="text-white mb-4" style="font-weight: 300; letter-spacing: 1px;">UTVALDA PROFILER</h4>
+
+    <div class="profile-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px;">
+        @foreach (var person in Model)
+        {
+            <div class="profile-card" style="background-color: #ffffff; border-radius: 15px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: none;">
+                <div style="height: 10px; background-color: #0056b3;"></div> <div class="p-4 text-center">
+                    @if (!string.IsNullOrEmpty(person.BildUrl))
+                    {
+                        <img src="@person.BildUrl" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #f0f2f5; margin-bottom: 15px;" alt="Profil" />
+                    }
+                    else
+                    {
+                        <div style="width: 100px; height: 100px; background: #f0f2f5; border-radius: 50%; margin: 0 auto 15px auto; line-height: 100px; color: #adb5bd; font-size: 2rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    }
+
+                    <h5 style="color: #002d5a; font-weight: bold; margin-bottom: 5px;">@person.Fornamn @person.Efternamn</h5>
+                    <p style="color: #0056b3; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px;">@person.Yrkestitel</p>
+
+                    <div style="background: #f8f9fa; border-radius: 8px; padding: 10px; margin-bottom: 20px; min-height: 60px;">
+                        <p class="text-muted small mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            @(string.IsNullOrEmpty(person.Beskrivning) ? "Ingen beskrivning tillgänglig." : person.Beskrivning)
+                        </p>
+                    </div>
+
+                    <a asp-controller="Account" asp-action="Profile" asp-route-id="@person.Id" class="btn btn-primary w-100" style="background-color: #002d5a; border: none; border-radius: 8px; padding: 10px; font-weight: 500;">Visa profil</a>
+                </div>
+            </div>
+        }
     </div>
 </div>
+
+<style>
+    /* Animationer */
+    .profile-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3) !important;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3 !important;
+    }
+</style>

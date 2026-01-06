@@ -5,8 +5,8 @@
     var personer = ViewBag.personResult as List<CV_siten.Models.Person>;
 
 }
-
-<h2>Sökresultat för "@ViewBag.SearchQuery"</h2>
+<section class="sr-main">
+<h2 class="text-center" style="color:white">Sökresultat för "@ViewBag.SearchQuery"</h2>
 
 @* <div class="row">
     <div class="col-md-6">
@@ -24,18 +24,34 @@
         }
     </div> *@
 
-    <div class="col-md-6">
-        <h3>Matchande Personer</h3>
+    <div class="sr-results-list">
+        <h3 class="sr-matchPerson" style="color:white;">Matchande Personer</h3>
         @if (personer != null && personer.Any())
         {
             @foreach (var pers in personer)
             {
-                <p>@pers.Fornamn @pers.Efternamn (@pers.Yrkestitel)</p>
+
+                <a class="sr-profile-card" asp-controller="Account" asp-action="Profile" asp-route-id="@pers.Id">
+                <div class="sr-img-wrapper">
+                    <img src="~/images/@(string.IsNullOrEmpty(pers.BildUrl) ? "defaultPicture.jpg" : pers.BildUrl)"
+                         alt="Profilbild" class="sr-profile-img" />
+                </div>
+
+                <div class="sr-identity-box">
+                    <h3 class="sr-full-name">@pers.Fornamn @pers.Efternamn</h3>
+                    <p class="sr-job-title">(@pers.Yrkestitel)</p>
+                </div>
+
+                <div class="sr-bio-container">
+                    <p class="sr-bio-text">@pers.Beskrivning</p>
+                </div>
+            </a>
+                
             }
         }
         else
         {
-            <p>Inga personer hittades.</p>
+            <p class ="sr-no-results">Inga personer hittades.</p>
         }
     </div>
-</div>
+</section>
