@@ -51,6 +51,15 @@
 
                     </div>
                 }
+                <a href="#" class="btn-action btn-primary">Ladda ned @Model.Fornamn's CV</a>
+            </div>
+            <div class="sidebar-actions">
+                <a asp-controller="Account"
+                   asp-action="EditAccount"
+                   class="btn-action btn-secondary">
+                    Redigera profilinformation
+                </a>
+
             </div>
         </div>
     </aside>
@@ -73,9 +82,7 @@
             </div>
 
             <button type="submit" class="btn-action btn-primary">Sök</button>
-            <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline" style="text-decoration: none; display: inline-block; text-align: center;">
-                Lägg till projekt
-            </a>
+            <button type="button" class="btn-action btn-outline">Lägg till projekt</button>
         </form>
 
         <div class="projects-container">

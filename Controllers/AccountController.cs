@@ -56,6 +56,7 @@ namespace CV_siten.Controllers
                     BildUrl = "", // LÄGG TILL DENNA RAD för att fixa nuvarande fel
                     CvUrl = "",
                     AktivtKonto = true,
+                    Telefonnummer = model.Telefonnummer,
                     IdentityUserId = user.Id
                 };
 
@@ -194,8 +195,62 @@ namespace CV_siten.Controllers
             return View("~/Views/Account/Profile.cshtml", person);
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> EditAccount()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
 
+            var person = await _context.Persons
+                .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
+            if (person == null) return NotFound();
+
+            var model = new EditAccountViewModel
+            {
+                Fornamn = person.Fornamn,
+                Efternamn = person.Efternamn,
+                Email = user.Email,
+                Telefonnummer = person.Telefonnummer,
+                Yrkestitel = person.Yrkestitel,
+                Beskrivning = person.Beskrivning
+            };
+
+            return View(model);
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> EditAccount(EditAccountViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
+
+            var person = await _context.Persons
+                .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person == null) return NotFound();
+
+            // Uppdatera IdentityUser
+            user.Email = model.Email;
+            user.UserName = model.Email;
+            await _userManager.UpdateAsync(user);
+
+            // Uppdatera Person
+            person.Fornamn = model.Fornamn;
+            person.Efternamn = model.Efternamn;
+            person.Telefonnummer = model.Telefonnummer;
+            person.Yrkestitel = model.Yrkestitel;
+            person.Beskrivning = model.Beskrivning;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Profilinformationen har uppdaterats.";
+            return RedirectToAction("Profile");
+        }
 
     }
 }
