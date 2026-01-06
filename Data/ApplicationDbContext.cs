@@ -1,4 +1,5 @@
 ﻿using CV_siten.Models;
+using CV_siten.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -14,13 +15,25 @@ namespace CV_siten.Data
 
         public DbSet<Projekt> Projekt { get; set; }
         public DbSet<Person> Persons { get; set; }
-        public DbSet<Meddelande> Meddelanden { get; set; }
+        public DbSet<Message> Messages { get; set; } = null!;
         public DbSet<CV> CVer { get; set; }
 
         // Lägg till denna metod här under:
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Avsandare)
+                .WithMany()
+                .HasForeignKey(m => m.AvsandareId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Mottagare)
+                .WithMany()
+                .HasForeignKey(m => m.MottagareId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Konfigurera den nya kopplingstabellen
             modelBuilder.Entity<PersonProjekt>()
