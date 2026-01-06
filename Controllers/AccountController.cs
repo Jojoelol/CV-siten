@@ -124,7 +124,7 @@ namespace CV_siten.Controllers
             var result = await _signInManager.PasswordSignInAsync(
                 model.Email,
                 model.Losenord, 
-                isPersistent: false, // <-- DEN HÄR ÄR AVGÖRANDE
+                isPersistent: false, 
                 lockoutOnFailure: false
                 );
 
