@@ -268,6 +268,22 @@ body {
     text-decoration: none;
     color: #333;
 }
+    .sr-profile-card:hover {
+        transform: scale(1.02);
+        text-decoration: none;
+        color: #333;
+    }
+
+
+    .sr-results-list {
+        display: flex; /* Aktiverar flexbox */
+        flex-direction: row; /* Lägger elementen horisontellt (standard) */
+        flex-wrap: wrap; /* Gör att de hoppar ner på ny rad om de inte får plats */
+        justify-content: center; /* Centrerar hela raden av knappar på sidan */
+        gap: 20px; /* Skapar mellanrum mellan knapparna */
+        padding: 20px;
+        width: 100%;
+    }
 
     .sr-profile-card:hover {
         transform: scale(1.02);
@@ -284,6 +300,7 @@ body {
     padding: 20px;
     width: 100%;
 }
+
 
 /* Unik bildbox */
 .sr-img-wrapper {
@@ -337,8 +354,8 @@ body {
     text-align: left;
 }
 
-.sr-matchPerson {
-    position: absolute;
+.sr-matchPerson{
+    position:absolute;
 }
 
 .sr-main {
@@ -351,4 +368,73 @@ body {
     text-align: center;
     width: 100%;
     margin-top: 50px; /* Ger lite avstånd från rubriken */
+
 }
+
+
+.profile-sidebar {
+    flex: 0 0 350px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 40px 25px; / Ökad padding för mer luft /
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+
+.sidebar-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+
+.profile-info-text {
+    text-align: center;
+    margin-bottom: 25px; / Skapar avstånd ner till knapparna /
+    width: 100%;
+}
+
+.profile-bio {
+    margin-top: 15px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #ecf0f1;
+    word-wrap: break-word; / Förhindrar att lång text skjuter ut /
+}
+
+
+.sidebar-actions-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; / EXAKT avstånd mellan varje knapprad /
+}
+
+
+.cv-button-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.cv-button-row form {
+    flex: 1;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 15px;
+    min-height: 45px; / Säkerställer att knapparna har en bra storlek
+border-radius: 6px;
+font-weight: 600;
+text-decoration: none !important;
+transition: all 0.2s ease;
+cursor: pointer;
+}
+
+
