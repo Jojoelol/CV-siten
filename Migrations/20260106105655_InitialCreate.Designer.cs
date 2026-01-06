@@ -12,7 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
+<<<<<<<< HEAD:Migrations/20260106105655_InitialCreate.Designer.cs
     [Migration("20260106105655_InitialCreate")]
+========
+    [Migration("20260106153535_InitialCreate")]
+>>>>>>>> main:Migrations/20260106153535_InitialCreate.Designer.cs
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,15 +98,25 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
+<<<<<<<< HEAD:Migrations/20260106105655_InitialCreate.Designer.cs
                             ConcurrencyStamp = "4d7dfc89-ec98-454d-b145-5c76c5a49789",
+========
+                            ConcurrencyStamp = "ec478fe8-5a79-4816-9faf-d6aa6118e163",
+>>>>>>>> main:Migrations/20260106153535_InitialCreate.Designer.cs
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
+<<<<<<<< HEAD:Migrations/20260106105655_InitialCreate.Designer.cs
                             PasswordHash = "AQAAAAIAAYagAAAAEOUxY+9VOr+PhkOQi6WustdeglJXmj1yziEETYMxFY2pX0Kgjrk5Yu8iSDXHTeVWLQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "7d16287c-a6d0-4f79-9a23-de085d2654ab",
+========
+                            PasswordHash = "AQAAAAIAAYagAAAAEL5NJXAtBufgI75K1OUv8M7fNB7rq2yv5lscNS2u9jGaoOhaSghxSOtGXsyKz7ptIg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "3d559754-b6a0-4c01-997f-b9e12608d38c",
+>>>>>>>> main:Migrations/20260106153535_InitialCreate.Designer.cs
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -160,11 +174,12 @@ namespace CV_siten.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Beskrivning")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BildUrl")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CvUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Efternamn")
@@ -179,11 +194,15 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+<<<<<<<< HEAD:Migrations/20260106105655_InitialCreate.Designer.cs
                     b.Property<int>("Telefonnummer")
                         .HasColumnType("int");
+========
+                    b.Property<string>("Telefonnummer")
+                        .HasColumnType("nvarchar(max)");
+>>>>>>>> main:Migrations/20260106153535_InitialCreate.Designer.cs
 
                     b.Property<string>("Yrkestitel")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -246,7 +265,7 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("Slutdatum")
+                    b.Property<DateTimeOffset?>("Slutdatum")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("Startdatum")
