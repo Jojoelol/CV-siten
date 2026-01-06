@@ -24,26 +24,26 @@
         }
     </div> *@
 
-    <div class="text-center">
+    <div class="sr-results-list">
         <h3>Matchande Personer</h3>
         @if (personer != null && personer.Any())
         {
             @foreach (var pers in personer)
             {
 
-            <button class="profile-container">
-                <div class="imgBox">
+            <button class="sr-profile-card">
+                <div class="sr-img-wrapper">
                     <img src="~/images/@(string.IsNullOrEmpty(pers.BildUrl) ? "defaultPicture.jpg" : pers.BildUrl)"
-                         alt="Profilbild" class="profilePicture" />
+                         alt="Profilbild" class="sr-profile-img" />
                 </div>
 
-                <div class="nameDescBox">
-                    <h3 class="searchedName">@pers.Fornamn @pers.Efternamn</h3>
-                    <p class="jobTitle">(@pers.Yrkestitel)</p>
+                <div class="sr-identity-box">
+                    <h3 class="sr-full-name">@pers.Fornamn @pers.Efternamn</h3>
+                    <p class="sr-job-title">(@pers.Yrkestitel)</p>
                 </div>
 
-                <div class="descriptionBox">
-                    <p class="description">@pers.Beskrivning</p>
+                <div class="sr-bio-container">
+                    <p class="sr-bio-text">@pers.Beskrivning</p>
                 </div>
             </button>
                 
@@ -54,4 +54,3 @@
             <p>Inga personer hittades.</p>
         }
     </div>
-</div>
