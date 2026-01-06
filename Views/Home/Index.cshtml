@@ -17,9 +17,14 @@
             <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6;">
                 <h5 style="color: #0056b3; font-weight: bold;">@ViewBag.SenasteProjekt.Projektnamn</h5>
                 <p style="color: #555;">@ViewBag.SenasteProjekt.Beskrivning</p>
+                @* Hitta denna rad i din Index.cshtml *@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                     <small class="text-muted">Startade: @ViewBag.SenasteProjekt.Startdatum.ToString("yyyy-MM-dd")</small>
-                    <a asp-controller="Projekt" asp-action="Details" asp-route-id="@ViewBag.SenasteProjekt.Id" class="btn btn-sm btn-outline-primary">Läs mer</a>
+
+                    @* ÄNDRA HÄR: asp-action ska vara ProjectDetails och controllern ska vara Project *@
+                    <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@ViewBag.SenasteProjekt.Id" class="btn btn-sm btn-outline-primary">
+                        Läs mer
+                    </a>
                 </div>
             </div>
         }

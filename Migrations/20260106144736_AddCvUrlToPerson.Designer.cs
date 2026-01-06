@@ -4,6 +4,7 @@ using CV_siten.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260106144736_AddCvUrlToPerson")]
+    partial class AddCvUrlToPerson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,7 +95,6 @@ namespace CV_siten.Migrations
                             Id = "test-user-1",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "83570413-ba90-4bb7-b7d1-becf6055f196",
-                            ConcurrencyStamp = "aa2cd39a-fe7a-4d21-bb86-7f6300f6ca15",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -101,9 +103,6 @@ namespace CV_siten.Migrations
                             PasswordHash = "AQAAAAIAAYagAAAAEL71XgZ8oGqpuUg4UDbHXhWn5O9qTW6IOaA/Jc7y701RxMovJnarTytXDQAmtVYNPw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "a60cf775-00f1-4804-8459-0dd14f102332",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJkRovPH7/3rIdKhoCDI6MicH1vcyFlCcA70DzI1iBbeNwy1OGA+Du2OO6M6eIXBoQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "856f0f13-8b31-499e-b6eb-a4454b4b6805",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -191,7 +190,6 @@ namespace CV_siten.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Telefonnummer")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Yrkestitel")
