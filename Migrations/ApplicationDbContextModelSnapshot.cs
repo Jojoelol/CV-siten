@@ -91,19 +91,15 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "83570413-ba90-4bb7-b7d1-becf6055f196",
-                            ConcurrencyStamp = "aa2cd39a-fe7a-4d21-bb86-7f6300f6ca15",
+                            ConcurrencyStamp = "ec478fe8-5a79-4816-9faf-d6aa6118e163",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL71XgZ8oGqpuUg4UDbHXhWn5O9qTW6IOaA/Jc7y701RxMovJnarTytXDQAmtVYNPw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL5NJXAtBufgI75K1OUv8M7fNB7rq2yv5lscNS2u9jGaoOhaSghxSOtGXsyKz7ptIg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a60cf775-00f1-4804-8459-0dd14f102332",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJkRovPH7/3rIdKhoCDI6MicH1vcyFlCcA70DzI1iBbeNwy1OGA+Du2OO6M6eIXBoQ==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "856f0f13-8b31-499e-b6eb-a4454b4b6805",
+                            SecurityStamp = "3d559754-b6a0-4c01-997f-b9e12608d38c",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -191,7 +187,6 @@ namespace CV_siten.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Telefonnummer")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Yrkestitel")
@@ -253,7 +248,7 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("Slutdatum")
+                    b.Property<DateTimeOffset?>("Slutdatum")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("Startdatum")

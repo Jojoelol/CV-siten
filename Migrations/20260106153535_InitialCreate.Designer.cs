@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260106144736_AddCvUrlToPerson")]
-    partial class AddCvUrlToPerson
+    [Migration("20260106153535_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,15 +94,15 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "83570413-ba90-4bb7-b7d1-becf6055f196",
+                            ConcurrencyStamp = "ec478fe8-5a79-4816-9faf-d6aa6118e163",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEL71XgZ8oGqpuUg4UDbHXhWn5O9qTW6IOaA/Jc7y701RxMovJnarTytXDQAmtVYNPw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL5NJXAtBufgI75K1OUv8M7fNB7rq2yv5lscNS2u9jGaoOhaSghxSOtGXsyKz7ptIg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a60cf775-00f1-4804-8459-0dd14f102332",
+                            SecurityStamp = "3d559754-b6a0-4c01-997f-b9e12608d38c",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -251,7 +251,7 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("Slutdatum")
+                    b.Property<DateTimeOffset?>("Slutdatum")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("Startdatum")
