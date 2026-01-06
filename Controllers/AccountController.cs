@@ -24,7 +24,9 @@ namespace CV_siten.Controllers
             _context = context;
         }
 
-        //REGISTRERING
+        // -------------------------
+        // REGISTRERING
+        // -------------------------
         [HttpGet]
         public IActionResult CreateAccount()
         {
@@ -52,8 +54,8 @@ namespace CV_siten.Controllers
                     Fornamn = model.Fornamn,
                     Efternamn = model.Efternamn,
                     Yrkestitel = model.Yrkestitel,
-                    Beskrivning = model.Beskrivning ?? "", 
-                    BildUrl = "", 
+                    Beskrivning = model.Beskrivning ?? "",
+                    BildUrl = "",
                     AktivtKonto = true,
                     Telefonnummer = model.Telefonnummer,
                     IdentityUserId = user.Id
@@ -71,7 +73,10 @@ namespace CV_siten.Controllers
 
             return View(model);
         }
-        //CHANGEPASSWORD
+
+        // -------------------------
+        // CHANGE PASSWORD
+        // -------------------------
         [Authorize]
         [HttpGet]
         public IActionResult ChangePassword()
@@ -108,92 +113,9 @@ namespace CV_siten.Controllers
             return View(model);
         }
 
-
-
-        //INLOGGNING
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            var result = await _signInManager.PasswordSignInAsync(
-                model.Email,
-                model.Losenord, 
-                isPersistent: false, 
-                lockoutOnFailure: false
-                );
-
-            if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
-
-            ModelState.AddModelError("", "Felaktig e-post eller lösenord.");
-            return View(model);
-        }
-
-        //LOGOUT
-        public async Task<IActionResult> Logout()
-        {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
-        }
-
-
-        // --- VISA PROFIL ---
-
-        [Authorize]
-        public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
-        {
-            Person person;
-
-            // 1. Hämta rätt person (antingen via ID i URL eller inloggad användare)
-            if (id.HasValue)
-            {
-                person = await _context.Persons
-                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
-                    .FirstOrDefaultAsync(p => p.Id == id);
-            }
-            else
-            {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null) return RedirectToAction("Login");
-
-                person = await _context.Persons
-                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
-                    .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-            }
-
-            if (person == null) return NotFound();
-
-            // 2. Logik för sökning (filtrering av projektlistan)
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                person.PersonProjekt = person.PersonProjekt
-                    .Where(pp => pp.Projekt.Projektnamn.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-            }
-
-            // 3. Logik för sortering
-            person.PersonProjekt = sortBy switch
-            {
-                "status" => person.PersonProjekt.OrderBy(pp => pp.Projekt.Status).ToList(),
-                "tid" => person.PersonProjekt.OrderByDescending(pp => pp.Projekt.Startdatum).ToList(),
-                _ => person.PersonProjekt.OrderBy(pp => pp.Projekt.Projektnamn).ToList()
-            };
-
-            // Skicka med söksträngen så den stannar kvar i sökfältet efter omladdning
-            ViewBag.CurrentSearch = searchString;
-
-            // Denna rad tvingar programmet att hitta vyn i rätt mapp
-            return View("~/Views/Account/Profile.cshtml", person);
-        }
-
+        // -------------------------
+        // EDIT ACCOUNT (GET)
+        // -------------------------
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> EditAccount()
@@ -218,12 +140,16 @@ namespace CV_siten.Controllers
 
             return View(model);
         }
+
+        // -------------------------
+        // EDIT ACCOUNT (POST)
+        // -------------------------
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> EditAccount(EditAccountViewModel model)
+        public async Task<IActionResult> SaveProfileChanges(EditAccountViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(model);
+                return View("EditAccount", model);
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login");
@@ -251,5 +177,87 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile");
         }
 
+        // -------------------------
+        // LOGIN
+        // -------------------------
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var result = await _signInManager.PasswordSignInAsync(
+                model.Email,
+                model.Losenord,
+                isPersistent: false,
+                lockoutOnFailure: false
+            );
+
+            if (result.Succeeded)
+                return RedirectToAction("Index", "Home");
+
+            ModelState.AddModelError("", "Felaktig e-post eller lösenord.");
+            return View(model);
+        }
+
+        // -------------------------
+        // LOGOUT
+        // -------------------------
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
+        // -------------------------
+        // PROFILE VIEW
+        // -------------------------
+        [Authorize]
+        public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
+        {
+            Person person;
+
+            if (id.HasValue)
+            {
+                person = await _context.Persons
+                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+            }
+            else
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return RedirectToAction("Login");
+
+                person = await _context.Persons
+                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
+                    .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+            }
+
+            if (person == null) return NotFound();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                person.PersonProjekt = person.PersonProjekt
+                    .Where(pp => pp.Projekt.Projektnamn.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            person.PersonProjekt = sortBy switch
+            {
+                "status" => person.PersonProjekt.OrderBy(pp => pp.Projekt.Status).ToList(),
+                "tid" => person.PersonProjekt.OrderByDescending(pp => pp.Projekt.Startdatum).ToList(),
+                _ => person.PersonProjekt.OrderBy(pp => pp.Projekt.Projektnamn).ToList()
+            };
+
+            ViewBag.CurrentSearch = searchString;
+
+            return View("~/Views/Account/Profile.cshtml", person);
+        }
     }
 }
