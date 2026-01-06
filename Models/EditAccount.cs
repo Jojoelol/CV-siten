@@ -22,7 +22,7 @@ namespace CV_siten.Models
         [Required(ErrorMessage = "Telefonnummer är obligatoriskt.")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Telefonnummer får endast innehålla siffror.")]
         [Display(Name = "Telefonnummer")]
-        public string Telefonnummer { get; set; }
+        public int Telefonnummer { get; set; }
 
         [StringLength(100, ErrorMessage = "Yrkestiteln får inte överskrida 100 tecken.")]
         [Display(Name = "Yrkestitel")]

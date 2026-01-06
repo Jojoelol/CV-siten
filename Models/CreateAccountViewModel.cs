@@ -14,7 +14,7 @@ namespace CV_siten.Models
         [EmailAddress(ErrorMessage = "Ogiltig e-postadress")]
         public string Email { get; set; }
 
-        public string Telefonnummer { get; set; }
+        public int Telefonnummer { get; set; }
 
         [Required(ErrorMessage = "Lösenord är obligatoriskt")]
         [DataType(DataType.Password)]

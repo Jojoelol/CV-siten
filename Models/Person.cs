@@ -12,12 +12,6 @@
         public string? BildUrl { get; set; }
         public string? Beskrivning { get; set; }
         public string? Yrkestitel { get; set; }
-        public string Fornamn { get; set; }
-        public string Efternamn { get; set; }
-        public string Telefonnummer { get; set; }
-        public string BildUrl { get; set; }
-        public string Beskrivning { get; set; }
-        public string Yrkestitel { get; set; }
         public bool AktivtKonto { get; set; }
 
         // Bra! Här lagras sökvägen till CV-filen (PDF)

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CV_siten.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260106144538_InitialCreate")]
+    [Migration("20260106105655_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,15 +94,15 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "aa2cd39a-fe7a-4d21-bb86-7f6300f6ca15",
+                            ConcurrencyStamp = "4d7dfc89-ec98-454d-b145-5c76c5a49789",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJkRovPH7/3rIdKhoCDI6MicH1vcyFlCcA70DzI1iBbeNwy1OGA+Du2OO6M6eIXBoQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOUxY+9VOr+PhkOQi6WustdeglJXmj1yziEETYMxFY2pX0Kgjrk5Yu8iSDXHTeVWLQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "856f0f13-8b31-499e-b6eb-a4454b4b6805",
+                            SecurityStamp = "7d16287c-a6d0-4f79-9a23-de085d2654ab",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -136,23 +136,14 @@ namespace CV_siten.Migrations
                     b.Property<bool>("ArLast")
                         .HasColumnType("bit");
 
-                    b.Property<string>("AvsandareNamn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Innehall")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MottagareId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Tidsstampel")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("Tidsstampel")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MottagareId");
 
                     b.ToTable("Meddelanden");
                 });
@@ -188,9 +179,8 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Telefonnummer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Telefonnummer")
+                        .HasColumnType("int");
 
                     b.Property<string>("Yrkestitel")
                         .IsRequired()
@@ -212,7 +202,7 @@ namespace CV_siten.Migrations
                             Efternamn = "Test",
                             Fornamn = "Joel",
                             IdentityUserId = "test-user-1",
-                            Telefonnummer = "0701234567",
+                            Telefonnummer = 701234567,
                             Yrkestitel = "Systemutvecklare"
                         });
                 });
@@ -245,6 +235,10 @@ namespace CV_siten.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Beskrivning")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Fil")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -406,17 +400,6 @@ namespace CV_siten.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("CV_siten.Models.Meddelande", b =>
-                {
-                    b.HasOne("CV_siten.Models.Person", "Mottagare")
-                        .WithMany()
-                        .HasForeignKey("MottagareId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Mottagare");
                 });
 
             modelBuilder.Entity("CV_siten.Models.Person", b =>
