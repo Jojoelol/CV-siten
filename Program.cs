@@ -16,6 +16,22 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+
+    // Gör cookien till en session-cookie
+    options.Cookie.MaxAge = null;
+    options.Cookie.Expiration = null;
+
+    options.ExpireTimeSpan = TimeSpan.FromHours(1);
+    options.SlidingExpiration = false;
+
+    options.LoginPath = "/Account/Login";
+});
+
+
 // --- MVC ---
 builder.Services.AddControllersWithViews();
 
