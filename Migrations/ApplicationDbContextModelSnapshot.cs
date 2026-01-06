@@ -91,15 +91,15 @@ namespace CV_siten.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c326557f-10cc-425d-bd82-5160d6ebe9c9",
+                            ConcurrencyStamp = "ec478fe8-5a79-4816-9faf-d6aa6118e163",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFt9hDcB8ikP7LMEqgXaJwWN/OftWIk7c4XJrQG2xb1vK2039Eaw1m7dEq/CD5+msQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEL5NJXAtBufgI75K1OUv8M7fNB7rq2yv5lscNS2u9jGaoOhaSghxSOtGXsyKz7ptIg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "62214848-1922-4eef-97fc-9c2937e44c55",
+                            SecurityStamp = "3d559754-b6a0-4c01-997f-b9e12608d38c",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -133,14 +133,23 @@ namespace CV_siten.Migrations
                     b.Property<bool>("ArLast")
                         .HasColumnType("bit");
 
+                    b.Property<string>("AvsandareNamn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Innehall")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("Tidsstampel")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<int>("MottagareId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Tidsstampel")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MottagareId");
 
                     b.ToTable("Meddelanden");
                 });
@@ -157,11 +166,12 @@ namespace CV_siten.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Beskrivning")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BildUrl")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CvUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Efternamn")
@@ -176,11 +186,10 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Telefonnummer")
-                        .HasColumnType("int");
+                    b.Property<string>("Telefonnummer")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Yrkestitel")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -199,7 +208,7 @@ namespace CV_siten.Migrations
                             Efternamn = "Test",
                             Fornamn = "Joel",
                             IdentityUserId = "test-user-1",
-                            Telefonnummer = 701234567,
+                            Telefonnummer = "0701234567",
                             Yrkestitel = "Systemutvecklare"
                         });
                 });
@@ -235,15 +244,11 @@ namespace CV_siten.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Fil")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Projektnamn")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("Slutdatum")
+                    b.Property<DateTimeOffset?>("Slutdatum")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("Startdatum")
@@ -397,6 +402,17 @@ namespace CV_siten.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("CV_siten.Models.Meddelande", b =>
+                {
+                    b.HasOne("CV_siten.Models.Person", "Mottagare")
+                        .WithMany()
+                        .HasForeignKey("MottagareId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mottagare");
                 });
 
             modelBuilder.Entity("CV_siten.Models.Person", b =>
