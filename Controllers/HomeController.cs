@@ -1,7 +1,8 @@
-using System.Diagnostics;
-using CV_siten.Models;
 using CV_siten.Data;
+using CV_siten.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace CV_siten.Controllers
 {
@@ -16,20 +17,23 @@ namespace CV_siten.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // Hämta profilen till Model
-            var profil = _context.Persons.FirstOrDefault();
+            // 1. Hämta de 3 senaste offentliga profilerna (Krav 1 & 6)
+            var urvalCV = await _context.Persons
+                .Where(p => p.AktivtKonto) // Endast aktiva och offentliga (Krav 6 & 12)
+                .Take(3)
+                .ToListAsync();
 
-            // Hämta senaste projektet till ViewBag
-            ViewBag.SenasteProjekt = _context.Projekt
-                                             .OrderByDescending(p => p.Id)
-                                             .FirstOrDefault();
+            // 2. Hämta det absolut senaste projektet (Krav 1)
+            var senasteProjekt = await _context.Projekt
+                .OrderByDescending(p => p.Startdatum) // Eller ID om ni inte har skapat-datum
+                .FirstOrDefaultAsync();
 
-            return View(profil); // Skickar profil till @model
+            ViewBag.SenasteProjekt = senasteProjekt;
+
+            return View(urvalCV);
         }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
