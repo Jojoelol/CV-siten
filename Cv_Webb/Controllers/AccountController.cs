@@ -46,6 +46,7 @@ namespace CV_siten.Controllers
                     LastName = model.LastName,
                     JobTitle = model.JobTitle,
                     Description = model.Description ?? "",
+                    PhoneNumber = model.PhoneNumber,
                     IsActive = true,
                     IdentityUserId = user.Id
                 };
