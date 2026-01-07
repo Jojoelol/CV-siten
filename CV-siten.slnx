@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="CV-siten.csproj" />
+  <Project Path="Cv_siten.Data/Cv_siten.Data.csproj" />
+  <Project Path="Cv_Webb/CV-siten.csproj" />
 </Solution>
