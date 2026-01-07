@@ -16,7 +16,6 @@ namespace CV_siten.Controllers
         }
 
         // --- VISA ALLA PROJEKT ---
-        // Listar alla projekt på siten
         public async Task<IActionResult> Index()
         {
             var allaProjekt = await _context.Projects.ToListAsync();
@@ -24,18 +23,14 @@ namespace CV_siten.Controllers
         }
 
         // --- PROJEKTDETALJER ---
-        // Visar info om ett projekt och vilka personer som deltar
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> ProjectDetails(int id)
         {
             var projekt = await _context.Projects
-                .Include(p => p.PersonProjects)       // Kopplingstabellen
-                    .ThenInclude(pp => pp.Person)    // Deltagarna
+                .Include(p => p.PersonProjects)
+                    .ThenInclude(pp => pp.Person)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
-            if (projekt == null)
-            {
-                return NotFound();
-            }
+            if (projekt == null) return NotFound();
 
             return View(projekt);
         }
@@ -43,10 +38,7 @@ namespace CV_siten.Controllers
         // --- SKAPA NYTT PROJEKT ---
         [Authorize]
         [HttpGet]
-        public IActionResult AddProject()
-        {
-            return View();
-        }
+        public IActionResult AddProject() => View();
 
         [Authorize]
         [HttpPost]

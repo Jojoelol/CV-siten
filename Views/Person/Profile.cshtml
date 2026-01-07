@@ -4,7 +4,6 @@
     <aside class="profile-sidebar">
         <div class="sidebar-card">
             <div class="pic-placeholder">
-                @* 1. Ändrat BildUrl -> ImageUrl *@
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
                     <img src="@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
@@ -19,7 +18,6 @@
                 <h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
                 <p class="profile-title">@Model.JobTitle</p>
                 <div class="profile-bio">
-                    @* 2. Ändrat Beskrivning -> Description *@
                     <p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
                 </div>
             </div>
@@ -27,7 +25,8 @@
             <div class="sidebar-actions-container">
                 @if (string.IsNullOrEmpty(Model.CvUrl))
                 {
-                    <form id="cvUploadForm" asp-controller="Project" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
+                    @* ÄNDRAT: asp-controller="Person" istället för Project *@
+                    <form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
                         <input type="hidden" name="personId" value="@Model.Id" />
                         <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
                     </form>
@@ -41,13 +40,15 @@
                     <div class="cv-button-row">
                         <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary">Visa CV</a>
 
-                        <form asp-controller="Project" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');">
+                        @* ÄNDRAT: asp-controller="Person" istället för Project *@
+                        <form asp-controller="Person" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');">
                             <input type="hidden" name="personId" value="@Model.Id" />
                             <button type="submit" class="btn-action btn-danger">Ta bort</button>
                         </form>
                     </div>
                 }
 
+                @* Denna länk var redan rätt! *@
                 <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">
                     Redigera profil
                 </a>
@@ -56,6 +57,7 @@
     </aside>
 
     <section class="profile-main-content">
+        @* Projektrelaterade saker stannar kvar i ProjectController eller Person beroende på action *@
         <form asp-action="Profile" method="get" class="content-toolbar">
             <input type="hidden" name="id" value="@Model.Id" />
 
@@ -74,6 +76,7 @@
 
             <button type="submit" class="btn-action btn-primary">Sök</button>
 
+            @* Projekt-logik hör hemma i ProjectController *@
             <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline" style="text-decoration:none;">
                 Lägg till projekt
             </a>
@@ -82,14 +85,11 @@
         <div class="projects-container">
             <h3 class="section-title">Mina Projekt</h3>
 
-            @* 3. Ändrat PersonProjekt -> PersonProjects *@
             @if (Model.PersonProjects != null && Model.PersonProjects.Any())
             {
                 <div class="projects-list">
-                    @* 4. Ändrat PersonProjekt -> PersonProjects *@
                     @foreach (var pp in Model.PersonProjects)
                     {
-                        @* 5. Ändrat Projekt -> Project och Projektnamn -> ProjectName *@
                         <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Project.Id"
                            class="project-pill" style="text-decoration:none; color:inherit;">
                             @pp.Project.ProjectName

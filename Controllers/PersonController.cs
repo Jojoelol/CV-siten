@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CV_siten.Controllers
 {
-    [Authorize] // Hela kontrollern kräver inloggning för personlig data
+    [Authorize]
     public class PersonController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -26,43 +26,35 @@ namespace CV_siten.Controllers
         }
 
         // --- VISA PROFIL ---
-        [AllowAnonymous] // Tillåt oinloggade att se publika profiler via ID
+        [AllowAnonymous]
         public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
         {
             Person person;
-
             if (id.HasValue)
             {
-                // Visa specifik profil baserat på ID
                 person = await _context.Persons
-                    .Include(p => p.PersonProjects)
-                    .ThenInclude(pp => pp.Project)
+                    .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
                     .FirstOrDefaultAsync(p => p.Id == id);
             }
             else
             {
-                // Visa den inloggade användarens egen profil
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null) return RedirectToAction("Login", "Account");
-
-                string userId = user.Id; // Fix: Bryt ut ID för att undvika Expression Tree-fel
                 person = await _context.Persons
-                    .Include(p => p.PersonProjects)
-                    .ThenInclude(pp => pp.Project)
-                    .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
+                    .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
+                    .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             }
 
             if (person == null) return NotFound();
 
-            // Sökning i personens projekt
+            // Sökning
             if (!string.IsNullOrEmpty(searchString))
             {
                 person.PersonProjects = person.PersonProjects
-                    .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                    .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            // Sortering av projekt
+            // Sortering
             person.PersonProjects = sortBy switch
             {
                 "status" => person.PersonProjects.OrderBy(pp => pp.Project.Status).ToList(),
@@ -71,19 +63,15 @@ namespace CV_siten.Controllers
             };
 
             ViewBag.CurrentSearch = searchString;
-            return View("~/Views/Account/Profile.cshtml", person);
+            return View(person); // MVC letar nu i Views/Person/Profile.cshtml
         }
 
-        // --- REDIGERA PROFIL (GET) ---
+        // --- REDIGERA PROFIL ---
         [HttpGet]
         public async Task<IActionResult> Edit()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return RedirectToAction("Login", "Account");
-
-            string userId = user.Id;
-            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == userId);
-
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             if (person == null) return NotFound();
 
             var model = new EditAccountViewModel
@@ -95,31 +83,23 @@ namespace CV_siten.Controllers
                 JobTitle = person.JobTitle,
                 Description = person.Description
             };
-
-            return View("~/Views/Account/EditAccount.cshtml", model);
+            return View(model); // MVC letar nu i Views/Person/Edit.cshtml
         }
 
-        // --- REDIGERA PROFIL (POST) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditAccountViewModel model)
         {
-            if (!ModelState.IsValid) return View("~/Views/Account/EditAccount.cshtml", model);
+            if (!ModelState.IsValid) return View(model);
 
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return RedirectToAction("Login", "Account");
-
-            string userId = user.Id;
-            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == userId);
-
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             if (person == null) return NotFound();
 
-            // Uppdatera Identity
             user.Email = model.Email;
             user.UserName = model.Email;
             await _userManager.UpdateAsync(user);
 
-            // Uppdatera Person-entiteten
             person.FirstName = model.FirstName;
             person.LastName = model.LastName;
             person.PhoneNumber = model.PhoneNumber;
@@ -128,14 +108,15 @@ namespace CV_siten.Controllers
 
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Profilen har uppdaterats!";
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
-        // --- CV-HANTERING (Flyttad hit från ProjectController) ---
+        // --- CV-HANTERING ---
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadCv(IFormFile cvFile)
         {
-            if (cvFile == null || cvFile.Length == 0) return RedirectToAction("Profile");
+            if (cvFile == null || cvFile.Length == 0) return RedirectToAction(nameof(Profile));
 
             var extension = Path.GetExtension(cvFile.FileName).ToLower();
             if (extension != ".pdf") return BadRequest("Endast PDF tillåtet.");
@@ -156,7 +137,6 @@ namespace CV_siten.Controllers
                     await cvFile.CopyToAsync(stream);
                 }
 
-                // Radera gammal fil om den finns
                 if (!string.IsNullOrEmpty(person.CvUrl))
                 {
                     var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, person.CvUrl.TrimStart('/'));
@@ -166,11 +146,11 @@ namespace CV_siten.Controllers
                 person.CvUrl = "/uploads/cvs/" + fileName;
                 await _context.SaveChangesAsync();
             }
-
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCv()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -184,8 +164,7 @@ namespace CV_siten.Controllers
                 person.CvUrl = null;
                 await _context.SaveChangesAsync();
             }
-
-            return RedirectToAction("Profile");
+            return RedirectToAction(nameof(Profile));
         }
     }
 }
