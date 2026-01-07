@@ -18,15 +18,15 @@ namespace CV_siten.Controllers
         // Visa alla projekt (Lista)
         public async Task<IActionResult> Index()
         {
-            var allaProjekt = await _context.Projekt.ToListAsync();
+            var allaProjekt = await _context.Projects.ToListAsync();
             return View(allaProjekt);
         }
 
         // Visa ett specifikt projekt och dess deltagare
         public async Task<IActionResult> Details(int id)
         {
-            var projekt = await _context.Projekt
-                .Include(p => p.PersonProjekt)        // Inkludera kopplingstabellen
+            var projekt = await _context.Projects
+                .Include(p => p.PersonProjects)        // Inkludera kopplingstabellen
                     .ThenInclude(pp => pp.Person)     // Inkludera personen via kopplingen
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -100,7 +100,7 @@ namespace CV_siten.Controllers
 
         public async Task<IActionResult> ProjectDetails(int id)
         {
-            var projekt = await _context.Projekt
+            var projekt = await _context.Projects
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (projekt == null) return NotFound();

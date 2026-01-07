@@ -1,57 +1,46 @@
-﻿@model IEnumerable<CV_siten.Data.Models.Projekt>
+﻿@* 1. Ändrat från Projekt till Project *@
+@model IEnumerable<CV_siten.Data.Models.Project>
 
 @{
     ViewData["Title"] = "Sökresultat";
+    @* 2. Säkerställ att sökvägen till Person är rätt *@
     var personer = ViewBag.personResult as List<CV_siten.Data.Models.Person>;
-
 }
-<section class="sr-main">
-<h2 class="text-center" style="color:white">Sökresultat för "@ViewBag.SearchQuery"</h2>
 
-@* <div class="row">
-    <div class="col-md-6">
-        <h3>Matchande Projekt</h3>
-        @if (Model.Any())
-        {
-            @foreach (var p in Model)
-            {
-                <p><a asp-controller="Projekt" asp-action="Details" asp-route-id="@p.Id">@p.Projektnamn</a></p>
-            }
-        }
-        else
-        {
-            <p>Inga projekt hittades.</p>
-        }
-    </div> *@
+<section class="sr-main">
+    <h2 class="text-center" style="color:white">Sökresultat för "@ViewBag.SearchQuery"</h2>
 
     <div class="sr-results-list">
         <h3 class="sr-matchPerson" style="color:white;">Matchande Personer</h3>
+        
         @if (personer != null && personer.Any())
         {
             @foreach (var pers in personer)
             {
-
                 <a class="sr-profile-card" asp-controller="Account" asp-action="Profile" asp-route-id="@pers.Id">
-                <div class="sr-img-wrapper">
-                    <img src="~/images/@(string.IsNullOrEmpty(pers.BildUrl) ? "defaultPicture.jpg" : pers.BildUrl)"
-                         alt="Profilbild" class="sr-profile-img" />
-                </div>
+                    <div class="sr-img-wrapper">
+                        @* 3. Ändrat BildUrl till ImageUrl *@
+                        <img src="~/images/@(string.IsNullOrEmpty(pers.ImageUrl) ? "defaultPicture.jpg" : pers.ImageUrl)"
+                             alt="Profilbild" class="sr-profile-img" />
+                    </div>
 
-                <div class="sr-identity-box">
-                    <h3 class="sr-full-name">@pers.Fornamn @pers.Efternamn</h3>
-                    <p class="sr-job-title">(@pers.Yrkestitel)</p>
-                </div>
+                    <div class="sr-identity-box">
+                        @* 4. Ändrat Fornamn/Efternamn till FirstName/LastName *@
+                        <h3 class="sr-full-name">@pers.FirstName @pers.LastName</h3>
+                        @* 5. Ändrat Yrkestitel till JobTitle *@
+                        <p class="sr-job-title">(@pers.JobTitle)</p>
+                    </div>
 
-                <div class="sr-bio-container">
-                    <p class="sr-bio-text">@pers.Beskrivning</p>
-                </div>
-            </a>
-                
+                    <div class="sr-bio-container">
+                        @* 6. Ändrat Beskrivning till Description *@
+                        <p class="sr-bio-text">@pers.Description</p>
+                    </div>
+                </a>
             }
         }
         else
         {
-            <p class ="sr-no-results">Inga personer hittades.</p>
+            <p class="sr-no-results">Inga personer hittades.</p>
         }
     </div>
 </section>

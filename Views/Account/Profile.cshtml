@@ -4,9 +4,10 @@
     <aside class="profile-sidebar">
         <div class="sidebar-card">
             <div class="pic-placeholder">
-                @if (!string.IsNullOrEmpty(Model.BildUrl))
+                @* 1. Ändrat BildUrl -> ImageUrl *@
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="@Model.BildUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+                    <img src="@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
                 }
                 else
                 {
@@ -15,10 +16,11 @@
             </div>
 
             <div class="profile-info-text">
-                <h2 class="profile-name">@Model.Fornamn @Model.Efternamn</h2>
-                <p class="profile-title">@Model.Yrkestitel</p>
+                <h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
+                <p class="profile-title">@Model.JobTitle</p>
                 <div class="profile-bio">
-                    <p>@(string.IsNullOrEmpty(Model.Beskrivning) ? "Ingen beskrivning tillgänglig." : Model.Beskrivning)</p>
+                    @* 2. Ändrat Beskrivning -> Description *@
+                    <p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
                 </div>
             </div>
 
@@ -80,14 +82,17 @@
         <div class="projects-container">
             <h3 class="section-title">Mina Projekt</h3>
 
-            @if (Model.PersonProjekt != null && Model.PersonProjekt.Any())
+            @* 3. Ändrat PersonProjekt -> PersonProjects *@
+            @if (Model.PersonProjects != null && Model.PersonProjects.Any())
             {
                 <div class="projects-list">
-                    @foreach (var pp in Model.PersonProjekt)
+                    @* 4. Ändrat PersonProjekt -> PersonProjects *@
+                    @foreach (var pp in Model.PersonProjects)
                     {
-                        <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Projekt.Id"
+                        @* 5. Ändrat Projekt -> Project och Projektnamn -> ProjectName *@
+                        <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Project.Id"
                            class="project-pill" style="text-decoration:none; color:inherit;">
-                            @pp.Projekt.Projektnamn
+                            @pp.Project.ProjectName
                         </a>
                     }
                 </div>

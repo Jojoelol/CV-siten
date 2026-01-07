@@ -1,7 +1,6 @@
-﻿using CV_siten.Data;
-using CV_siten.Data.Data;
+﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
-using CV_siten.Models.ViewModels.Account;
+using CV_siten.Models.ViewModels.Account; // Se till att detta namespace stämmer
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ namespace CV_siten.Controllers
             _context = context;
         }
 
-        //REGISTRERING
+        // --- REGISTRERING ---
         [HttpGet]
         public IActionResult CreateAccount()
         {
@@ -44,20 +43,22 @@ namespace CV_siten.Controllers
                 Email = model.Email
             };
 
-            var result = await _userManager.CreateAsync(user, model.Losenord);
+            // 1. Ändrat model.Losenord -> model.Password
+            var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
                 var person = new Person
                 {
-                    Fornamn = model.Fornamn,
-                    Efternamn = model.Efternamn,
-                    Yrkestitel = model.Yrkestitel,
-                    Beskrivning = model.Beskrivning ?? "", // Fixar förra felet
-                    BildUrl = "", // LÄGG TILL DENNA RAD för att fixa nuvarande fel
+                    // 2. Ändrat till engelska properties från model
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    JobTitle = model.JobTitle,
+                    Description = model.Description ?? "",
+                    ImageUrl = "",
                     CvUrl = "",
-                    AktivtKonto = true,
-                    Telefonnummer = model.Telefonnummer,
+                    IsActive = true,
+                    PhoneNumber = model.PhoneNumber,
                     IdentityUserId = user.Id
                 };
 
@@ -73,7 +74,8 @@ namespace CV_siten.Controllers
 
             return View(model);
         }
-        //CHANGEPASSWORD
+
+        // --- ÄNDRA LÖSENORD ---
         [Authorize]
         [HttpGet]
         public IActionResult ChangePassword()
@@ -110,9 +112,7 @@ namespace CV_siten.Controllers
             return View(model);
         }
 
-
-
-        //INLOGGNING
+        // --- INLOGGNING ---
         [HttpGet]
         public IActionResult Login()
         {
@@ -125,10 +125,11 @@ namespace CV_siten.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            // 3. Ändrat model.Losenord -> model.Password
             var result = await _signInManager.PasswordSignInAsync(
                 model.Email,
-                model.Losenord, 
-                isPersistent: false, 
+                model.Password,
+                isPersistent: false,
                 lockoutOnFailure: false
                 );
 
@@ -139,26 +140,24 @@ namespace CV_siten.Controllers
             return View(model);
         }
 
-        //LOGOUT
+        // --- LOGOUT ---
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
-
         // --- VISA PROFIL ---
-
         [Authorize]
         public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
         {
             Person person;
 
-            // 1. Hämta rätt person (antingen via ID i URL eller inloggad användare)
             if (id.HasValue)
             {
                 person = await _context.Persons
-                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
+                    .Include(p => p.PersonProjects)
+                    .ThenInclude(pp => pp.Project)
                     .FirstOrDefaultAsync(p => p.Id == id);
             }
             else
@@ -167,35 +166,32 @@ namespace CV_siten.Controllers
                 if (user == null) return RedirectToAction("Login");
 
                 person = await _context.Persons
-                    .Include(p => p.PersonProjekt).ThenInclude(pp => pp.Projekt)
+                    .Include(p => p.PersonProjects)
+                    .ThenInclude(pp => pp.Project)
                     .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             }
 
             if (person == null) return NotFound();
 
-            // 2. Logik för sökning (filtrering av projektlistan)
             if (!string.IsNullOrEmpty(searchString))
             {
-                person.PersonProjekt = person.PersonProjekt
-                    .Where(pp => pp.Projekt.Projektnamn.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                person.PersonProjects = person.PersonProjects
+                    .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
-            // 3. Logik för sortering
-            person.PersonProjekt = sortBy switch
+            person.PersonProjects = sortBy switch
             {
-                "status" => person.PersonProjekt.OrderBy(pp => pp.Projekt.Status).ToList(),
-                "tid" => person.PersonProjekt.OrderByDescending(pp => pp.Projekt.Startdatum).ToList(),
-                _ => person.PersonProjekt.OrderBy(pp => pp.Projekt.Projektnamn).ToList()
+                "status" => person.PersonProjects.OrderBy(pp => pp.Project.Status).ToList(),
+                "tid" => person.PersonProjects.OrderByDescending(pp => pp.Project.StartDate).ToList(),
+                _ => person.PersonProjects.OrderBy(pp => pp.Project.ProjectName).ToList()
             };
 
-            // Skicka med söksträngen så den stannar kvar i sökfältet efter omladdning
             ViewBag.CurrentSearch = searchString;
-
-            // Denna rad tvingar programmet att hitta vyn i rätt mapp
             return View("~/Views/Account/Profile.cshtml", person);
         }
 
+        // --- REDIGERA PROFIL ---
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> EditAccount()
@@ -208,18 +204,20 @@ namespace CV_siten.Controllers
 
             if (person == null) return NotFound();
 
+            // 4. Mappa till engelska properties i ViewModel
             var model = new EditAccountViewModel
             {
-                Fornamn = person.Fornamn,
-                Efternamn = person.Efternamn,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
                 Email = user.Email,
-                Telefonnummer = person.Telefonnummer,
-                Yrkestitel = person.Yrkestitel,
-                Beskrivning = person.Beskrivning
+                PhoneNumber = person.PhoneNumber,
+                JobTitle = person.JobTitle,
+                Description = person.Description
             };
 
             return View(model);
         }
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> EditAccount(EditAccountViewModel model)
@@ -235,23 +233,21 @@ namespace CV_siten.Controllers
 
             if (person == null) return NotFound();
 
-            // Uppdatera IdentityUser
             user.Email = model.Email;
             user.UserName = model.Email;
             await _userManager.UpdateAsync(user);
 
-            // Uppdatera Person
-            person.Fornamn = model.Fornamn;
-            person.Efternamn = model.Efternamn;
-            person.Telefonnummer = model.Telefonnummer;
-            person.Yrkestitel = model.Yrkestitel;
-            person.Beskrivning = model.Beskrivning;
+            // 5. Mappa från engelska properties i ViewModel till Person-modell
+            person.FirstName = model.FirstName;
+            person.LastName = model.LastName;
+            person.PhoneNumber = model.PhoneNumber;
+            person.JobTitle = model.JobTitle;
+            person.Description = model.Description;
 
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Profilinformationen har uppdaterats.";
             return RedirectToAction("Profile");
         }
-
     }
 }

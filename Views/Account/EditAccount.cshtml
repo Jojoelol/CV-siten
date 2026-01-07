@@ -1,4 +1,4 @@
-﻿@model CV_siten.Data.Models.EditAccountViewModel
+﻿@model CV_siten.Models.ViewModels.Account.EditAccountViewModel
 
 <div class="yellow-box welcome-area" style="max-width: 600px; margin: 20px auto; padding: 30px;">
     <h2>Redigera profil</h2>
@@ -7,15 +7,15 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group mb-3">
-            <label asp-for="Fornamn" class="form-label"></label>
-            <input asp-for="Fornamn" class="form-control" />
-            <span asp-validation-for="Fornamn" class="text-danger"></span>
+            <label asp-for="FirstName" class="form-label"></label>
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="Efternamn" class="form-label"></label>
-            <input asp-for="Efternamn" class="form-control" />
-            <span asp-validation-for="Efternamn" class="text-danger"></span>
+            <label asp-for="LastName" class="form-label"></label>
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
@@ -25,22 +25,23 @@
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="Telefonnummer" class="form-label"></label>
-            <input asp-for="Telefonnummer" class="form-control" />
-            <span asp-validation-for="Telefonnummer" class="text-danger"></span>
+            <label asp-for="PhoneNumber" class="form-label"></label>
+            <input asp-for="PhoneNumber" class="form-control" />
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="Yrkestitel" class="form-label"></label>
-            <input asp-for="Yrkestitel" class="form-control" />
-            <span asp-validation-for="Yrkestitel" class="text-danger"></span>
+            <label asp-for="JobTitle" class="form-label"></label>
+            <input asp-for="JobTitle" class="form-control" />
+            <span asp-validation-for="JobTitle" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="Beskrivning" class="form-label"></label>
-            <textarea asp-for="Beskrivning" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="Beskrivning" class="text-danger"></span>
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
+
         <div class="mt-4">
             <button type="submit" class="btn btn-primary">Spara ändringar</button>
             <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Avbryt</a>
@@ -51,8 +52,6 @@
         </div>
     </form>
 </div>
-
-
 
 @section Scripts {
     @{

@@ -1,7 +1,6 @@
-﻿using CV_siten.Data.Data;   // Peikar på ApplicationDbContext
-using CV_siten.Data.Models; // Peikar på Message, Person och ApplicationUser
-using CV_siten.Data.Models.ViewModels;
-using CV_siten.Models.ViewModels; // Innehåller SendMessage (och ev. din omdöpta MessageViewModel)
+﻿using CV_siten.Data.Data;
+using CV_siten.Data.Models;
+using CV_siten.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,7 @@ namespace CV_siten.Controllers
     public class MessageController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly UserManager<ApplicationUser> _userManager; 
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public MessageController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
         {
@@ -31,26 +30,27 @@ namespace CV_siten.Controllers
 
             return person;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> Inbox()
         {
             var me = await GetMyPersonAsync();
 
-            var messages = await _db.Set<Message>() // FIX: Use Set<Message>() instead of _db.Messages
-                .Where(m => m.MottagareId == me.Id)
-                .Include(m => m.Avsandare)
-                .OrderByDescending(m => m.Tidsstampel)
+            // 1. Uppdaterat till ReceiverId, Sender och Timestamp
+            var messages = await _db.Messages
+                .Where(m => m.ReceiverId == me.Id)
+                .Include(m => m.Sender)
+                .OrderByDescending(m => m.Timestamp)
                 .ToListAsync();
 
             return View("~/Views/Account/Message.cshtml", messages);
         }
 
-        // Form för att skicka (t.ex. från en profil)
         [HttpGet]
-        public IActionResult Send(int mottagareId)
+        public IActionResult Send(int receiverId) // receiverId matchar parametern från URL:en
         {
-            return View(new SendMessage { MottagareId = mottagareId });
+            // 2. Uppdaterat ViewModel-property till ReceiverId
+            return View(new SendMessage { ReceiverId = receiverId });
         }
 
         [HttpPost]
@@ -62,56 +62,54 @@ namespace CV_siten.Controllers
 
             var me = await GetMyPersonAsync();
 
-            if (vm.MottagareId == me.Id)
+            if (vm.ReceiverId == me.Id)
             {
                 ModelState.AddModelError("", "Du kan inte skicka meddelande till dig själv.");
                 return View(vm);
             }
 
-            var mottagareFinns = await _db.Persons.AnyAsync(p => p.Id == vm.MottagareId);
-            if (!mottagareFinns)
+            var receiverExists = await _db.Persons.AnyAsync(p => p.Id == vm.ReceiverId);
+            if (!receiverExists)
             {
                 ModelState.AddModelError("", "Mottagaren finns inte.");
                 return View(vm);
             }
 
+            // 3. Mapning till den engelska Message-entiteten
             var entity = new Message
             {
-                AvsandareId = me.Id,
-                MottagareId = vm.MottagareId,
-                Innehall = vm.Innehall,
-                Tidsstampel = DateTime.UtcNow,
-                ArLast = false
+                SenderId = me.Id,
+                ReceiverId = vm.ReceiverId,
+                Content = vm.Content,
+                Timestamp = DateTime.UtcNow,
+                IsRead = false
             };
 
-            _db.Set<Message>().Add(entity);
+            _db.Messages.Add(entity);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Inbox));
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkRead(int id)
         {
             var me = await GetMyPersonAsync();
 
-            var msg = await _db.Set<Message>().FirstOrDefaultAsync(m => m.Id == id && m.MottagareId == me.Id);
+            // 4. Uppdaterat till ReceiverId och IsRead
+            var msg = await _db.Messages.FirstOrDefaultAsync(m => m.Id == id && m.ReceiverId == me.Id);
             if (msg == null) return NotFound();
 
-            msg.ArLast = true;
+            msg.IsRead = true;
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Inbox));
         }
+
         public IActionResult Index()
         {
-            return View();
-        }
-
-        public IActionResult Message()
-        {
-            // Berätta specifikt för controllern att den ska titta i Account-mappen
-            return View("~/Views/Account/Message.cshtml");
+            return RedirectToAction(nameof(Inbox));
         }
     }
 }

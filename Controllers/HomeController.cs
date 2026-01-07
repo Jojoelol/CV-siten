@@ -23,13 +23,13 @@ namespace CV_siten.Controllers
         {
             // 1. Hämta de 3 senaste offentliga profilerna (Krav 1 & 6)
             var urvalCV = await _context.Persons
-                .Where(p => p.AktivtKonto) // Endast aktiva och offentliga (Krav 6 & 12)
+                .Where(p => p.IsActive) // Endast aktiva och offentliga (Krav 6 & 12)
                 .Take(3)
                 .ToListAsync();
 
             // 2. Hämta det absolut senaste projektet (Krav 1)
-            var senasteProjekt = await _context.Projekt
-                .OrderByDescending(p => p.Startdatum) // Eller ID om ni inte har skapat-datum
+            var senasteProjekt = await _context.Projects
+                .OrderByDescending(p => p.StartDate) // Eller ID om ni inte har skapat-datum
                 .FirstOrDefaultAsync();
 
             ViewBag.SenasteProjekt = senasteProjekt;
@@ -48,14 +48,14 @@ namespace CV_siten.Controllers
             }
             string searchUpper = search.ToUpper();
 
-            var projektResult = _context.Projekt
-            .Where(p => p.Projektnamn.ToUpper().Contains(searchUpper))
+            var projektResult = _context.Projects
+            .Where(p => p.ProjectName.ToUpper().Contains(searchUpper))
             .ToList();
 
             var personResult = _context.Persons
-                    .Where(p => p.Fornamn.ToUpper().Contains(searchUpper) ||
-                        p.Efternamn.ToUpper().Contains(searchUpper) ||
-                        p.Yrkestitel.ToUpper().Contains(searchUpper))
+                    .Where(p => p.FirstName.ToUpper().Contains(searchUpper) ||
+                        p.LastName.ToUpper().Contains(searchUpper) ||
+                        p.JobTitle.ToUpper().Contains(searchUpper))
                     .   ToList();
 
             ViewBag.SearchQuery = search;
