@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Cv_siten.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialSetup : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -231,6 +231,7 @@ namespace Cv_siten.Data.Migrations
                     SenderId = table.Column<int>(type: "int", nullable: false),
                     ReceiverId = table.Column<int>(type: "int", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsRead = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -279,7 +280,7 @@ namespace Cv_siten.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "91b33f86-a1bf-4875-a9c8-df2553ca964a", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEKZyxPdUj4yX20cxUDNqcznem0vPRIwfHwfg+OsJyPzVX44vuVEO+QIvYFJtnpMUyQ==", null, false, "ad76d3ae-d4f7-4419-b087-4bdb3f1db019", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "d09324d2-5041-4b5e-af3a-dac4a658f70e", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAENiYKN/P4VbGG0qvC4nLpT1kiDGNU5girqhQqGfbhQUZlevwd2j2wrTcYboG5Xg3jw==", null, false, "9d592074-a850-4639-9d80-b07f9286c119", false, "test@test.se" });
 
             migrationBuilder.InsertData(
                 table: "Persons",
