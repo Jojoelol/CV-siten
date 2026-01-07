@@ -25,36 +25,86 @@ namespace CV_siten.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
+        //// --- VISA PROFIL ---
+        //[AllowAnonymous]
+        //public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
+        //{
+        //    Person person;
+        //    if (id.HasValue)
+        //    {
+        //        person = await _context.Persons
+        //            .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
+        //            .FirstOrDefaultAsync(p => p.Id == id);
+        //    }
+        //    else
+        //    {
+        //        var user = await _userManager.GetUserAsync(User);
+        //        if (user == null) return RedirectToAction("Login", "Account");
+        //        person = await _context.Persons
+        //            .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
+        //            .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+        //    }
+
+        //    if (person == null) return NotFound();
+
+        //    // Sökning
+        //    if (!string.IsNullOrEmpty(searchString))
+        //    {
+        //        person.PersonProjects = person.PersonProjects
+        //            .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
+        //    }
+
+        //    // Sortering
+        //    person.PersonProjects = sortBy switch
+        //    {
+        //        "status" => person.PersonProjects.OrderBy(pp => pp.Project.Status).ToList(),
+        //        "tid" => person.PersonProjects.OrderByDescending(pp => pp.Project.StartDate).ToList(),
+        //        _ => person.PersonProjects.OrderBy(pp => pp.Project.ProjectName).ToList()
+        //    };
+
+        //    ViewBag.CurrentSearch = searchString;
+        //    return View(person); 
+        //}
+
         // --- VISA PROFIL ---
         [AllowAnonymous]
         public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
         {
-            Person person;
-            if (id.HasValue)
-            {
-                person = await _context.Persons
-                    .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
-                    .FirstOrDefaultAsync(p => p.Id == id);
-            }
-            else
-            {
-                var user = await _userManager.GetUserAsync(User);
-                if (user == null) return RedirectToAction("Login", "Account");
-                person = await _context.Persons
-                    .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
-                    .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-            }
+            // 1. Hämta den inloggade användaren (om någon)
+            var user = await _userManager.GetUserAsync(User);
+            var loggedInPerson = user != null
+                ? await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id)
+                : null;
+
+            // 2. Bestäm vilken person som ska visas
+            // Om id saknas i URL, visa den inloggades profil. Om inte inloggad, gå till login.
+            if (!id.HasValue && loggedInPerson == null) return RedirectToAction("Login", "Account");
+            int targetId = id ?? loggedInPerson.Id;
+
+            // 3. Kolla om besökaren är ägaren (för att visa/dölja knappar)
+            ViewBag.IsOwner = (loggedInPerson != null && targetId == loggedInPerson.Id);
+
+            // 4. Hämta personen från databasen
+            var person = await _context.Persons
+                .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
+                .FirstOrDefaultAsync(p => p.Id == targetId);
 
             if (person == null) return NotFound();
 
-            // Sökning
+            //[cite_start]// 5. Krav 7: Hantera privat profil 
+                        // Om profilen är privat och besökaren INTE är inloggad -> skicka till login
+            //if (person.IsPrivate && user == null)
+            //{
+            //    return RedirectToAction("Login", "Account");
+           // }
+
+            // --- Sökning och sortering (din befintliga kod) ---
             if (!string.IsNullOrEmpty(searchString))
             {
                 person.PersonProjects = person.PersonProjects
                     .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            // Sortering
             person.PersonProjects = sortBy switch
             {
                 "status" => person.PersonProjects.OrderBy(pp => pp.Project.Status).ToList(),
@@ -63,7 +113,10 @@ namespace CV_siten.Controllers
             };
 
             ViewBag.CurrentSearch = searchString;
-            return View(person); 
+
+            // Om du flyttade filen till Views/Account måste du skriva hela sökvägen:
+            // return View("~/Views/Account/Profile.cshtml", person);
+            return View(person);
         }
 
         // --- REDIGERA PROFIL ---

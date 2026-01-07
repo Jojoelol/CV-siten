@@ -54,6 +54,44 @@
     </aside>
 
     <section class="profile-main-content">
+        @* --- KOMPETENSER --- *@
+        <div class="cv-section">
+            <div class="cv-header-row">
+                <h3 class="section-title">Kompetenser</h3>
+                @if (ViewBag.IsOwner == true)
+                {
+                    <a asp-controller="Person" asp-action="Edit" class="btn-action btn-outline btn-edit-small">Redigera</a>
+                }
+            </div>
+            <p class="cv-text">@(string.IsNullOrEmpty(Model.Skills) ? "Inga kompetenser angivna." : Model.Skills)</p>
+        </div>
+
+        @* --- UTBILDNINGAR --- *@
+        <div class="cv-section">
+            <div class="cv-header-row">
+                <h3 class="section-title">Utbildningar</h3>
+                @if (ViewBag.IsOwner == true)
+                {
+                    <a asp-controller="Person" asp-action="Edit" class="btn-action btn-outline btn-edit-small">Redigera</a>
+                }
+            </div>
+            <p class="cv-text">@(string.IsNullOrEmpty(Model.Education) ? "Ingen utbildningsinformation angiven." : Model.Education)</p>
+        </div>
+
+        @* --- TIDIGARE ERFARENHET --- *@
+        <div class="cv-section">
+            <div class="cv-header-row">
+                <h3 class="section-title">Tidigare erfarenhet</h3>
+                @if (ViewBag.IsOwner == true)
+                {
+                    <a asp-controller="Person" asp-action="Edit" class="btn-action btn-outline btn-edit-small">Redigera</a>
+                }
+            </div>
+            <p class="cv-text">@(string.IsNullOrEmpty(Model.Experience) ? "Ingen tidigare erfarenhet angiven." : Model.Experience)</p>
+        </div>
+        <hr class="section-divider" />
+
+        @* --- VERKTYGSFÄLT (Flyttat ned) --- *@
         <form asp-action="Profile" method="get" class="content-toolbar">
             <input type="hidden" name="id" value="@Model.Id" />
 
@@ -70,11 +108,17 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn-action btn-primary">Sök</button>
+            <div class="toolbar-buttons">
+                <button type="submit" class="btn-action btn-primary btn-small">Sök</button>
 
-            <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline" style="text-decoration:none;">
-                Lägg till projekt
-            </a>
+                @if (ViewBag.IsOwner == true)
+                {
+                    <div class="right-buttons">
+                        <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline btn-small">Lägg till projekt</a>
+                        <a asp-controller="Project" asp-action="JoinProject" class="btn-action btn-outline btn-small">Gå med i projekt</a>
+                    </div>
+                }
+            </div>
         </form>
 
         <div class="projects-container">
