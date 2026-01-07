@@ -39,7 +39,7 @@ namespace CV_siten.Models.ViewModels.Account
         public string ConfirmPassword { get; set; }
 
         [Display(Name = "Beskrivning")]
-        [MinLength(10, ErrorMessage = "Beskrivningen måste vara minst 10 tecken.")]
+        [MaxLength(300, ErrorMessage = "Beskrivningen får vara max 300 tecken.")]
         public string? Description { get; set; }
 
         [Display(Name = "Yrkestitel")]
