@@ -1,6 +1,4 @@
 <Solution>
-  <Project Path="../Cv_siten.Data/Cv_siten.Data.csproj" Id="a958ba33-4efb-4bbd-ad04-d81db85ba64f">
-    <BuildDependency Project="CV-siten.csproj" />
-  </Project>
-  <Project Path="CV-siten.csproj" />
+  <Project Path="Cv_siten.Data/Cv_siten.Data.csproj" />
+  <Project Path="Cv_Webb/CV-siten.csproj" />
 </Solution>
