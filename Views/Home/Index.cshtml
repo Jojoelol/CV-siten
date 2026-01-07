@@ -15,16 +15,14 @@
         @if (ViewBag.SenasteProjekt != null)
         {
             <div style="background-color: white; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6;">
-                @* 1. Ändrat Projektnamn -> ProjectName *@
                 <h5 style="color: #0056b3; font-weight: bold;">@ViewBag.SenasteProjekt.ProjectName</h5>
-                @* 2. Ändrat Beskrivning -> Description *@
                 <p style="color: #555;">@ViewBag.SenasteProjekt.Description</p>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                    @* 3. Ändrat Startdatum -> StartDate *@
                     <small class="text-muted">Startade: @ViewBag.SenasteProjekt.StartDate.ToString("yyyy-MM-dd")</small>
 
-                    <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@ViewBag.SenasteProjekt.Id" class="btn btn-sm btn-outline-primary">
+                    @* 1. ÄNDRAT: asp-action till "Details" (enligt nya ProjectController) *@
+                    <a asp-controller="Project" asp-action="Details" asp-route-id="@ViewBag.SenasteProjekt.Id" class="btn btn-sm btn-outline-primary">
                         Läs mer
                     </a>
                 </div>
@@ -44,7 +42,6 @@
             <div class="profile-card" style="background-color: #ffffff; border-radius: 15px; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: none;">
                 <div style="height: 10px; background-color: #0056b3;"></div>
                 <div class="p-4 text-center">
-                    @* 4. Ändrat BildUrl -> ImageUrl *@
                     @if (!string.IsNullOrEmpty(person.ImageUrl))
                     {
                         <img src="@person.ImageUrl" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #f0f2f5; margin-bottom: 15px;" alt="Profil" />
@@ -56,19 +53,17 @@
                         </div>
                     }
 
-                    @* 5. Ändrat Fornamn/Efternamn -> FirstName/LastName *@
                     <h5 style="color: #002d5a; font-weight: bold; margin-bottom: 5px;">@person.FirstName @person.LastName</h5>
-                    @* 6. Ändrat Yrkestitel -> JobTitle *@
                     <p style="color: #0056b3; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px;">@person.JobTitle</p>
 
                     <div style="background: #f8f9fa; border-radius: 8px; padding: 10px; margin-bottom: 20px; min-height: 60px;">
                         <p class="text-muted small mb-0" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                            @* 7. Ändrat Beskrivning -> Description *@
                             @(string.IsNullOrEmpty(person.Description) ? "Ingen beskrivning tillgänglig." : person.Description)
                         </p>
                     </div>
 
-                    <a asp-controller="Account" asp-action="Profile" asp-route-id="@person.Id" class="btn btn-primary w-100" style="background-color: #002d5a; border: none; border-radius: 8px; padding: 10px; font-weight: 500;">Visa profil</a>
+                    @* 2. ÄNDRAT: asp-controller till "Person" *@
+                    <a asp-controller="Person" asp-action="Profile" asp-route-id="@person.Id" class="btn btn-primary w-100" style="background-color: #002d5a; border: none; border-radius: 8px; padding: 10px; font-weight: 500;">Visa profil</a>
                 </div>
             </div>
         }

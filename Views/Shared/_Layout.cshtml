@@ -25,16 +25,17 @@
                 <button type="submit">Sök</button>
             </form>
 
-            @if (User.Identity.IsAuthenticated)
+            @if (User.Identity?.IsAuthenticated == true)
             {
                 <div class="logged-in-info">
                     <span class="logged-in-text">Inloggad som: @User.Identity.Name</span>
 
-                    <form class="login" asp-controller="Account" asp-action="Profile" method="get">
+                    @* Länkar nu till PersonController *@
+                    <form class="login" asp-controller="Person" asp-action="Profile" method="get">
                         <button type="submit">Min profil</button>
                     </form>
 
-                    <form class="login" asp-controller="Message" asp-action="Message" method="get">
+                    <form class="login" asp-controller="Message" asp-action="Inbox" method="get">
                         <button type="submit">Meddelanden</button>
                     </form>
 
@@ -49,17 +50,21 @@
                     <button type="submit">Logga in</button>
                 </form>
             }
-
         </div>
     </header>
 
-    <main>
+    @* --- DETTA ÄR DEN VIKTIGASTE DELEN FÖR ATT FIXA FELET --- *@
+    <main role="main">
         @RenderBody()
     </main>
+    @* ------------------------------------------------------- *@
 
     <footer class="footer">
-        <div>&#169; 2025 - CV_siten</div>
+        <div class="container text-center">
+            &#169; 2026 - CV_siten
+        </div>
     </footer>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

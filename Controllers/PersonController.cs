@@ -1,7 +1,6 @@
-﻿using CV_siten.Data;
-using CV_siten.Data.Data;
+﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
-using CV_siten.Models;
+using CV_siten.Models.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,38 +8,184 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CV_siten.Controllers
 {
-    [Authorize] // Skyddar alla actions i denna controller
+    [Authorize] // Hela kontrollern kräver inloggning för personlig data
     public class PersonController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public PersonController(
+            ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
-            ApplicationDbContext context)
+            IWebHostEnvironment webHostEnvironment)
         {
-            _userManager = userManager;
             _context = context;
+            _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
-        // Exempel-action: Visa min profil
-        public async Task<IActionResult> MinProfil()
+        // --- VISA PROFIL ---
+        [AllowAnonymous] // Tillåt oinloggade att se publika profiler via ID
+        public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
         {
-            // 1. Hämta inloggad IdentityUser
-            var identityUser = await _userManager.GetUserAsync(User);
+            Person person;
 
-            if (identityUser == null)
-                return RedirectToAction("Login", "Account");
+            if (id.HasValue)
+            {
+                // Visa specifik profil baserat på ID
+                person = await _context.Persons
+                    .Include(p => p.PersonProjects)
+                    .ThenInclude(pp => pp.Project)
+                    .FirstOrDefaultAsync(p => p.Id == id);
+            }
+            else
+            {
+                // Visa den inloggade användarens egen profil
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null) return RedirectToAction("Login", "Account");
 
-            // 2. Hämta Person kopplad till IdentityUser
-            var person = await _context.Persons
-                .FirstOrDefaultAsync(p => p.IdentityUserId == identityUser.Id);
+                string userId = user.Id; // Fix: Bryt ut ID för att undvika Expression Tree-fel
+                person = await _context.Persons
+                    .Include(p => p.PersonProjects)
+                    .ThenInclude(pp => pp.Project)
+                    .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
+            }
 
-            if (person == null)
-                return NotFound("Ingen Person-profil kopplad till detta konto.");
+            if (person == null) return NotFound();
 
-            // 3. Returnera view med Person-data
-            return View(person);
+            // Sökning i personens projekt
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                person.PersonProjects = person.PersonProjects
+                    .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // Sortering av projekt
+            person.PersonProjects = sortBy switch
+            {
+                "status" => person.PersonProjects.OrderBy(pp => pp.Project.Status).ToList(),
+                "tid" => person.PersonProjects.OrderByDescending(pp => pp.Project.StartDate).ToList(),
+                _ => person.PersonProjects.OrderBy(pp => pp.Project.ProjectName).ToList()
+            };
+
+            ViewBag.CurrentSearch = searchString;
+            return View("~/Views/Account/Profile.cshtml", person);
+        }
+
+        // --- REDIGERA PROFIL (GET) ---
+        [HttpGet]
+        public async Task<IActionResult> Edit()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            string userId = user.Id;
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == userId);
+
+            if (person == null) return NotFound();
+
+            var model = new EditAccountViewModel
+            {
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Email = user.Email,
+                PhoneNumber = person.PhoneNumber,
+                JobTitle = person.JobTitle,
+                Description = person.Description
+            };
+
+            return View("~/Views/Account/EditAccount.cshtml", model);
+        }
+
+        // --- REDIGERA PROFIL (POST) ---
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditAccountViewModel model)
+        {
+            if (!ModelState.IsValid) return View("~/Views/Account/EditAccount.cshtml", model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            string userId = user.Id;
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == userId);
+
+            if (person == null) return NotFound();
+
+            // Uppdatera Identity
+            user.Email = model.Email;
+            user.UserName = model.Email;
+            await _userManager.UpdateAsync(user);
+
+            // Uppdatera Person-entiteten
+            person.FirstName = model.FirstName;
+            person.LastName = model.LastName;
+            person.PhoneNumber = model.PhoneNumber;
+            person.JobTitle = model.JobTitle;
+            person.Description = model.Description;
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Profilen har uppdaterats!";
+            return RedirectToAction("Profile");
+        }
+
+        // --- CV-HANTERING (Flyttad hit från ProjectController) ---
+        [HttpPost]
+        public async Task<IActionResult> UploadCv(IFormFile cvFile)
+        {
+            if (cvFile == null || cvFile.Length == 0) return RedirectToAction("Profile");
+
+            var extension = Path.GetExtension(cvFile.FileName).ToLower();
+            if (extension != ".pdf") return BadRequest("Endast PDF tillåtet.");
+
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person != null)
+            {
+                string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "cvs");
+                if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+
+                string fileName = Guid.NewGuid().ToString() + extension;
+                string filePath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await cvFile.CopyToAsync(stream);
+                }
+
+                // Radera gammal fil om den finns
+                if (!string.IsNullOrEmpty(person.CvUrl))
+                {
+                    var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, person.CvUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
+                }
+
+                person.CvUrl = "/uploads/cvs/" + fileName;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteCv()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person != null && !string.IsNullOrEmpty(person.CvUrl))
+            {
+                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, person.CvUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+
+                person.CvUrl = null;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Profile");
         }
     }
 }

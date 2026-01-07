@@ -1,6 +1,6 @@
 ﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
-using CV_siten.Models.ViewModels;
+using CV_siten.Models.ViewModels.Message;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -50,12 +50,12 @@ namespace CV_siten.Controllers
         public IActionResult Send(int receiverId) // receiverId matchar parametern från URL:en
         {
             // 2. Uppdaterat ViewModel-property till ReceiverId
-            return View(new SendMessage { ReceiverId = receiverId });
+            return View(new SendMessageViewModel { ReceiverId = receiverId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Send(SendMessage vm)
+        public async Task<IActionResult> Send(SendMessageViewModel vm)
         {
             if (!ModelState.IsValid)
                 return View(vm);
