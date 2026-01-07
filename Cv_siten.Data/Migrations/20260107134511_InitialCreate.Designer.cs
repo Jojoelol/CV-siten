@@ -4,6 +4,7 @@ using CV_siten.Data.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260107134511_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,15 +94,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "504c173b-a634-444b-825f-a00a3fa14cba",
+                            ConcurrencyStamp = "d09324d2-5041-4b5e-af3a-dac4a658f70e",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBhAL/xtShwtLZC2aitsexAdBGHoQgAU2Rq1yQeKbw/rK8K2Cw9XP7+GyKXy9R7wHQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENiYKN/P4VbGG0qvC4nLpT1kiDGNU5girqhQqGfbhQUZlevwd2j2wrTcYboG5Xg3jw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8cf706ad-968a-460a-8267-155be553e7b4",
+                            SecurityStamp = "9d592074-a850-4639-9d80-b07f9286c119",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -175,22 +178,10 @@ namespace Cv_siten.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("CvUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Education")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Experience")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
@@ -217,12 +208,6 @@ namespace Cv_siten.Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PostalCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Skills")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityUserId");
@@ -233,19 +218,12 @@ namespace Cv_siten.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Address = "Testvägen 1",
-                            City = "Teststad",
                             Description = "Testprofil.",
-                            Education = "Örebro Universitet",
-                            Experience = "Junior utvecklare på Test AB",
                             FirstName = "Joel",
                             IdentityUserId = "test-user-1",
                             IsActive = true,
                             JobTitle = "Systemutvecklare",
-                            LastName = "Test",
-                            PhoneNumber = "0701234567",
-                            PostalCode = "12345",
-                            Skills = "C#, ASP.NET Core, SQL"
+                            LastName = "Test"
                         });
                 });
 

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CV_siten.Data.Models 
 {
+    [Table("Messages")]
     public class Message
     {
         public int Id { get; set; }
@@ -13,6 +14,7 @@ namespace CV_siten.Data.Models
 
         [Required]
         public string Content { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
 
         public DateTime Timestamp { get; set; } = DateTime.Now;
 
