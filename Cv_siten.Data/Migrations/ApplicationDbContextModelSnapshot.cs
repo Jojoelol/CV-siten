@@ -91,15 +91,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "91b33f86-a1bf-4875-a9c8-df2553ca964a",
+                            ConcurrencyStamp = "504c173b-a634-444b-825f-a00a3fa14cba",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKZyxPdUj4yX20cxUDNqcznem0vPRIwfHwfg+OsJyPzVX44vuVEO+QIvYFJtnpMUyQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBhAL/xtShwtLZC2aitsexAdBGHoQgAU2Rq1yQeKbw/rK8K2Cw9XP7+GyKXy9R7wHQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ad76d3ae-d4f7-4419-b087-4bdb3f1db019",
+                            SecurityStamp = "8cf706ad-968a-460a-8267-155be553e7b4",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -171,10 +171,22 @@ namespace Cv_siten.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CvUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Education")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Experience")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
@@ -201,6 +213,12 @@ namespace Cv_siten.Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Skills")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityUserId");
@@ -211,12 +229,19 @@ namespace Cv_siten.Data.Migrations
                         new
                         {
                             Id = 1,
+                            Address = "Testvägen 1",
+                            City = "Teststad",
                             Description = "Testprofil.",
+                            Education = "Örebro Universitet",
+                            Experience = "Junior utvecklare på Test AB",
                             FirstName = "Joel",
                             IdentityUserId = "test-user-1",
                             IsActive = true,
                             JobTitle = "Systemutvecklare",
-                            LastName = "Test"
+                            LastName = "Test",
+                            PhoneNumber = "0701234567",
+                            PostalCode = "12345",
+                            Skills = "C#, ASP.NET Core, SQL"
                         });
                 });
 

@@ -63,3 +63,22 @@
         </div>
     </form>
 </div>
+
+
+@* Vi skapar ett dolt element som JS kan läsa av *@
+@if (ViewBag.ShowSuccessPopup == true)
+{
+    <div id="popup-data"
+         data-show="true"
+         data-url="@Url.Action("Profile", "Person")">
+    </div>
+}
+
+@* Din popup-HTML *@
+<div id="successPopup" class="success-popup-overlay" style="display:none;">
+    <div class="success-popup-content">
+        <i class="bi bi-check-circle-fill" style="color: #28a745; font-size: 3rem;"></i>
+        <h3>Projektet har sparats!</h3>
+        <p>Du skickas nu tillbaka till din profil...</p>
+    </div>
+</div>

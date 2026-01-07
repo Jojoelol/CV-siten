@@ -139,6 +139,30 @@ namespace CV_siten.Controllers
             return View(model); 
         }
 
+        // --- REDIGERA KOMPETENSER, UTBILDNINGAR OCH TIDIGARE ERFARENHETER ---
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfileField(int id, string fieldName, string fieldValue)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            if (person == null) return NotFound();
+
+            // Kontrollera att det är ägaren som försöker spara
+            var user = await _userManager.GetUserAsync(User);
+            if (person.IdentityUserId != user.Id) return Forbid();
+
+            // Uppdatera rätt fält baserat på namnet vi skickar in
+            switch (fieldName)
+            {
+                case "Skills": person.Skills = fieldValue; break;
+                case "Education": person.Education = fieldValue; break;
+                case "Experience": person.Experience = fieldValue; break;
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Profile", new { id = person.Id });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditAccountViewModel model)
