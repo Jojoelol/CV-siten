@@ -17,9 +17,8 @@ namespace CV_siten.Models.ViewModels.Account
         public string LastName { get; set; }
 
         [Required(ErrorMessage = "E-post är obligatorisk")]
-        [EmailAddress(ErrorMessage = "Ogiltig e-postadress")]
-        [RegularExpression(@"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|se)$",
-            ErrorMessage = "E-post måste sluta med .com eller .se.")]
+        [RegularExpression(@"^[A-Za-z]{3,}@[A-Za-z]{3,}\.(se|com)$",
+            ErrorMessage = "E-post måste ha minst tre bokstäver före och efter @ och sluta med .se eller .com.")]
         [Display(Name = "E-post")]
         public string Email { get; set; }
 
