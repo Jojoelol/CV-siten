@@ -67,8 +67,15 @@ namespace CV_siten.Data.Data
                 Id = 1,
                 FirstName = "Joel",
                 LastName = "Test",
+                PhoneNumber = "0701234567",
                 JobTitle = "Systemutvecklare",
                 Description = "Testprofil.",
+                Address = "Testvägen 1",
+                PostalCode = "12345",
+                City = "Teststad",
+                Skills = "C#, ASP.NET Core, SQL",
+                Education = "Örebro Universitet",
+                Experience = "Junior utvecklare på Test AB",
                 IsActive = true,
                 IdentityUserId = "test-user-1"
             });

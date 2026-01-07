@@ -23,6 +23,24 @@ namespace CV_siten.Data.Models
 
         [Display(Name = "Yrkestitel")]
         public string? JobTitle { get; set; }
+        
+        [Display(Name = "Färdigheter")]
+        public string? Skills { get; set; }
+
+        [Display(Name = "Utbildning")]
+        public string? Education { get; set; }
+
+        [Display(Name = "Erfarenheter")]
+        public string? Experience { get; set; }
+
+        [Display(Name = "Adress")]
+        public string? Address { get; set; }
+
+        [Display(Name = "Postnummer")]
+        public string? PostalCode { get; set; }
+
+        [Display(Name = "Ort")]
+        public string? City { get; set; }
 
         [Display(Name = "Aktivt konto")]
         public bool IsActive { get; set; }
