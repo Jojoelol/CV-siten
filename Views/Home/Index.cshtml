@@ -21,7 +21,6 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                     <small class="text-muted">Startade: @ViewBag.SenasteProjekt.StartDate.ToString("yyyy-MM-dd")</small>
 
-                    @* 1. ÄNDRAT: asp-action till "Details" (enligt nya ProjectController) *@
                     <a asp-controller="Project" asp-action="Details" asp-route-id="@ViewBag.SenasteProjekt.Id" class="btn btn-sm btn-outline-primary">
                         Läs mer
                     </a>
@@ -62,7 +61,6 @@
                         </p>
                     </div>
 
-                    @* 2. ÄNDRAT: asp-controller till "Person" *@
                     <a asp-controller="Person" asp-action="Profile" asp-route-id="@person.Id" class="btn btn-primary w-100" style="background-color: #002d5a; border: none; border-radius: 8px; padding: 10px; font-weight: 500;">Visa profil</a>
                 </div>
             </div>

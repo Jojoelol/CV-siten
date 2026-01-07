@@ -12,7 +12,6 @@ namespace CV_siten.Models.ViewModels.Account
         [Required(ErrorMessage = "Lösenord krävs")]
         [DataType(DataType.Password)]
         [Display(Name = "Lösenord")]
-        // 1. Ändrat från Losenord till Password
         public string Password { get; set; } = string.Empty;
 
         [Display(Name = "Kom ihåg mig")]

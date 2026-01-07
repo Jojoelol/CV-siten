@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CV_siten.Models.ViewModels.Account // Tips: Flytta denna till Webb-projektet senare
+namespace CV_siten.Models.ViewModels.Account 
 {
     public class CreateAccountViewModel
     {
         [Required(ErrorMessage = "Förnamn är obligatoriskt")]
-        [Display(Name = "Förnamn")] // Detta gör att användaren fortfarande ser "Förnamn" i webbläsaren
+        [Display(Name = "Förnamn")] 
         public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Efternamn är obligatoriskt")]
@@ -28,7 +28,7 @@ namespace CV_siten.Models.ViewModels.Account // Tips: Flytta denna till Webb-pro
 
         [Required(ErrorMessage = "Du måste bekräfta lösenordet")]
         [DataType(DataType.Password)]
-        [Compare("Password", ErrorMessage = "Lösenorden matchar inte.")] // Måste matcha nya namnet 'Password'
+        [Compare("Password", ErrorMessage = "Lösenorden matchar inte.")] 
         [Display(Name = "Bekräfta lösenord")]
         public string ConfirmPassword { get; set; }
 

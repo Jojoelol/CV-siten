@@ -23,15 +23,15 @@ namespace CV_siten.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // 1. Hämta de 3 senaste offentliga profilerna (Krav 1 & 6)
+
             var urvalCV = await _context.Persons
-                .Where(p => p.IsActive) // Endast aktiva och offentliga (Krav 6 & 12)
+                .Where(p => p.IsActive) 
                 .Take(3)
                 .ToListAsync();
 
-            // 2. Hämta det absolut senaste projektet (Krav 1)
+
             var senasteProjekt = await _context.Projects
-                .OrderByDescending(p => p.StartDate) // Eller ID om ni inte har skapat-datum
+                .OrderByDescending(p => p.StartDate) 
                 .FirstOrDefaultAsync();
 
             ViewBag.SenasteProjekt = senasteProjekt;

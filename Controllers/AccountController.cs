@@ -1,6 +1,6 @@
-﻿using CV_siten.Data.Data;         // För ApplicationDbContext
-using CV_siten.Data.Models;       // För ApplicationUser och Person
-using CV_siten.Models.ViewModels.Account; // För alla Account-ViewModels
+﻿using CV_siten.Data.Data;         
+using CV_siten.Data.Models;       
+using CV_siten.Models.ViewModels.Account; 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

@@ -1,5 +1,4 @@
-﻿@* 1. Uppdaterat namespace till där din ViewModel nu bor *@
-@model CV_siten.Models.ViewModels.Account.CreateAccountViewModel
+﻿@model CV_siten.Models.ViewModels.Account.CreateAccountViewModel
 
 @{
     ViewData["Title"] = "Skapa konto";
@@ -15,13 +14,11 @@
 
         <div class="row">
             <div class="col-md-6 form-group">
-                @* 2. Ändrat Fornamn -> FirstName *@
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="col-md-6 form-group">
-                @* 3. Ändrat Efternamn -> LastName *@
                 <label asp-for="LastName" class="control-label"></label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
@@ -35,21 +32,18 @@
         </div>
 
         <div class="form-group mt-2">
-            @* 4. Ändrat Telefonnummer -> PhoneNumber *@
             <label asp-for="PhoneNumber" class="control-label"></label>
             <input asp-for="PhoneNumber" class="form-control" />
             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
         <div class="form-group mt-2">
-            @* 5. Ändrat Yrkestitel -> JobTitle *@
             <label asp-for="JobTitle" class="control-label"></label>
             <input asp-for="JobTitle" class="form-control" placeholder="t.ex. Systemutvecklare" />
             <span asp-validation-for="JobTitle" class="text-danger"></span>
         </div>
 
         <div class="form-group mt-2">
-            @* 6. Ändrat Beskrivning -> Description *@
             <label asp-for="Description" class="control-label"></label>
             <textarea asp-for="Description" class="form-control" rows="3"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
@@ -57,13 +51,11 @@
 
         <div class="row mt-2">
             <div class="col-md-6 form-group">
-                @* 7. Ändrat Losenord -> Password *@
                 <label asp-for="Password" class="control-label"></label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="col-md-6 form-group">
-                @* 8. Ändrat BekraftaLosenord -> ConfirmPassword *@
                 <label asp-for="ConfirmPassword" class="control-label"></label>
                 <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>

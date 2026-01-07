@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CV_siten.Models.ViewModels.Account // Tips: Se till att namespacet matchar mappen
+namespace CV_siten.Models.ViewModels.Account 
 {
     public class EditAccountViewModel
     {

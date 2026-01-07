@@ -1,5 +1,4 @@
-﻿@* 1. Ändrat från Projekt till Project *@
-@model CV_siten.Data.Models.Project
+﻿@model CV_siten.Data.Models.Project
 
 <div class="project-details-wrapper" style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
     <div style="margin-bottom: 20px;">
@@ -10,12 +9,10 @@
 
     <article class="sidebar-card" style="padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <header style="border-bottom: 2px solid #3498db; padding-bottom: 15px; margin-bottom: 25px;">
-            @* 2. Ändrat från Projektnamn till ProjectName *@
             <h1 style="color: #2c3e50; margin: 0; font-size: 2rem;">@Model.ProjectName</h1>
 
             <div style="margin-top: 10px; color: #7f8c8d; font-size: 0.95rem;">
                 <span style="margin-right: 20px;"><strong>Status:</strong> @(Model.Status ?? "Ej angiven")</span>
-                @* 3. Ändrat från Typ till Type (eller det namn du valt i klassen) *@
                 <span><strong>Typ:</strong> @(Model.Type ?? "Ej angiven")</span>
             </div>
         </header>
@@ -23,9 +20,7 @@
         <div class="project-meta" style="margin-bottom: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 6px; display: flex; gap: 30px;">
             <div>
                 <small style="display:block; color: #95a5a6; text-transform: uppercase;">Period</small>
-                @* 4. Ändrat från Startdatum till StartDate *@
                 <strong>@Model.StartDate.ToString("yyyy-MM-dd")</strong> —
-                @* 5. Ändrat från Slutdatum till EndDate *@
                 <strong>@(Model.EndDate.HasValue? Model.EndDate.Value.ToString("yyyy-MM-dd") : "Pågående")</strong>
             </div>
         </div>
@@ -33,7 +28,6 @@
         <div class="project-description">
             <h3 style="color: #2c3e50; margin-bottom: 15px;">Om projektet</h3>
             <div style="line-height: 1.8; font-size: 1.1rem; color: #34495e; white-space: pre-line;">
-                @* 6. Ändrat från Beskrivning till Description *@
                 @if (!string.IsNullOrEmpty(Model.Description))
                 {
                     @Model.Description

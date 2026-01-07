@@ -36,7 +36,6 @@ namespace CV_siten.Controllers
         {
             var me = await GetMyPersonAsync();
 
-            // 1. Uppdaterat till ReceiverId, Sender och Timestamp
             var messages = await _db.Messages
                 .Where(m => m.ReceiverId == me.Id)
                 .Include(m => m.Sender)
@@ -47,9 +46,8 @@ namespace CV_siten.Controllers
         }
 
         [HttpGet]
-        public IActionResult Send(int receiverId) // receiverId matchar parametern från URL:en
+        public IActionResult Send(int receiverId) 
         {
-            // 2. Uppdaterat ViewModel-property till ReceiverId
             return View(new SendMessageViewModel { ReceiverId = receiverId });
         }
 
@@ -75,7 +73,6 @@ namespace CV_siten.Controllers
                 return View(vm);
             }
 
-            // 3. Mapning till den engelska Message-entiteten
             var entity = new Message
             {
                 SenderId = me.Id,
@@ -97,7 +94,6 @@ namespace CV_siten.Controllers
         {
             var me = await GetMyPersonAsync();
 
-            // 4. Uppdaterat till ReceiverId och IsRead
             var msg = await _db.Messages.FirstOrDefaultAsync(m => m.Id == id && m.ReceiverId == me.Id);
             if (msg == null) return NotFound();
 

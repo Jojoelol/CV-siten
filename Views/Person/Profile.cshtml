@@ -25,7 +25,6 @@
             <div class="sidebar-actions-container">
                 @if (string.IsNullOrEmpty(Model.CvUrl))
                 {
-                    @* ÄNDRAT: asp-controller="Person" istället för Project *@
                     <form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
                         <input type="hidden" name="personId" value="@Model.Id" />
                         <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
@@ -40,7 +39,6 @@
                     <div class="cv-button-row">
                         <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary">Visa CV</a>
 
-                        @* ÄNDRAT: asp-controller="Person" istället för Project *@
                         <form asp-controller="Person" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');">
                             <input type="hidden" name="personId" value="@Model.Id" />
                             <button type="submit" class="btn-action btn-danger">Ta bort</button>
@@ -48,7 +46,6 @@
                     </div>
                 }
 
-                @* Denna länk var redan rätt! *@
                 <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">
                     Redigera profil
                 </a>
@@ -57,7 +54,6 @@
     </aside>
 
     <section class="profile-main-content">
-        @* Projektrelaterade saker stannar kvar i ProjectController eller Person beroende på action *@
         <form asp-action="Profile" method="get" class="content-toolbar">
             <input type="hidden" name="id" value="@Model.Id" />
 
@@ -76,7 +72,6 @@
 
             <button type="submit" class="btn-action btn-primary">Sök</button>
 
-            @* Projekt-logik hör hemma i ProjectController *@
             <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline" style="text-decoration:none;">
                 Lägg till projekt
             </a>

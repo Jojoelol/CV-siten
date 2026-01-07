@@ -63,7 +63,7 @@ namespace CV_siten.Controllers
             };
 
             ViewBag.CurrentSearch = searchString;
-            return View(person); // MVC letar nu i Views/Person/Profile.cshtml
+            return View(person); 
         }
 
         // --- REDIGERA PROFIL ---
@@ -83,7 +83,7 @@ namespace CV_siten.Controllers
                 JobTitle = person.JobTitle,
                 Description = person.Description
             };
-            return View(model); // MVC letar nu i Views/Person/Edit.cshtml
+            return View(model); 
         }
 
         [HttpPost]

@@ -1,9 +1,7 @@
-﻿@* 1. Ändrat från Projekt till Project *@
-@model IEnumerable<CV_siten.Data.Models.Project>
+﻿@model IEnumerable<CV_siten.Data.Models.Project>
 
 @{
     ViewData["Title"] = "Sökresultat";
-    @* 2. Säkerställ att sökvägen till Person är rätt *@
     var personer = ViewBag.personResult as List<CV_siten.Data.Models.Person>;
 }
 
@@ -19,20 +17,16 @@
             {
                 <a class="sr-profile-card" asp-controller="Account" asp-action="Profile" asp-route-id="@pers.Id">
                     <div class="sr-img-wrapper">
-                        @* 3. Ändrat BildUrl till ImageUrl *@
                         <img src="~/images/@(string.IsNullOrEmpty(pers.ImageUrl) ? "defaultPicture.jpg" : pers.ImageUrl)"
                              alt="Profilbild" class="sr-profile-img" />
                     </div>
 
                     <div class="sr-identity-box">
-                        @* 4. Ändrat Fornamn/Efternamn till FirstName/LastName *@
                         <h3 class="sr-full-name">@pers.FirstName @pers.LastName</h3>
-                        @* 5. Ändrat Yrkestitel till JobTitle *@
                         <p class="sr-job-title">(@pers.JobTitle)</p>
                     </div>
 
                     <div class="sr-bio-container">
-                        @* 6. Ändrat Beskrivning till Description *@
                         <p class="sr-bio-text">@pers.Description</p>
                     </div>
                 </a>
