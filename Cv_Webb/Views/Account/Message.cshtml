@@ -1,4 +1,5 @@
-﻿@using CV_siten.Models.ViewModels
+﻿@model List<CV_siten.Data.Models.Message>
+
 @{
     ViewData["Title"] = "Mina meddelanden";
 }
@@ -24,7 +25,7 @@
                         <thead>
                             <tr>
                                 <th>Från</th>
-                                <th>Meddelande</th>
+                                <th>Ämne</th>
                                 <th>Datum</th>
                                 <th>Status</th>
                                 <th>Åtgärd</th>
@@ -35,12 +36,17 @@
                             {
                                 foreach (var m in Model)
                                 {
-                                    <tr class="@(m.ArLast ? "" : "table-light")">
-                                        <td><strong>@m.Avsandare?.Fornamn @m.Avsandare?.Efternamn</strong></td>
-                                        <td>@m.Innehall</td>
-                                        <td>@m.Tidsstampel.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                    <tr class="@(m.IsRead ? "" : "table-light") message-row"
+                                        role="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#readMessageModal"
+                                        data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)">
+
+                                        <td><strong>@m.Sender?.FirstName @m.Sender?.LastName</strong></td>
+                                        <td>@m.Subject</td>
+                                        <td>@m.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                                         <td>
-                                            @if (m.ArLast)
+                                            @if (m.IsRead)
                                             {
                                                 <span class="badge bg-secondary">Läst</span>
                                             }
@@ -50,7 +56,7 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (!m.ArLast)
+                                            @if (!m.IsRead)
                                             {
                                                 <form asp-controller="Message" asp-action="MarkRead" method="post" style="display:inline;">
                                                     @Html.AntiForgeryToken()
@@ -58,6 +64,9 @@
                                                     <button class="btn btn-sm btn-outline-dark">Markera läst</button>
                                                 </form>
                                             }
+                                        </td>
+                                        <td style="display:none;" class="message-content">
+                                            @m.Content
                                         </td>
                                     </tr>
                                 }
@@ -91,26 +100,47 @@
 
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label">Skicka till (PersonId)</label>
+                            <label class="form-label">Sök mottagare (förnamn / efternamn)</label>
+
+                            <input id="receiverSearch"
+                                   class="form-control"
+                                   type="text"
+                                   placeholder=""
+                                   autocomplete="off" />
+
+                            <input type="hidden"
+                                   id="receiverId"
+                                   name="ReceiverId"
+                                   value="@(ViewData["SendReceiverId"] ?? "")" />
+
+                            <div id="receiverSelected" class="form-text mt-2"></div>
+
+                            <div id="receiverResults" class="list-group mt-2"></div>
+
+                            @Html.ValidationMessage("ReceiverId", "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ämne</label>
                             <input class="form-control"
-                                   type="number"
-                                   name="MottagareId"
-                                   placeholder="Ex: 1"
+                                   type="text"
+                                   name="Subject"
+                                   value="@(ViewData["SendSubject"] ?? "")"
                                    required />
-                            <div class="form-text">
-                                (För test: skriv Person.Id på den du vill skicka till)
-                            </div>
+                            @Html.ValidationMessage("Subject", "", new { @class = "text-danger" })
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Meddelande</label>
                             <textarea class="form-control"
-                                      name="Innehall"
+                                      name="Content"
                                       rows="4"
-                                      placeholder="Skriv ditt meddelande..."
-                                      required></textarea>
+                                      required>@(ViewData["SendContent"] ?? "")</textarea>
+                            @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
                         </div>
+
                     </div>
+
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
@@ -121,4 +151,119 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="readMessageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="readMessageFrom"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="readMessageContent" style="white-space: pre-wrap;"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Stäng
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const searchInput = document.getElementById('receiverSearch');
+            const resultsEl = document.getElementById('receiverResults');
+            const receiverIdEl = document.getElementById('receiverId');
+
+            if (!searchInput) return;
+
+            let timer = null;
+
+            function clearResults() {
+                resultsEl.innerHTML = "";
+            }
+
+            function setSelected(person) {
+            receiverIdEl.value = person.id;
+            searchInput.value = person.name;
+            clearResults();
+            }
+
+            async function search(q) {
+                const res = await fetch(`/Message/SearchPerson?q=${encodeURIComponent(q)}`, {
+                    headers: { "Accept": "application/json" }
+                });
+                if (!res.ok) return [];
+                return await res.json();
+            }
+
+            function render(items) {
+                clearResults();
+
+                if (!items || items.length === 0) return;
+
+                for (const p of items) {
+                    const a = document.createElement('button');
+                    a.type = "button";
+                    a.className = "list-group-item list-group-item-action d-flex align-items-center gap-2";
+
+                    const img = document.createElement('img');
+                    img.src = p.imageUrl || "/img/default-avatar.png";
+                    img.alt = p.name;
+                    img.style.width = "32px";
+                    img.style.height = "32px";
+                    img.style.borderRadius = "50%";
+                    img.style.objectFit = "cover";
+
+                    const span = document.createElement('span');
+                    span.textContent = p.name;
+
+                    a.appendChild(img);
+                    a.appendChild(span);
+
+                    a.addEventListener('click', () => setSelected(p));
+                    resultsEl.appendChild(a);
+                }
+            }
+
+            searchInput.addEventListener('input', function () {
+                const q = (searchInput.value || "").trim();
+
+         
+                receiverIdEl.value = "";
+
+                clearTimeout(timer);
+                if (q.length < 2) {
+                    clearResults();
+                    return;
+                }
+
+                timer = setTimeout(async () => {
+                    const items = await search(q);
+                    render(items);
+                }, 200);
+            });
+        })();
+    </script>
+    <script>
+        document.addEventListener('click', function (e) {
+            const row = e.target.closest('.message-row');
+            if (!row) return;
+
+            const from = row.getAttribute('data-from') || '';
+            const content = row.querySelector('.message-content')?.textContent || '';
+
+            document.getElementById('readMessageFrom').textContent = "Från: " + from;
+            document.getElementById('readMessageContent').textContent = content;
+        });
+    </script>
+
+}
+

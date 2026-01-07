@@ -1,6 +1,6 @@
 ﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
-using CV_siten.Models.ViewModels.Message;
+using CV_siten.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -56,27 +56,28 @@ namespace CV_siten.Controllers
         public async Task<IActionResult> Send(SendMessageViewModel vm)
         {
             if (!ModelState.IsValid)
-                return View(vm);
+                return await ReturnInboxWithModalAsync(vm);
 
             var me = await GetMyPersonAsync();
 
             if (vm.ReceiverId == me.Id)
             {
-                ModelState.AddModelError("", "Du kan inte skicka meddelande till dig själv.");
-                return View(vm);
+                ModelState.AddModelError("ReceiverId", "Du kan inte skicka meddelande till dig själv.");
+                return await ReturnInboxWithModalAsync(vm);
             }
 
             var receiverExists = await _db.Persons.AnyAsync(p => p.Id == vm.ReceiverId);
             if (!receiverExists)
             {
-                ModelState.AddModelError("", "Mottagaren finns inte.");
-                return View(vm);
+                ModelState.AddModelError("ReceiverId", "Mottagaren finns inte.");
+                return await ReturnInboxWithModalAsync(vm);
             }
 
-            var entity = new Message
+            var entity = new CV_siten.Data.Models.Message
             {
                 SenderId = me.Id,
                 ReceiverId = vm.ReceiverId,
+                Subject = vm.Subject,
                 Content = vm.Content,
                 Timestamp = DateTime.UtcNow,
                 IsRead = false
@@ -107,5 +108,52 @@ namespace CV_siten.Controllers
         {
             return RedirectToAction(nameof(Inbox));
         }
+
+        private async Task<IActionResult> ReturnInboxWithModalAsync(SendMessageViewModel? vm = null)
+        {
+            var me = await GetMyPersonAsync();
+
+            var messages = await _db.Messages
+                .Where(m => m.ReceiverId == me.Id)
+                .Include(m => m.Sender)
+                .OrderByDescending(m => m.Timestamp)
+                .ToListAsync();
+
+            if (vm != null)
+            {
+                ViewData["OpenSendModal"] = true;
+                ViewData["SendReceiverId"] = vm.ReceiverId;
+                ViewData["SendSubject"] = vm.Subject;
+                ViewData["SendContent"] = vm.Content;
+            }
+
+            return View("~/Views/Account/Message.cshtml", messages);
+        }
+        [HttpGet]
+        public async Task<IActionResult> SearchPerson(string q)
+        {
+            q = (q ?? "").Trim();
+            if (q.Length < 2)
+                return Json(Array.Empty<object>());
+
+            var results = await _db.Persons
+                .Where(p =>
+                    (p.FirstName + " " + p.LastName).Contains(q) ||
+                    p.FirstName.Contains(q) ||
+                    p.LastName.Contains(q))
+                .OrderBy(p => p.FirstName)
+                .ThenBy(p => p.LastName)
+                .Select(p => new
+                {
+                    id = p.Id,
+                    name = p.FirstName + " " + p.LastName,
+                    imageUrl = p.ImageUrl
+                })
+                .Take(8)
+                .ToListAsync();
+
+            return Json(results);
+        }
+
     }
 }

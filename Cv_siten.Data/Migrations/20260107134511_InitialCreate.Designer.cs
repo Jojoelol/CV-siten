@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260107111818_InitialSetup")]
-    partial class InitialSetup
+    [Migration("20260107134511_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -94,15 +94,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "91b33f86-a1bf-4875-a9c8-df2553ca964a",
+                            ConcurrencyStamp = "d09324d2-5041-4b5e-af3a-dac4a658f70e",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKZyxPdUj4yX20cxUDNqcznem0vPRIwfHwfg+OsJyPzVX44vuVEO+QIvYFJtnpMUyQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENiYKN/P4VbGG0qvC4nLpT1kiDGNU5girqhQqGfbhQUZlevwd2j2wrTcYboG5Xg3jw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ad76d3ae-d4f7-4419-b087-4bdb3f1db019",
+                            SecurityStamp = "9d592074-a850-4639-9d80-b07f9286c119",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -153,6 +153,10 @@ namespace Cv_siten.Data.Migrations
 
                     b.Property<int>("SenderId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
