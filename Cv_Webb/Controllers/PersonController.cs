@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Xml.Serialization;
+using System.IO;
+using System.Text;
 
 namespace CV_siten.Controllers
 {
@@ -45,14 +47,12 @@ namespace CV_siten.Controllers
 
             if (person == null) return NotFound();
 
-            // Säkerställ att vi inte räknar besök vid t.ex. bildanrop (Fix för dubbelräkning)
             if (Request.Headers["Accept"].ToString().Contains("text/html"))
             {
                 person.ViewCount++; // VG-krav #1
                 await _context.SaveChangesAsync();
             }
 
-            // Hantera privat profil (G-krav 7)
             if (person.IsPrivate && user == null)
             {
                 return RedirectToAction("Login", "Account");
@@ -60,7 +60,6 @@ namespace CV_siten.Controllers
 
             ViewBag.IsOwner = (loggedInPerson != null && targetId == loggedInPerson.Id);
 
-            // Sökning och sortering i projekt
             if (!string.IsNullOrEmpty(searchString))
             {
                 person.PersonProjects = person.PersonProjects
@@ -95,7 +94,6 @@ namespace CV_siten.Controllers
                 JobTitle = person.JobTitle,
                 Description = person.Description,
                 ImageUrl = person.ImageUrl,
-                // --- LÄGG TILL DESSA RADER ---
                 Address = person.Address,
                 PostalCode = person.PostalCode,
                 City = person.City,
@@ -111,10 +109,9 @@ namespace CV_siten.Controllers
             var person = await _context.Persons.FindAsync(id);
             var user = await _userManager.GetUserAsync(User);
 
-            // Säkerställ att det är ägaren som ändrar
             if (person != null && person.IdentityUserId == user.Id)
             {
-                person.IsPrivate = !person.IsPrivate; // Växlar mellan true/false
+                person.IsPrivate = !person.IsPrivate;
                 await _context.SaveChangesAsync();
             }
 
@@ -132,7 +129,6 @@ namespace CV_siten.Controllers
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             if (person == null) return NotFound();
 
-            // 1. Hantera ny bilduppladdning
             if (model.ImageFile != null)
             {
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
@@ -145,14 +141,9 @@ namespace CV_siten.Controllers
                 {
                     await model.ImageFile.CopyToAsync(stream);
                 }
-
-                // Sparar "ProfilePicture/filnamn.jpg"
-                person.ImageUrl = "ProfilePicture/" + fileName;
+                person.ImageUrl = fileName; // Vi sparar bara filnamnet
             }
-            // Om ingen ny fil valts, behåll värdet som fanns i person.ImageUrl sedan tidigare.
-            // Vi rör inte person.ImageUrl här om model.ImageFile är null.
 
-            // 2. Uppdatera övriga fält
             person.FirstName = model.FirstName;
             person.LastName = model.LastName;
             person.PhoneNumber = model.PhoneNumber;
@@ -177,28 +168,40 @@ namespace CV_siten.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportToXml()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userId = _userManager.GetUserId(User);
+
             var person = await _context.Persons
                 .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
-                .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+                .Include(p => p.IdentityUser)
+                .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
             if (person == null) return NotFound();
 
-            // Skapa en export-struktur för att undvika problem med tunga objekt
-            var export = new
+            // Här använder vi den riktiga klassen för att undvika InvalidOperationException
+            var exportData = new ProfileExportModel
             {
-                Namn = $"{person.FirstName} {person.LastName}",
-                Titel = person.JobTitle,
-                Beskrivning = person.Description,
-                Kompetenser = person.Skills,
-                Projekt = person.PersonProjects.Select(pp => new { pp.Project.ProjectName, pp.Project.Description }).ToList()
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                Email = person.IdentityUser?.Email,
+                Description = person.Description,
+                Skills = person.Skills,
+                Education = person.Education,
+                Experience = person.Experience,
+                Projects = person.PersonProjects.Select(pp => new ProjectExportModel
+                {
+                    ProjectName = pp.Project.ProjectName,
+                    Description = pp.Project.Description
+                }).ToList()
             };
 
-            var serializer = new XmlSerializer(export.GetType());
-            using (var sw = new StringWriter())
+            var serializer = new XmlSerializer(typeof(ProfileExportModel));
+            using (var stringWriter = new StringWriter())
             {
-                serializer.Serialize(sw, export);
-                return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "application/xml", $"CV_{person.LastName}.xml");
+                serializer.Serialize(stringWriter, exportData);
+                var xmlContent = stringWriter.ToString();
+                var bytes = Encoding.UTF8.GetBytes(xmlContent);
+
+                return File(bytes, "application/xml", $"CV_{person.FirstName}_{person.LastName}.xml");
             }
         }
 
@@ -238,7 +241,6 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", new { id = id });
         }
 
-        // --- CV-FILSHANTERING ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadCv(IFormFile cvFile)

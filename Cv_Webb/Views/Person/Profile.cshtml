@@ -7,7 +7,7 @@
             <div class="pic-placeholder">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="~/images/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+                    <img src="~/images/ProfilePicture/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
                 }
                 else
                 {
@@ -53,7 +53,7 @@
             <div class="sidebar-actions-container">
                 @if (ViewBag.IsOwner == true)
                 {
-                    @* --- SEKRETESSINSTÄLLNING (Privat/Offentlig) --- *@
+                    @* --- SEKRETESSINSTÄLLNING (Krav 3.1.6) --- *@
                     <div class="privacy-status" style="margin-bottom: 15px; padding: 12px; background-color: @(Model.IsPrivate ? "#fff3cd" : "#d1e7dd"); border-radius: 8px; font-size: 0.85em; text-align: center; border: 1px solid @(Model.IsPrivate ? "#ffeeba" : "#badbcc");">
                         @if (Model.IsPrivate)
                         {
@@ -95,6 +95,7 @@
 
                     <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">Redigera profil</a>
 
+                    @* --- XML EXPORT (Krav 3.2.7) --- *@
                     <a asp-controller="Person" asp-action="ExportToXml" class="btn-action" style="background-color: #17a2b8; color: white; border: none; margin-top: 5px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-file-export" style="margin-right: 8px;"></i> Exportera CV (XML)
                     </a>

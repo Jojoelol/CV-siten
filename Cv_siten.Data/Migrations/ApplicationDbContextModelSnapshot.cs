@@ -91,15 +91,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "6597e796-9ab7-470f-93ae-285158952a6b",
+                            ConcurrencyStamp = "2063b52c-a768-4bee-a20a-9fa9957b7981",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAENCtb44DUqFMWnKS9ZcNtGTnFaWKzXtCiqxCODn93kaV+o3mULR6gv1GcyNtWpDeww==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBSamYIP7tW+YSg16D6c1uQysDuYpmKDZPg20QUakIaSIFr0E/lU2rk1z+ThKtQntA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a09de1f0-dd56-48ad-9147-b84661eeac12",
+                            SecurityStamp = "d42e5f75-b600-4b77-b3a1-e808b29b766d",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         },
@@ -107,15 +107,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "209544a2-244d-4626-aa1c-9ede24aa9c98",
+                            ConcurrencyStamp = "612faea9-e069-45d2-80fb-7bb014fed138",
                             Email = "testsson@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TESTSSON@TEST.SE",
                             NormalizedUserName = "TESTSSON@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOkwt9Tuj9OtgWiQffHeiuTFCPgA0i0/nIGtI+En94G29Y0nXUXSOoDvF/yXAt4jPg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEMMo6/0bp3kiqjtyOU3JcvKFb3kc2ixO0ZwKa5uAM/xoFxn3zk4Ri/0ZJfDs0IwdA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "ea833b1a-3813-4ac6-b401-afbd5323a166",
+                            SecurityStamp = "9e442700-7756-4fce-b13f-06b5e62b9c81",
                             TwoFactorEnabled = false,
                             UserName = "testsson@test.se"
                         });
@@ -346,6 +346,9 @@ namespace Cv_siten.Data.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZipUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
