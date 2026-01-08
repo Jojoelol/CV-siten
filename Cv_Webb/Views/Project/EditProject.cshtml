@@ -1,0 +1,97 @@
+﻿@model CV_siten.Models.ViewModels.EditProjectViewModel
+
+<div class="yellow-box welcome-area" style="max-width: 700px; margin: 20px auto; padding: 30px;">
+    <h2>Redigera projekt</h2>
+    <p class="text-muted">Uppdatera information, bild eller källkod för <strong>@Model.ProjectName</strong></p>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="ImageUrl" />
+        <input type="hidden" asp-for="ZipUrl" />
+
+        <div class="row">
+            @* --- PROJEKTBILD --- *@
+            <div class="col-md-12 mb-4 text-center">
+                <label class="d-block mb-2 fw-bold">Projektbild</label>
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Url.Content("~/images/projects/" + Model.ImageUrl)"
+                         class="img-thumbnail mb-2"
+                         style="width: 250px; height: 150px; object-fit: cover; border-radius: 8px; border: 2px solid #002d5a;" />
+                }
+                else
+                {
+                    <div class="mb-2" style="width: 250px; height: 150px; background: #eee; border-radius: 8px; display: inline-block; line-height: 150px; color: #aaa; border: 2px dashed #ccc;">
+                        Ingen bild vald
+                    </div>
+                }
+                <input type="file" asp-for="ImageFile" class="form-control mt-2" accept="image/*" />
+            </div>
+
+            @* --- GRUNDUPPGIFTER --- *@
+            <div class="col-md-12 mb-3">
+                <label asp-for="ProjectName" class="form-label fw-bold">Projektnamn</label>
+                <input asp-for="ProjectName" class="form-control" />
+                <span asp-validation-for="ProjectName" class="text-danger"></span>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Type" class="form-label fw-bold">Typ</label>
+                <input asp-for="Type" class="form-control" placeholder="t.ex. Webbapplikation" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="Status" class="form-label fw-bold">Status</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="Aktivt">Aktivt</option>
+                    <option value="Avslutatt">Avslutat</option>
+                    <option value="Pausat">Pausat</option>
+                </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="StartDate" class="form-label fw-bold">Startdatum</label>
+                <input asp-for="StartDate" type="date" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label asp-for="EndDate" class="form-label fw-bold">Slutdatum (Valfritt)</label>
+                <input asp-for="EndDate" type="date" class="form-control" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+            </div>
+
+            @* --- KÄLLKOD (ZIP) --- *@
+            <div class="col-md-12 mb-4">
+                <div class="p-3 border rounded bg-light">
+                    <label class="form-label fw-bold"><i class="fas fa-file-archive text-warning"></i> Uppdatera Källkod (.zip)</label>
+                    @if (!string.IsNullOrEmpty(Model.ZipUrl))
+                    {
+                        <p class="small text-success"><i class="fas fa-check"></i> Nuvarande fil: @Model.ZipUrl</p>
+                    }
+                    <input type="file" asp-for="ZipFile" class="form-control" accept=".zip,.rar,.7z" />
+                </div>
+            </div>
+
+            <div class="col-md-12 mb-4">
+                <label asp-for="Description" class="form-label fw-bold">Beskrivning</label>
+                <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+            </div>
+        </div>
+
+        @* --- KNAPPAR --- *@
+        <div class="d-grid gap-2 mb-3">
+            <button type="submit" class="btn btn-primary" style="background-color: #002d5a; padding: 12px;">
+                <i class="fas fa-save"></i> Spara ändringar
+            </button>
+            <a asp-action="ProjectDetails" asp-route-id="@Model.Id" class="btn btn-secondary">Avbryt</a>
+        </div>
+    </form>
+</div>
