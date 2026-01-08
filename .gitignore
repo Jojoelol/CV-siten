@@ -37,3 +37,14 @@ project.assets.json
 ## Övrigt skräp
 .DS_Store
 Thumbs.db
+
+
+# Exkludera Entity Framework Migrations (valfritt, se varning nedan)
+**/Migrations/*.cs
+**/Migrations/*.Designer.cs
+**/Migrations/*.resx
+
+# Exkludera lokala databasfiler
+*.mdf
+*.ldf
+*.db
