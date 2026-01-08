@@ -26,16 +26,14 @@ namespace CV_siten.Controllers
 
         public async Task<IActionResult> Index()
         {
-            // Senaste projektet
             ViewBag.SenasteProjekt = await _context.Projects
                 .OrderByDescending(p => p.Id)
                 .FirstOrDefaultAsync();
 
-            // Om utloggad â visa 3 utvalda profiler
             if (!User.Identity.IsAuthenticated)
             {
                 ViewBag.SectionTitle = "UTVALDA PROFILER";
-                ViewBag.MatchData = new Dictionary<int, int>(); // viktigt!
+                ViewBag.MatchData = new Dictionary<int, int>();
 
                 var urvalCV = await _context.Persons
                     .Where(p => p.IsActive && !p.IsPrivate)
@@ -45,12 +43,10 @@ namespace CV_siten.Controllers
                 return View(urvalCV);
             }
 
-            // HÃ¤mta inloggad anvÃ¤ndare
             var userId = _userManager.GetUserId(User);
             var currentPerson = await _context.Persons
                 .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
-            // Om ingen Person-profil finns â visa utvalda
             if (currentPerson == null)
             {
                 ViewBag.SectionTitle = "UTVALDA PROFILER";
@@ -64,31 +60,27 @@ namespace CV_siten.Controllers
                 return View(fallback);
             }
 
-            // HÃ¤mta andra personer
             var others = await _context.Persons
                 .Where(p => p.Id != currentPerson.Id && p.IsActive && !p.IsPrivate)
                 .ToListAsync();
 
-
-
-            // MATCHANDE AV PROFILER
             var matches = others
                 .Select(p =>
                 {
                     var score = CalculateMatchScore(currentPerson, p);
+
                     return new
                     {
                         Person = p,
                         Score = score,
-                        MatchPercent = score * 10 // maxscore 10 â 100%
+                        MatchPercent = Math.Min(score * 10, 100) // ⭐ CAP VID 100%
                     };
                 })
-                .Where(x => x.Score >= 5) // minst 50%
+                .Where(x => x.Score >= 5)
                 .OrderByDescending(x => x.Score)
                 .Take(3)
                 .ToList();
 
-            // Skicka procent till vyn
             ViewBag.MatchData = matches.ToDictionary(
                 x => x.Person.Id,
                 x => x.MatchPercent
@@ -99,7 +91,39 @@ namespace CV_siten.Controllers
             return View(matches.Select(x => x.Person).ToList());
         }
 
-        // BERÃKNAR MATCHNINGSSCORE MELLAN TVÃ PERSONER
+        // ⭐ Fuzzy skill match
+        private bool FuzzySkillMatch(string a, string b)
+        {
+            a = a.ToLower().Trim();
+            b = b.ToLower().Trim();
+
+            if (a == b)
+                return true;
+
+            if (a.Contains(b) || b.Contains(a))
+                return true;
+
+            var synonyms = new Dictionary<string, string[]>
+            {
+                { "javascript", new[] { "js" } },
+                { "js", new[] { "javascript" } },
+                { "c#", new[] { "c sharp", "c-sharp" } },
+                { "c sharp", new[] { "c#", "c-sharp" } },
+                { "react", new[] { "react.js", "reactjs" } },
+                { "react.js", new[] { "react", "reactjs" } },
+                { "sql", new[] { "t-sql", "mysql", "postgresql" } }
+            };
+
+            if (synonyms.ContainsKey(a) && synonyms[a].Contains(b))
+                return true;
+
+            if (synonyms.ContainsKey(b) && synonyms[b].Contains(a))
+                return true;
+
+            return false;
+        }
+
+        // ⭐ MER EXAKT MATCHNING
         private int CalculateMatchScore(Person a, Person b)
         {
             int score = 0;
@@ -108,14 +132,29 @@ namespace CV_siten.Controllers
                 a.JobTitle.Equals(b.JobTitle, StringComparison.OrdinalIgnoreCase))
                 score += 3;
 
-            if (!string.IsNullOrEmpty(a.Skills) &&
-                !string.IsNullOrEmpty(b.Skills))
+            if (!string.IsNullOrEmpty(a.Skills) && !string.IsNullOrEmpty(b.Skills))
             {
-                var skillsA = a.Skills.Split(',').Select(s => s.Trim());
-                var skillsB = b.Skills.Split(',').Select(s => s.Trim());
+                var skillsA = a.Skills
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim().ToLower())
+                    .ToList();
 
-                if (skillsA.Intersect(skillsB).Any())
-                    score += 5;
+                var skillsB = b.Skills
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim().ToLower())
+                    .ToList();
+
+                foreach (var skillA in skillsA)
+                {
+                    foreach (var skillB in skillsB)
+                    {
+                        if (FuzzySkillMatch(skillA, skillB))
+                        {
+                            score += 2; // ⭐ +2 PER MATCHAD SKILL
+                            break;
+                        }
+                    }
+                }
             }
 
             if (!string.IsNullOrEmpty(a.Education) &&
@@ -137,11 +176,12 @@ namespace CV_siten.Controllers
         {
             var query = _context.Persons.AsQueryable();
             query = query.Where(p => p.IsActive);
-            // G-krav 12: Om anv�ndaren inte �r inloggad, d�lj privata profiler
+
             if (!User.Identity.IsAuthenticated)
             {
                 query = query.Where(p => !p.IsPrivate);
             }
+
             if (!string.IsNullOrEmpty(search))
             {
                 string s = search.ToUpper();
@@ -149,7 +189,7 @@ namespace CV_siten.Controllers
                     p.FirstName.ToUpper().Contains(s) ||
                     p.LastName.ToUpper().Contains(s));
             }
-            // F�lt 2 (name="skill"): S�k p� Skills, Education, JobTitle och Experience
+
             if (!string.IsNullOrEmpty(skill))
             {
                 string sk = skill.ToUpper();
@@ -163,7 +203,6 @@ namespace CV_siten.Controllers
 
             var personResult = await query.ToListAsync();
 
-            // S�k efter projekt (valfritt om du vill att search-f�ltet �ven ska trigga projekt)
             var projektResult = await _context.Projects
                 .Where(p => string.IsNullOrEmpty(search) || p.ProjectName.ToUpper().Contains(search.ToUpper()))
                 .ToListAsync();
@@ -173,7 +212,6 @@ namespace CV_siten.Controllers
             ViewBag.personResult = personResult;
 
             return View("SearchResult", projektResult);
-
         }
     }
 }
