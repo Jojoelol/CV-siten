@@ -91,17 +91,33 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1b78a88d-04ec-4aa9-96b3-ce11a3c1e95e",
+                            ConcurrencyStamp = "6597e796-9ab7-470f-93ae-285158952a6b",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAELJK3DG2eAx45o/DRgj9OJx/KDZMAGQGrKbsiHtTPtvSTymELwVBm+U5rIs7XDbDlQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENCtb44DUqFMWnKS9ZcNtGTnFaWKzXtCiqxCODn93kaV+o3mULR6gv1GcyNtWpDeww==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f7860673-90d6-4827-a9be-7108915f64e9",
+                            SecurityStamp = "a09de1f0-dd56-48ad-9147-b84661eeac12",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
+                        },
+                        new
+                        {
+                            Id = "test-user-2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "209544a2-244d-4626-aa1c-9ede24aa9c98",
+                            Email = "testsson@test.se",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TESTSSON@TEST.SE",
+                            NormalizedUserName = "TESTSSON@TEST.SE",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOkwt9Tuj9OtgWiQffHeiuTFCPgA0i0/nIGtI+En94G29Y0nXUXSOoDvF/yXAt4jPg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "ea833b1a-3813-4ac6-b401-afbd5323a166",
+                            TwoFactorEnabled = false,
+                            UserName = "testsson@test.se"
                         });
                 });
 
@@ -164,7 +180,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("CV_siten.Data.Models.Person", b =>
@@ -233,7 +249,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("IdentityUserId");
 
-                    b.ToTable("Persons");
+                    b.ToTable("Persons", (string)null);
 
                     b.HasData(
                         new
@@ -255,6 +271,26 @@ namespace Cv_siten.Data.Migrations
                             PostalCode = "12345",
                             Skills = "C#, ASP.NET Core, SQL",
                             ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Address = "Testvägen 2",
+                            City = "Teststad",
+                            Description = "Testprofil.",
+                            Education = "Örebro Universitet",
+                            Experience = "Junior utvecklare på Test AB",
+                            FirstName = "Oscar",
+                            IdentityUserId = "test-user-2",
+                            ImageUrl = "Bild1.png",
+                            IsActive = true,
+                            IsPrivate = false,
+                            JobTitle = "Systemutvecklare",
+                            LastName = "Test",
+                            PhoneNumber = "0709876543",
+                            PostalCode = "12345",
+                            Skills = "C#, ASP.NET Core, SQL",
+                            ViewCount = 0
                         });
                 });
 
@@ -273,7 +309,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("PersonProjects");
+                    b.ToTable("PersonProjects", (string)null);
                 });
 
             modelBuilder.Entity("CV_siten.Data.Models.Project", b =>
@@ -294,6 +330,9 @@ namespace Cv_siten.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -311,7 +350,9 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -503,12 +544,23 @@ namespace Cv_siten.Data.Migrations
                     b.HasOne("CV_siten.Data.Models.Project", "Project")
                         .WithMany("PersonProjects")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Person");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CV_siten.Data.Models.Project", b =>
+                {
+                    b.HasOne("CV_siten.Data.Models.Person", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
