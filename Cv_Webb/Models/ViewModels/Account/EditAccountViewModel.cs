@@ -31,5 +31,7 @@ namespace CV_siten.Models.ViewModels.Account
         [StringLength(500, ErrorMessage = "Beskrivningen får inte överskrida 500 tecken.")]
         [Display(Name = "Om mig / Beskrivning")]
         public string Description { get; set; }
+        public string? ImageUrl { get; set; } // För att visa nuvarande bild
+        public IFormFile? ImageFile { get; set; } // För att ta emot den nya filen
     }
 }
