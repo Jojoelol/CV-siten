@@ -28,36 +28,36 @@ namespace CV_siten.Controllers
         // --- PROJEKTDETALJER ---
         public async Task<IActionResult> ProjectDetails(int id)
         {
-            // 1. Hämta projektet och inkludera deltagarna (Personer)
             var project = await _context.Projects
                 .Include(p => p.PersonProjects)
                     .ThenInclude(pp => pp.Person)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (project == null)
-            {
-                return NotFound();
-            }
+            if (project == null) return NotFound();
 
-            // 2. Kontrollera vem som är inloggad
             var user = await _userManager.GetUserAsync(User);
             bool isOwner = false;
+            bool isParticipant = false;
+            int? currentPersonId = null;
 
             if (user != null)
             {
-                // Hitta person-objektet som hör till Identity-användaren
                 var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-
                 if (person != null)
                 {
-                    // Kontrollera om den inloggade personen finns i projektets deltagarlista
-                    // TIPS: Om du har en bool "IsOwner" i PersonProject-tabellen bör du kolla den här istället
-                    isOwner = project.PersonProjects.Any(pp => pp.PersonId == person.Id);
+                    currentPersonId = person.Id;
+                    // Kontrollera om användaren är med i projektet
+                    isParticipant = project.PersonProjects.Any(pp => pp.PersonId == person.Id);
+
+                    // Här definierar vi "Owner" (t.ex. den som skapade det eller har flaggan IsOwner)
+                    // För enkelhetens skull i detta exempel använder vi samma logik som tidigare
+                    isOwner = isParticipant;
                 }
             }
 
-            // 3. Skicka resultatet till vyn via ViewBag
             ViewBag.IsOwner = isOwner;
+            ViewBag.IsParticipant = isParticipant;
+            ViewBag.CurrentPersonId = currentPersonId;
 
             return View(project);
         }
@@ -116,7 +116,7 @@ namespace CV_siten.Controllers
             return View(model);
         }
 
-        //UIPPDATERA PROJEKTINFO
+        //UPPDATERA PROJEKTINFO
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> UpdateDescription(int id, string description)
@@ -130,6 +130,30 @@ namespace CV_siten.Controllers
             }
 
             // Skicka tillbaka användaren till samma sida
+            return RedirectToAction("ProjectDetails", new { id = id });
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> LeaveProject(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person != null)
+            {
+                // Hitta kopplingen mellan personen och projektet
+                var connection = await _context.PersonProjects
+                    .FirstOrDefaultAsync(pp => pp.ProjectId == id && pp.PersonId == person.Id);
+
+                if (connection != null)
+                {
+                    _context.PersonProjects.Remove(connection);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
             return RedirectToAction("ProjectDetails", new { id = id });
         }
     }

@@ -717,3 +717,34 @@ cursor: pointer;
     .project-pill i {
         display: inline-block;
     }
+
+/*css för inaktivera och aktivera profil*/
+.btn-danger-outline {
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
+    background-color: transparent;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+    .btn-danger-outline:hover {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+.btn-success-outline {
+    border: 2px solid #27ae60; /* Grön */
+    color: #27ae60;
+    background-color: transparent;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+    .btn-success-outline:hover {
+        background-color: #27ae60;
+        color: white;
+    }
