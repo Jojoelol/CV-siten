@@ -28,7 +28,7 @@ namespace CV_siten.Controllers
         {
             // Senaste projektet
             ViewBag.SenasteProjekt = await _context.Projects
-                .OrderByDescending(p => p.StartDate)
+                .OrderByDescending(p => p.Id)
                 .FirstOrDefaultAsync();
 
             // Om utloggad â visa 3 utvalda profiler
