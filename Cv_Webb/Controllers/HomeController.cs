@@ -28,7 +28,7 @@ namespace CV_siten.Controllers
         {
             // Senaste projektet
             ViewBag.SenasteProjekt = await _context.Projects
-                .OrderByDescending(p => p.StartDate)
+                .OrderByDescending(p => p.Id)
                 .FirstOrDefaultAsync();
 
             // Om utloggad â visa 3 utvalda profiler
@@ -71,7 +71,7 @@ namespace CV_siten.Controllers
 
 
 
-         // MATCHANDE AV PROFILER
+            // MATCHANDE AV PROFILER
             var matches = others
                 .Select(p =>
                 {
@@ -131,6 +131,49 @@ namespace CV_siten.Controllers
             {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
+        }
+
+        public async Task<IActionResult> Search(string search, string skill)
+        {
+            var query = _context.Persons.AsQueryable();
+            query = query.Where(p => p.IsActive);
+            // G-krav 12: Om anv�ndaren inte �r inloggad, d�lj privata profiler
+            if (!User.Identity.IsAuthenticated)
+            {
+                query = query.Where(p => !p.IsPrivate);
+            }
+            if (!string.IsNullOrEmpty(search))
+            {
+                string s = search.ToUpper();
+                query = query.Where(p =>
+                    p.FirstName.ToUpper().Contains(s) ||
+                    p.LastName.ToUpper().Contains(s));
+            }
+            // F�lt 2 (name="skill"): S�k p� Skills, Education, JobTitle och Experience
+            if (!string.IsNullOrEmpty(skill))
+            {
+                string sk = skill.ToUpper();
+                query = query.Where(p =>
+                    (p.Skills != null && p.Skills.ToUpper().Contains(sk)) ||
+                    (p.Education != null && p.Education.ToUpper().Contains(sk)) ||
+                    (p.JobTitle != null && p.JobTitle.ToUpper().Contains(sk)) ||
+                    (p.Experience != null && p.Experience.ToUpper().Contains(sk))
+                );
+            }
+
+            var personResult = await query.ToListAsync();
+
+            // S�k efter projekt (valfritt om du vill att search-f�ltet �ven ska trigga projekt)
+            var projektResult = await _context.Projects
+                .Where(p => string.IsNullOrEmpty(search) || p.ProjectName.ToUpper().Contains(search.ToUpper()))
+                .ToListAsync();
+
+            ViewBag.SearchQuery = search;
+            ViewBag.SkillQuery = skill;
+            ViewBag.personResult = personResult;
+
+            return View("SearchResult", projektResult);
+
         }
     }
 }

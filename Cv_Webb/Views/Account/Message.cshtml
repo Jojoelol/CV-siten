@@ -3,25 +3,27 @@
 @{
     ViewData["Title"] = "Mina meddelanden";
 }
-
-<div class="container mt-4">
+<div class="background">
+  <div class="container mt-4">
     <div class="row">
         <div class="col-md-12">
-            
-            <!--TEST -->
-            <div class="mb-3">
-                <button type="button"
-                        class="btn btn-outline-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#sendMessageModal">
-                    Skicka meddelande
-                </button>
-            </div>
-            <div class="yellow-box p-4" style="border: 2px solid #ffd800; border-radius: 8px; background-color: #fffbe6;">
-                <h2 class="mb-4">Mina meddelanden</h2>
 
-                <div class="table-responsive">
-                    <table class="table table-hover">
+                <div class="yellow-box p-4 message-card">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0">Mina meddelanden</h2>
+
+                        <button type="button"
+                                class="btn-action btn-primary btn-small"
+                                data-bs-toggle="modal"
+                                data-bs-target="#sendMessageModal">
+                            Skicka meddelande
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover message-table">
                         <thead>
                             <tr>
                                 <th>Från</th>
@@ -50,14 +52,14 @@
                                         <td>
                                             @if (m.IsRead)
                                             {
-                                                <span class="badge bg-secondary">Läst</span>
+                                                    <span class="badge message-badge-read">Läst</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-primary">Nytt</span>
+                                                    <span class="badge message-badge-new">Nytt</span>
                                             }
                                         </td>
-                                        <td>
+                                            <td class="message-actions">
                                             @if (!m.IsRead)
                                             {
                                                 <form asp-controller="Message" asp-action="MarkRead" method="post" style="display:inline;">
@@ -67,7 +69,6 @@
                                                 </form>
                                             }
                                             <button type="button"
-                                                    onclick="event.stopPropagation();"
                                                     class="btn btn-sm btn-outline-danger ms-2 btn-delete-message"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#deleteMessageModal"
@@ -104,11 +105,6 @@
 
                 <form asp-controller="Message" asp-action="Send" method="post">
                     @Html.AntiForgeryToken()
-
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="sendMessageModalLabel">Skicka meddelande</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stäng"></button>
-                    </div>
 
                     <div class="modal-body">
                         <div class="mb-3">
@@ -215,8 +211,8 @@
 
         </div>
     </div>
+   </div>
 </div>
-
 
 @section Scripts {
     <script>
