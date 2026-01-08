@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260108101812_InitialCreate")]
+    [Migration("20260108110317_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,15 +94,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cf855e83-63f4-4977-a783-a9f515ac4582",
+                            ConcurrencyStamp = "1df1f93d-1d08-4bad-9882-7d1cd962d209",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAENllS/Qmr04eZ77wjJpZWyDRs0NDwwzkfdW1vu+bgEo/7RLp6jY409JkFWNBKm03eQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKk+JSsw/TtHTfItdmhOyR5QrjzYGGNEUn0Fb6k/ynvWg1KVjc3C41bqWci+oN8q+g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "7d21c1be-348b-4a2c-a419-d4ec7897214c",
+                            SecurityStamp = "3a3e6213-ffad-4184-b834-1c1d548b4688",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -210,6 +210,9 @@ namespace Cv_siten.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("bit");
+
                     b.Property<string>("JobTitle")
                         .HasColumnType("nvarchar(max)");
 
@@ -245,6 +248,7 @@ namespace Cv_siten.Data.Migrations
                             IdentityUserId = "test-user-1",
                             ImageUrl = "Bild1.png",
                             IsActive = true,
+                            IsPrivate = false,
                             JobTitle = "Systemutvecklare",
                             LastName = "Test",
                             PhoneNumber = "0701234567",
@@ -285,6 +289,9 @@ namespace Cv_siten.Data.Migrations
 
                     b.Property<DateTimeOffset?>("EndDate")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProjectName")
                         .IsRequired()

@@ -61,7 +61,8 @@ namespace Cv_siten.Data.Migrations
                     StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     EndDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -194,6 +195,7 @@ namespace Cv_siten.Data.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CvUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsPrivate = table.Column<bool>(type: "bit", nullable: false),
                     IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -286,12 +288,12 @@ namespace Cv_siten.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "cf855e83-63f4-4977-a783-a9f515ac4582", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAENllS/Qmr04eZ77wjJpZWyDRs0NDwwzkfdW1vu+bgEo/7RLp6jY409JkFWNBKm03eQ==", null, false, "7d21c1be-348b-4a2c-a419-d4ec7897214c", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "1df1f93d-1d08-4bad-9882-7d1cd962d209", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEKk+JSsw/TtHTfItdmhOyR5QrjzYGGNEUn0Fb6k/ynvWg1KVjc3C41bqWci+oN8q+g==", null, false, "3a3e6213-ffad-4184-b834-1c1d548b4688", false, "test@test.se" });
 
             migrationBuilder.InsertData(
                 table: "Persons",
-                columns: new[] { "Id", "Address", "City", "CvUrl", "Description", "Education", "Experience", "FirstName", "IdentityUserId", "ImageUrl", "IsActive", "JobTitle", "LastName", "PhoneNumber", "PostalCode", "Skills" },
-                values: new object[] { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", "Bild1.png", true, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL" });
+                columns: new[] { "Id", "Address", "City", "CvUrl", "Description", "Education", "Experience", "FirstName", "IdentityUserId", "ImageUrl", "IsActive", "IsPrivate", "JobTitle", "LastName", "PhoneNumber", "PostalCode", "Skills" },
+                values: new object[] { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", "Bild1.png", true, false, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

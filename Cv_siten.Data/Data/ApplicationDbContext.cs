@@ -78,7 +78,8 @@ namespace CV_siten.Data.Data
                 Experience = "Junior utvecklare på Test AB",
                 IsActive = true,
                 IdentityUserId = "test-user-1",
-                IsPrivate = false
+                IsPrivate = false,
+                ImageUrl="Bild1.png"
             });
         }
     }
