@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260108124541_InitialCreate")]
+    [Migration("20260108143525_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,15 +94,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1b78a88d-04ec-4aa9-96b3-ce11a3c1e95e",
+                            ConcurrencyStamp = "31151050-5b74-4d9f-ac84-ffe91c278019",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAELJK3DG2eAx45o/DRgj9OJx/KDZMAGQGrKbsiHtTPtvSTymELwVBm+U5rIs7XDbDlQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDaB3xzyn3tcU79iF/qXdXzmK6aohVrYPG1cNZqqLj5PEmxONvdWjq04p3oPWaHjQQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f7860673-90d6-4827-a9be-7108915f64e9",
+                            SecurityStamp = "cde98a66-2bc3-405d-a2e6-5219d32784ef",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -167,7 +167,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("CV_siten.Data.Models.Person", b =>
@@ -236,7 +236,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("IdentityUserId");
 
-                    b.ToTable("Persons");
+                    b.ToTable("Persons", (string)null);
 
                     b.HasData(
                         new
@@ -276,7 +276,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("PersonProjects");
+                    b.ToTable("PersonProjects", (string)null);
                 });
 
             modelBuilder.Entity("CV_siten.Data.Models.Project", b =>
@@ -297,6 +297,9 @@ namespace Cv_siten.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -314,7 +317,9 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -506,12 +511,23 @@ namespace Cv_siten.Data.Migrations
                     b.HasOne("CV_siten.Data.Models.Project", "Project")
                         .WithMany("PersonProjects")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Person");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CV_siten.Data.Models.Project", b =>
+                {
+                    b.HasOne("CV_siten.Data.Models.Person", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

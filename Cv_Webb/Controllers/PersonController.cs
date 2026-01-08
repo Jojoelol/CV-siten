@@ -94,9 +94,31 @@ namespace CV_siten.Controllers
                 PhoneNumber = person.PhoneNumber,
                 JobTitle = person.JobTitle,
                 Description = person.Description,
-                ImageUrl = person.ImageUrl // Viktigt för att visa bilden i Edit-vyn
+                ImageUrl = person.ImageUrl,
+                // --- LÄGG TILL DESSA RADER ---
+                Address = person.Address,
+                PostalCode = person.PostalCode,
+                City = person.City,
+                IsPrivate = person.IsPrivate
             };
             return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> TogglePrivacy(int id)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+
+            // Säkerställ att det är ägaren som ändrar
+            if (person != null && person.IdentityUserId == user.Id)
+            {
+                person.IsPrivate = !person.IsPrivate; // Växlar mellan true/false
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Profile", new { id = id });
         }
 
         // --- REDIGERA PROFIL (POST) ---
@@ -136,6 +158,10 @@ namespace CV_siten.Controllers
             person.PhoneNumber = model.PhoneNumber;
             person.JobTitle = model.JobTitle;
             person.Description = model.Description;
+            person.Address = model.Address;
+            person.PostalCode = model.PostalCode;
+            person.City = model.City;
+            person.IsPrivate = model.IsPrivate;
 
             user.Email = model.Email;
             user.UserName = model.Email;
