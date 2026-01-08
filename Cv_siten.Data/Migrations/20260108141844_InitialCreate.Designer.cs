@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260108134943_InitialCreate")]
+    [Migration("20260108141844_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,17 +94,33 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f0db8d88-eef3-46c3-9dd1-1740abb3f189",
+                            ConcurrencyStamp = "30cca18c-f630-41de-ab35-c72288b30a66",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEK5eFJ35mEUh5bhw6ZTkMAAOKGNQYosdNWVtVCmpZ4NLTF5XEYsaJk24Kh6GgIJ6xA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEE9sYFOmDxJER9w5rUAuEXb/puEZPHhJApc1oeFZNMEDUoOsUnR6A4ePU9i6V0fxUA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1ef11a06-5239-4134-8126-38692eadcf93",
+                            SecurityStamp = "51636137-da23-4c65-8d93-77c65b9873bc",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
+                        },
+                        new
+                        {
+                            Id = "test-user-2",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "5134dccf-1fe0-4c91-98af-baf57fc6115d",
+                            Email = "testsson@test.se",
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "TESTSSON@TEST.SE",
+                            NormalizedUserName = "TESTSSON@TEST.SE",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBMQAl6+1TiOb4drYj4dSat3x6Gcyg8qOCJd5wqlRZwzSe4jyjHeENX/6K8b2LGE8Q==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "929eb86c-9b53-4a7f-9eac-09790da5f23c",
+                            TwoFactorEnabled = false,
+                            UserName = "testsson@test.se"
                         });
                 });
 
@@ -255,6 +271,26 @@ namespace Cv_siten.Data.Migrations
                             JobTitle = "Systemutvecklare",
                             LastName = "Test",
                             PhoneNumber = "0701234567",
+                            PostalCode = "12345",
+                            Skills = "C#, ASP.NET Core, SQL",
+                            ViewCount = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Address = "Testvägen 2",
+                            City = "Teststad",
+                            Description = "Testprofil.",
+                            Education = "Örebro Universitet",
+                            Experience = "Junior utvecklare på Test AB",
+                            FirstName = "Oscar",
+                            IdentityUserId = "test-user-2",
+                            ImageUrl = "Bild1.png",
+                            IsActive = true,
+                            IsPrivate = false,
+                            JobTitle = "Systemutvecklare",
+                            LastName = "Test",
+                            PhoneNumber = "0709876543",
                             PostalCode = "12345",
                             Skills = "C#, ASP.NET Core, SQL",
                             ViewCount = 0

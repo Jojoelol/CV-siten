@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Cv_siten.Data.Migrations
 {
     /// <inheritdoc />
@@ -289,12 +291,20 @@ namespace Cv_siten.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "f0db8d88-eef3-46c3-9dd1-1740abb3f189", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEK5eFJ35mEUh5bhw6ZTkMAAOKGNQYosdNWVtVCmpZ4NLTF5XEYsaJk24Kh6GgIJ6xA==", null, false, "1ef11a06-5239-4134-8126-38692eadcf93", false, "test@test.se" });
+                values: new object[,]
+                {
+                    { "test-user-1", 0, "30cca18c-f630-41de-ab35-c72288b30a66", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEE9sYFOmDxJER9w5rUAuEXb/puEZPHhJApc1oeFZNMEDUoOsUnR6A4ePU9i6V0fxUA==", null, false, "51636137-da23-4c65-8d93-77c65b9873bc", false, "test@test.se" },
+                    { "test-user-2", 0, "5134dccf-1fe0-4c91-98af-baf57fc6115d", "testsson@test.se", true, false, null, "TESTSSON@TEST.SE", "TESTSSON@TEST.SE", "AQAAAAIAAYagAAAAEBMQAl6+1TiOb4drYj4dSat3x6Gcyg8qOCJd5wqlRZwzSe4jyjHeENX/6K8b2LGE8Q==", null, false, "929eb86c-9b53-4a7f-9eac-09790da5f23c", false, "testsson@test.se" }
+                });
 
             migrationBuilder.InsertData(
                 table: "Persons",
                 columns: new[] { "Id", "Address", "City", "CvUrl", "Description", "Education", "Experience", "FirstName", "IdentityUserId", "ImageUrl", "IsActive", "IsPrivate", "JobTitle", "LastName", "PhoneNumber", "PostalCode", "Skills", "ViewCount" },
-                values: new object[] { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", "Bild1.png", true, false, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL", 0 });
+                values: new object[,]
+                {
+                    { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", "Bild1.png", true, false, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL", 0 },
+                    { 2, "Testvägen 2", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Oscar", "test-user-2", "Bild1.png", true, false, "Systemutvecklare", "Test", "0709876543", "12345", "C#, ASP.NET Core, SQL", 0 }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
