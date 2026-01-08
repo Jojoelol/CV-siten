@@ -14,25 +14,29 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-@*     @await RenderSectionAsync("Scripts", required: false)
- *@</head>
+</head>
 <body>
     <header class="main-header">
-        <div class="header-content">
-            <div class="logo">
+        <div class="header-content" style="display: flex; align-items: center; justify-content: flex-start; gap: 20px;">
+
+            @* Logo *@
+            <div class="logo" style="flex-shrink: 0;">
                 <a asp-controller="Home" asp-action="Index">
                     <img src="~/images/logo.png" alt="CV-siten Logotyp" style="height: 45px; width: auto;" asp-append-version="true" />
                 </a>
             </div>
-            <form class="search-bar" asp-controller="Home" asp-action="Search" method="get">
-                <input type="text" name="search" placeholder="Sök efter projekt eller personer..." />
-                <button type="submit">Sök</button>
+
+            @* Utökad sökbar (VG-krav #6) - Placerad till vänster bredvid logon *@
+            <form class="search-bar" asp-controller="Home" asp-action="Search" method="get" style="display: flex; gap: 10px; margin-right: auto;">
+                <input type="text" name="search" value="@ViewBag.SearchQuery" placeholder="Sök efter namn..." class="form-control" style="width: 200px;" />
+                <input type="text" name="skill" value="@ViewBag.SkillQuery" placeholder="Kompetens (t.ex. .Net)..." class="form-control" style="width: 200px;" />
+                <button type="submit" class="btn btn-outline-primary">Sök</button>
             </form>
 
+            @* Inloggningsinformation - Trycks till höger tack vare margin-right: auto på sökbaren *@
             @if (User.Identity?.IsAuthenticated == true)
             {
-                <div class="logged-in-info">
+                <div class="logged-in-info" style="display: flex; align-items: center; gap: 15px;">
                     <span class="logged-in-text">Inloggad som: @User.Identity.Name</span>
 
                     <form class="login" asp-controller="Person" asp-action="Profile" method="get">

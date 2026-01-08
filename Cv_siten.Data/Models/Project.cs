@@ -26,5 +26,10 @@ namespace CV_siten.Data.Models
 
         [Display(Name = "Status")]
         public string Status { get; set; } = string.Empty;
+
+        [Display(Name = "Projektbild")]
+        public string? ImageUrl { get; set; }
+
+
     }
 }
