@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260108135324_InitialCreate")]
+    [Migration("20260108153859_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,15 +94,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "69d7c10b-f26e-4069-8ff7-97f976868761",
+                            ConcurrencyStamp = "3f1c4f7b-880d-446a-8410-9abc0d7fba91",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAENFh+/DjxEBT0eaK6/IJnruXyrHDlowcqao2gKmpBNoT/nzjGhlK/PfHSQh0XmF5cw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEPUBji1TaHofheIr+BNBDNSoqb10g6TFYRPWC5w4j7y3eegvYVCRL/qWbrrNvP9WQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2d70cc8a-48b5-421a-980a-b60e206bb884",
+                            SecurityStamp = "276c0406-aee6-43bc-acbe-b9ee4ca8de78",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -313,6 +313,9 @@ namespace Cv_siten.Data.Migrations
 
                     b.Property<string>("Type")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZipUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");

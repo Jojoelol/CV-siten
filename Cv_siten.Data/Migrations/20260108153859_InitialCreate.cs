@@ -255,6 +255,7 @@ namespace Cv_siten.Data.Migrations
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ZipUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OwnerId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -294,7 +295,7 @@ namespace Cv_siten.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "69d7c10b-f26e-4069-8ff7-97f976868761", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAENFh+/DjxEBT0eaK6/IJnruXyrHDlowcqao2gKmpBNoT/nzjGhlK/PfHSQh0XmF5cw==", null, false, "2d70cc8a-48b5-421a-980a-b60e206bb884", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "3f1c4f7b-880d-446a-8410-9abc0d7fba91", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEEPUBji1TaHofheIr+BNBDNSoqb10g6TFYRPWC5w4j7y3eegvYVCRL/qWbrrNvP9WQ==", null, false, "276c0406-aee6-43bc-acbe-b9ee4ca8de78", false, "test@test.se" });
 
             migrationBuilder.InsertData(
                 table: "Persons",

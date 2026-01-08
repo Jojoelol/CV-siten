@@ -57,5 +57,7 @@ namespace CV_siten.Models.ViewModels.Account
 
         [Display(Name = "Ort")]
         public string? City { get; set; }
+
+        public IFormFile? ImageFile { get; set; }
     }
 }

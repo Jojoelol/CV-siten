@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\Uploads\cvs\" />
+    <Folder Include="wwwroot\Uploads\projects\" />
   </ItemGroup>
 
 </Project>
