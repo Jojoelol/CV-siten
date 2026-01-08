@@ -1,42 +1,139 @@
 ﻿@model CV_siten.Data.Models.Project
 
-<div class="project-details-wrapper" style="max-width: 800px; margin: 40px auto; padding: 20px; font-family: sans-serif;">
-    <div style="margin-bottom: 20px;">
-        <a href="javascript:history.back()" class="btn-action btn-outline" style="text-decoration:none;">
-            ← Tillbaka
-        </a>
+<div class="profile-page-wrapper">
+    @* --- SIDEBAR: PROJEKT-INFO --- *@
+    <aside class="profile-sidebar">
+        <div class="sidebar-card">
+            @* Uppdaterad rektangulär placeholder som matchar bredden på rutan under *@
+            <div class="project-image-placeholder" style="width: 100%; height: 180px; background-color: #3498db; border-radius: 8px; display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+                <i class="fas fa-project-diagram" style="font-size: 3.5rem; color: white;"></i>
+            </div>
+
+            <div class="profile-info-text">
+                <h2 class="profile-name">@Model.ProjectName</h2>
+                <p class="profile-title">@(Model.Type ?? "Webbprojekt")</p>
+
+                <div class="profile-contact-details">
+                    <p class="contact-item">
+                        <i class="fas fa-info-circle"></i> <strong>Status:</strong> @(Model.Status ?? "Aktivt")
+                    </p>
+                    <p class="contact-item">
+                        <i class="fas fa-tag"></i> <strong>Typ:</strong> @(Model.Type ?? "Ej angiven")
+                    </p>
+                    <p class="contact-item">
+                        <i class="fas fa-calendar-alt"></i> <strong>Start:</strong> @Model.StartDate.ToString("yyyy-MM-dd")
+                    </p>
+                    <p class="contact-item">
+                        <i class="fas fa-calendar-check"></i> <strong>Slut:</strong> @(Model.EndDate.HasValue? Model.EndDate.Value.ToString("yyyy-MM-dd") : "Pågående")
+                    </p>
+                </div>
+            </div>
+
+            <div class="sidebar-actions-container">
+                <a href="javascript:history.back()" class="btn-action btn-secondary-outline">
+                    ← Tillbaka
+                </a>
+
+                <a asp-action="JoinProject" asp-route-id="@Model.Id" class="btn-action btn-primary">
+                    Gå med i projektet
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    @* --- HUVUDINNEHÅLL --- *@
+    <section class="profile-main-content">
+        @* --- OM PROJEKTET (Med redigeringsfunktion) --- *@
+        <div class="cv-section" id="section-Description">
+            <form asp-action="UpdateDescription" asp-controller="Project" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <div class="cv-header-row">
+                    <h3 class="section-title">Om projektet</h3>
+
+                    @* Knappar som styrs av din befintliga enableEdit-funktion *@
+                    @if (ViewBag.IsOwner == true)
+                    {
+                        <button type="button" class="btn-action btn-outline btn-edit-small edit-btn" onclick="enableEdit('Description')">
+                            Redigera
+                        </button>
+                        <button type="submit" class="btn-action btn-primary btn-edit-small save-btn" style="display:none;">
+                            Spara
+                        </button>
+                    }
+                </div>
+
+                <div class="cv-text">
+                    @* Visningsläge *@
+                    <div class="display-mode">
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            <p style="white-space: pre-line;">@Model.Description</p>
+                        }
+                        else
+                        {
+                            <p style="color: #7f8c8d; font-style: italic;">Ingen beskrivning tillgänglig för detta projekt.</p>
+                        }
+                    </div>
+
+                    @* Redigeringsläge *@
+                    <textarea name="description" class="form-control-custom edit-mode"
+                              style="display:none; width:100%; min-height:150px; padding: 15px; border-radius: 8px; border: 1px solid #3498db;">@Model.Description</textarea>
+                </div>
+            </form>
+        </div>
+
+@* --- DELTAGARE (Krav 76) --- *@
+<div class="projects-block">
+    <div class="cv-header-row">
+        <h3 class="section-title">Deltagare</h3>
     </div>
 
-    <article class="sidebar-card" style="padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <header style="border-bottom: 2px solid #3498db; padding-bottom: 15px; margin-bottom: 25px;">
-            <h1 style="color: #2c3e50; margin: 0; font-size: 2rem;">@Model.ProjectName</h1>
+    @if (Model.PersonProjects != null && Model.PersonProjects.Any())
+    {
+        <div class="projects-list" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px;">
+            @foreach (var pp in Model.PersonProjects)
+            {
+                <a asp-controller="Person" asp-action="Profile" asp-route-id="@pp.Person.Id" 
+                   class="project-pill" 
+                   style="background-color: #f8f9fa; color: #2c3e50; border: 1px solid #dee2e6; text-decoration: none; display: flex; align-items: center; padding: 10px 15px; border-radius: 8px;">
+                    
+                    <i class="fas fa-user-circle" style="font-size: 1.8rem; margin-right: 12px; color: #3498db;"></i>
+                    
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-weight: bold; font-size: 0.95rem;">@pp.Person.FirstName @pp.Person.LastName</span>
+                        @* Vi antar att din PersonProject-modell har en egenskap som heter Role *@
+                        <span style="font-size: 0.8rem; color: #7f8c8d;">@(pp.Role ?? "Deltagare")</span>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <p style="color: #7f8c8d; font-style: italic; margin-top: 10px;">Inga deltagare listade än.</p>
+    }
+</div>
 
-            <div style="margin-top: 10px; color: #7f8c8d; font-size: 0.95rem;">
-                <span style="margin-right: 20px;"><strong>Status:</strong> @(Model.Status ?? "Ej angiven")</span>
-                <span><strong>Typ:</strong> @(Model.Type ?? "Ej angiven")</span>
+        @* --- RESURSER (Endast Zip-fil med nedladdningsknapp) --- *@
+        <div class="cv-section" style="margin-top: 30px;">
+            <div class="cv-header-row">
+                <h3 class="section-title">Resurser</h3>
             </div>
-        </header>
 
-        <div class="project-meta" style="margin-bottom: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 6px; display: flex; gap: 30px;">
-            <div>
-                <small style="display:block; color: #95a5a6; text-transform: uppercase;">Period</small>
-                <strong>@Model.StartDate.ToString("yyyy-MM-dd")</strong> —
-                <strong>@(Model.EndDate.HasValue? Model.EndDate.Value.ToString("yyyy-MM-dd") : "Pågående")</strong>
+            <div class="resource-container" style="max-width: 280px; margin-top: 15px;">
+                <div class="file-card-v2" style="padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; text-align: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                    <div class="file-info" style="margin-bottom: 15px;">
+                        <i class="fas fa-file-archive" style="font-size: 2.5rem; color: #e67e22; display: block; margin-bottom: 10px;"></i>
+                        <span style="font-weight: bold; color: #2c3e50; display: block;">Projektkod.zip</span>
+                    </div>
+
+                    @* Knappen för nedladdning *@
+                    <a href="#" class="btn-action btn-primary" style="width: 100%; text-decoration: none; display: inline-block; box-sizing: border-box;">
+                        <i class="fas fa-download"></i> Ladda ned projekt
+                    </a>
+                </div>
             </div>
         </div>
-
-        <div class="project-description">
-            <h3 style="color: #2c3e50; margin-bottom: 15px;">Om projektet</h3>
-            <div style="line-height: 1.8; font-size: 1.1rem; color: #34495e; white-space: pre-line;">
-                @if (!string.IsNullOrEmpty(Model.Description))
-                {
-                    @Model.Description
-                }
-                else
-                {
-                    <p style="color: #adb5bd; font-style: italic;">Ingen beskrivning har lagts till för detta projekt.</p>
-                }
-            </div>
-        </div>
-    </article>
+    </section>
 </div>

@@ -357,11 +357,6 @@ body {
 
 .sr-main {
     background-color: #2c3e50;
-    margin: 0;
-    padding: 40px 0;
-    width: 100%;
-    /* Säkerställer att bakgrunden täcker hela skärmen även om listan är kort */
-    min-height: calc(100vh - 60px);
 }
 
 .sr-no-results {
@@ -658,6 +653,71 @@ cursor: pointer;
     width: 100%;
 }
 
+/*PROJECTDETAILS*/
+/* Specifikt för resurs-korten i projektvyn */
+.file-card {
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+    .file-card:hover {
+        background-color: rgba(52, 152, 219, 0.05);
+        border-style: solid;
+    }
+
+/* Anpassa projekt-piller för deltagare så de ser ut som profil-länkar */
+.projects-list .project-pill i {
+    margin-right: 8px;
+    color: #3498db;
+}
+
+.projects-list .project-pill:hover {
+    border-color: #3498db;
+    background-color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Ny styling för projektbilden i sidebaren */
+.project-image-container {
+    width: 100%; /* Fyller hela kortets bredd minus padding */
+    height: 200px; /* Eller den höjd du föredrar */
+    border-radius: 8px; /* Samma rundning som profile-contact-details */
+    overflow: hidden; /* Klipper bilden snyggt vid hörnen */
+    background: rgba(255, 255, 255, 0.05); /* Samma bakgrund som kontakt-rutan */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .project-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ser till att bilden fyller rutan utan att bli utdragen */
+    }
+
+    .project-image-container i {
+        font-size: 4rem;
+        color: #3498db;
+    }
+
+.project-pill {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+    .project-pill:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        border-color: #3498db !important;
+        background-color: #ffffff !important;
+    }
+
+    /* Säkerställer att ikonerna i pillerna också är centrerade */
+    .project-pill i {
+        display: inline-block;
+    }
+
 /*css för inaktivera och aktivera profil*/
 .btn-danger-outline {
     border: 2px solid #e74c3c;
@@ -688,4 +748,3 @@ cursor: pointer;
         background-color: #27ae60;
         color: white;
     }
-

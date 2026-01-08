@@ -28,14 +28,38 @@ namespace CV_siten.Controllers
         // --- PROJEKTDETALJER ---
         public async Task<IActionResult> ProjectDetails(int id)
         {
-            var projekt = await _context.Projects
+            var project = await _context.Projects
                 .Include(p => p.PersonProjects)
                     .ThenInclude(pp => pp.Person)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (projekt == null) return NotFound();
+            if (project == null) return NotFound();
 
-            return View(projekt);
+            var user = await _userManager.GetUserAsync(User);
+            bool isOwner = false;
+            bool isParticipant = false;
+            int? currentPersonId = null;
+
+            if (user != null)
+            {
+                var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+                if (person != null)
+                {
+                    currentPersonId = person.Id;
+                    // Kontrollera om användaren är med i projektet
+                    isParticipant = project.PersonProjects.Any(pp => pp.PersonId == person.Id);
+
+                    // Här definierar vi "Owner" (t.ex. den som skapade det eller har flaggan IsOwner)
+                    // För enkelhetens skull i detta exempel använder vi samma logik som tidigare
+                    isOwner = isParticipant;
+                }
+            }
+
+            ViewBag.IsOwner = isOwner;
+            ViewBag.IsParticipant = isParticipant;
+            ViewBag.CurrentPersonId = currentPersonId;
+
+            return View(project);
         }
 
         // --- SKAPA NYTT PROJEKT ---
@@ -90,6 +114,47 @@ namespace CV_siten.Controllers
 
             // Om valideringen misslyckas (t.ex. saknat namn), visa vyn igen med felmeddelanden
             return View(model);
+        }
+
+        //UPPDATERA PROJEKTINFO
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateDescription(int id, string description)
+        {
+            var project = await _context.Projects.FindAsync(id);
+
+            if (project != null)
+            {
+                project.Description = description;
+                await _context.SaveChangesAsync();
+            }
+
+            // Skicka tillbaka användaren till samma sida
+            return RedirectToAction("ProjectDetails", new { id = id });
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> LeaveProject(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person != null)
+            {
+                // Hitta kopplingen mellan personen och projektet
+                var connection = await _context.PersonProjects
+                    .FirstOrDefaultAsync(pp => pp.ProjectId == id && pp.PersonId == person.Id);
+
+                if (connection != null)
+                {
+                    _context.PersonProjects.Remove(connection);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            return RedirectToAction("ProjectDetails", new { id = id });
         }
     }
 }
