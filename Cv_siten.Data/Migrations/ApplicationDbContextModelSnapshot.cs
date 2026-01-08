@@ -91,15 +91,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "31151050-5b74-4d9f-ac84-ffe91c278019",
+                            ConcurrencyStamp = "a589d28a-363c-42a3-924a-f2367677f917",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDaB3xzyn3tcU79iF/qXdXzmK6aohVrYPG1cNZqqLj5PEmxONvdWjq04p3oPWaHjQQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENpAEbjC4EF0aqsQM3tvAfiONi+sWUbAqd/rLfqj8LHDTV5GT1Clb397Sj402bbzBQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "cde98a66-2bc3-405d-a2e6-5219d32784ef",
+                            SecurityStamp = "7ae50be9-237c-46d4-82d6-f95c865358ef",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });

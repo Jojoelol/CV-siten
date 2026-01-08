@@ -51,25 +51,6 @@ namespace Cv_siten.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Projects",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ProjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    EndDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Projects", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -195,6 +176,7 @@ namespace Cv_siten.Data.Migrations
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CvUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ViewCount = table.Column<int>(type: "int", nullable: false),
                     IsPrivate = table.Column<bool>(type: "bit", nullable: false),
                     IdentityUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -261,6 +243,31 @@ namespace Cv_siten.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Projects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ProjectName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    EndDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    OwnerId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Projects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Projects_Persons_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Persons",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PersonProjects",
                 columns: table => new
                 {
@@ -281,19 +288,18 @@ namespace Cv_siten.Data.Migrations
                         name: "FK_PersonProjects_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "6538f28e-2f9a-4649-b52e-d52e87fac40a", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEBnsOyhxrI3LHLv3PrE+A/ITQYrApB8Lsr/2zMii6bno56vBWW4TThdrFEoKn+Mpzw==", null, false, "0a886c67-4fd5-4376-a9eb-3f3186346b36", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "a589d28a-363c-42a3-924a-f2367677f917", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAENpAEbjC4EF0aqsQM3tvAfiONi+sWUbAqd/rLfqj8LHDTV5GT1Clb397Sj402bbzBQ==", null, false, "7ae50be9-237c-46d4-82d6-f95c865358ef", false, "test@test.se" });
 
             migrationBuilder.InsertData(
                 table: "Persons",
-                columns: new[] { "Id", "Address", "City", "CvUrl", "Description", "Education", "Experience", "FirstName", "IdentityUserId", "ImageUrl", "IsActive", "IsPrivate", "JobTitle", "LastName", "PhoneNumber", "PostalCode", "Skills" },
-                values: new object[] { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", "Bild1.png", true, false, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL" });
+                columns: new[] { "Id", "Address", "City", "CvUrl", "Description", "Education", "Experience", "FirstName", "IdentityUserId", "ImageUrl", "IsActive", "IsPrivate", "JobTitle", "LastName", "PhoneNumber", "PostalCode", "Skills", "ViewCount" },
+                values: new object[] { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", "Bild1.png", true, false, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL", 0 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -358,6 +364,11 @@ namespace Cv_siten.Data.Migrations
                 name: "IX_Persons_IdentityUserId",
                 table: "Persons",
                 column: "IdentityUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Projects_OwnerId",
+                table: "Projects",
+                column: "OwnerId");
         }
 
         /// <inheritdoc />
@@ -391,10 +402,10 @@ namespace Cv_siten.Data.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Persons");
+                name: "Projects");
 
             migrationBuilder.DropTable(
-                name: "Projects");
+                name: "Persons");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
