@@ -108,11 +108,17 @@ namespace CV_siten.Controllers
             if (user == null) return RedirectToAction("Login");
 
             var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
             if (result.Succeeded)
             {
-                TempData["SuccessMessage"] = "Lösenordet har ändrats.";
-                // Omdirigerar till Profile-sidan i PersonController
-                return RedirectToAction("Profile", "Person");
+                // 1. HÅLL ANVÄNDAREN INLOGGAD (Viktigt!)
+                await _signInManager.RefreshSignInAsync(user);
+
+                // 2. SÄTT MEDDELANDET
+                TempData["SuccessMessage"] = "Lösenordet har ändrats!";
+
+                // 3. SKICKA TILLBAKA TILL REDIGERA PROFIL
+                return RedirectToAction("Edit", "Person");
             }
 
             foreach (var error in result.Errors)

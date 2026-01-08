@@ -1,81 +1,104 @@
 ﻿@model CV_siten.Models.ViewModels.Account.EditAccountViewModel
 
 <div class="yellow-box welcome-area" style="max-width: 600px; margin: 20px auto; padding: 30px;">
-    
+
     <h2>Redigera profil</h2>
     <hr />
+
+    @* Visar bekräftelse när profil uppdaterats eller lösenord ändrats *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        @* Viktigt: Håller koll på den befintliga bildsökvägen om ingen ny laddas upp *@
         <input type="hidden" asp-for="ImageUrl" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-       
-
+        @* --- PROFILBILD --- *@
         <div class="form-group mb-4 text-center">
-            <label class="d-block mb-2">Profilbild</label>
+            <label class="d-block mb-2 fw-bold">Profilbild</label>
 
             @if (!string.IsNullOrEmpty(Model.ImageUrl))
             {
-                @* Här hämtas bilden från mappen wwwroot/images *@
-                <img src="~/images/@Model.ImageUrl"
+                <img src="@Url.Content("~/images/" + Model.ImageUrl)"
                      alt="Profilbild"
                      class="img-thumbnail mb-2"
-                     style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;" />
+                     style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid #002d5a;" />
             }
             else
             {
-                <div class="mb-2" style="width: 150px; height: 150px; background: #eee; border-radius: 50%; display: inline-block; line-height: 150px; color: #aaa;">
+                <div class="mb-2" style="width: 150px; height: 150px; background: #eee; border-radius: 50%; display: inline-block; line-height: 150px; color: #aaa; border: 2px dashed #ccc;">
                     Ingen bild
                 </div>
             }
 
-            @* Input för att ladda upp ny fil - Namnet 'ImageFile' måste matcha parametern i din [HttpPost] *@
             <input type="file" asp-for="ImageFile" class="form-control mt-2" accept="image/*" />
+            <small class="text-muted">Ladda upp en ny bild för att byta ut den nuvarande.</small>
+        </div>
+
+        @* --- PERSONUPPGIFTER --- *@
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label asp-for="FirstName" class="form-label fw-bold">Förnamn</label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label asp-for="LastName" class="form-label fw-bold">Efternamn</label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="FirstName" class="form-label"></label>
-            <input asp-for="FirstName" class="form-control" />
-            <span asp-validation-for="FirstName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="LastName" class="form-label"></label>
-            <input asp-for="LastName" class="form-control" />
-            <span asp-validation-for="LastName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-3">
-            <label asp-for="Email" class="form-label"></label>
+            <label asp-for="Email" class="form-label fw-bold">E-post</label>
             <input asp-for="Email" class="form-control" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="PhoneNumber" class="form-label"></label>
+            <label asp-for="PhoneNumber" class="form-label fw-bold">Telefonnummer</label>
             <input asp-for="PhoneNumber" class="form-control" />
             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="JobTitle" class="form-label"></label>
-            <input asp-for="JobTitle" class="form-control" />
+            <label asp-for="JobTitle" class="form-label fw-bold">Yrkesroll</label>
+            <input asp-for="JobTitle" class="form-control" placeholder="t.ex. Fullstack-utvecklare" />
             <span asp-validation-for="JobTitle" class="text-danger"></span>
         </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="Description" class="form-label"></label>
+        <div class="form-group mb-4">
+            <label asp-for="Description" class="form-label fw-bold">Kort beskrivning</label>
             <textarea asp-for="Description" class="form-control" rows="3"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
-        <div class="form-group mt-3">
-            <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-warning">Ändra lösenord</a>
+        @* --- ÅTGÄRDSKNAPPAR --- *@
+        <div class="d-grid gap-2 mb-4">
+            <button type="submit" class="btn btn-primary" style="background-color: #002d5a;">
+                <i class="fas fa-save"></i> Spara ändringar
+            </button>
         </div>
 
+        <hr />
 
-        <div class="form-group">
-            <input type="submit" value="Spara ändringar" class="btn btn-primary" />
-            <a asp-action="Index" class="btn btn-secondary">Avbryt</a>
+        <div class="d-flex justify-content-between align-items: center;">
+            <div class="btn-group">
+                <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-sm btn-warning">
+                    <i class="fas fa-key"></i> Byt lösenord
+                </a>
+                @* Knapp för VG-krav 7: XML-export *@
+                <a asp-action="ExportToXml" class="btn btn-sm btn-outline-info">
+                    <i class="fas fa-file-export"></i> Exportera CV (XML)
+                </a>
+            </div>
+            <a asp-action="Profile" class="btn btn-sm btn-secondary">Avbryt</a>
         </div>
     </form>
 </div>
