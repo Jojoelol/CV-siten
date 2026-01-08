@@ -30,6 +30,12 @@ namespace CV_siten.Data.Models
         [Display(Name = "Projektbild")]
         public string? ImageUrl { get; set; }
 
+        [Display(Name = "Projektägare")]
+        public int OwnerId { get; set; } // ID på personen som skapade projektet
+
+        // Navigeringsattribut för att lätt kunna hämta ägarens namn etc.
+        public virtual Person? Owner { get; set; }
+
 
     }
 }

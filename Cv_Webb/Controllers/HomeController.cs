@@ -1,4 +1,4 @@
-﻿using CV_siten.Data.Data;
+ï»¿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
 using CV_siten.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -31,7 +31,7 @@ namespace CV_siten.Controllers
                 .OrderByDescending(p => p.StartDate)
                 .FirstOrDefaultAsync();
 
-            // Om utloggad → visa 3 utvalda profiler
+            // Om utloggad â visa 3 utvalda profiler
             if (!User.Identity.IsAuthenticated)
             {
                 ViewBag.SectionTitle = "UTVALDA PROFILER";
@@ -45,12 +45,12 @@ namespace CV_siten.Controllers
                 return View(urvalCV);
             }
 
-            // Hämta inloggad användare
+            // HÃ¤mta inloggad anvÃ¤ndare
             var userId = _userManager.GetUserId(User);
             var currentPerson = await _context.Persons
                 .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
-            // Om ingen Person-profil finns → visa utvalda
+            // Om ingen Person-profil finns â visa utvalda
             if (currentPerson == null)
             {
                 ViewBag.SectionTitle = "UTVALDA PROFILER";
@@ -64,7 +64,7 @@ namespace CV_siten.Controllers
                 return View(fallback);
             }
 
-            // Hämta andra personer
+            // HÃ¤mta andra personer
             var others = await _context.Persons
                 .Where(p => p.Id != currentPerson.Id && p.IsActive && !p.IsPrivate)
                 .ToListAsync();
@@ -80,7 +80,7 @@ namespace CV_siten.Controllers
                     {
                         Person = p,
                         Score = score,
-                        MatchPercent = score * 10 // maxscore 10 → 100%
+                        MatchPercent = score * 10 // maxscore 10 â 100%
                     };
                 })
                 .Where(x => x.Score >= 5) // minst 50%
@@ -99,7 +99,7 @@ namespace CV_siten.Controllers
             return View(matches.Select(x => x.Person).ToList());
         }
 
-        // BERÄKNAR MATCHNINGSSCORE MELLAN TVÅ PERSONER
+        // BERÃKNAR MATCHNINGSSCORE MELLAN TVÃ PERSONER
         private int CalculateMatchScore(Person a, Person b)
         {
             int score = 0;

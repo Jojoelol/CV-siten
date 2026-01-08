@@ -44,37 +44,58 @@
         @* --- PERSONUPPGIFTER --- *@
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label asp-for="FirstName" class="form-label fw-bold">Förnamn</label>
+                <label asp-for="FirstName" class="form-label fw-bold"></label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="col-md-6 mb-3">
-                <label asp-for="LastName" class="form-label fw-bold">Efternamn</label>
+                <label asp-for="LastName" class="form-label fw-bold"></label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="Email" class="form-label fw-bold">E-post</label>
+            <label asp-for="Email" class="form-label fw-bold"></label>
             <input asp-for="Email" class="form-control" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="PhoneNumber" class="form-label fw-bold">Telefonnummer</label>
+            <label asp-for="PhoneNumber" class="form-label fw-bold"></label>
             <input asp-for="PhoneNumber" class="form-control" />
             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
+        @* --- ADRESS --- *@
         <div class="form-group mb-3">
-            <label asp-for="JobTitle" class="form-label fw-bold">Yrkesroll</label>
+            <label asp-for="Address" class="form-label fw-bold"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="PostalCode" class="form-label fw-bold"></label>
+                <input asp-for="PostalCode" class="form-control" />
+                <span asp-validation-for="PostalCode" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="City" class="form-label fw-bold"></label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+        </div>
+
+        @* --- YRKESROLL OCH BESKRIVNING --- *@
+        <div class="form-group mb-3">
+            <label asp-for="JobTitle" class="form-label fw-bold"></label>
             <input asp-for="JobTitle" class="form-control" placeholder="t.ex. Fullstack-utvecklare" />
             <span asp-validation-for="JobTitle" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-4">
-            <label asp-for="Description" class="form-label fw-bold">Kort beskrivning</label>
+            <label asp-for="Description" class="form-label fw-bold"></label>
             <textarea asp-for="Description" class="form-control" rows="3"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
@@ -88,16 +109,10 @@
 
         <hr />
 
-        <div class="d-flex justify-content-between align-items: center;">
-            <div class="btn-group">
-                <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-sm btn-warning">
-                    <i class="fas fa-key"></i> Byt lösenord
-                </a>
-                @* Knapp för VG-krav 7: XML-export *@
-                <a asp-action="ExportToXml" class="btn btn-sm btn-outline-info">
-                    <i class="fas fa-file-export"></i> Exportera CV (XML)
-                </a>
-            </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-sm btn-warning">
+                <i class="fas fa-key"></i> Byt lösenord
+            </a>
             <a asp-action="Profile" class="btn btn-sm btn-secondary">Avbryt</a>
         </div>
     </form>
@@ -107,4 +122,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+}   

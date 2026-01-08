@@ -40,7 +40,7 @@
                     <p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
                 </div>
 
-                @* --- VG-KRAV: BESÖKSSTATISTIK (Endast för ägaren) --- *@
+                @* Besöksstatistik *@
                 @if (ViewBag.IsOwner == true)
                 {
                     <div class="profile-stats" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ecf0f1; font-size: 0.9em; color: #7f8c8d;">
@@ -51,61 +51,79 @@
 
             @* 5. Knappar i Sidebar *@
             <div class="sidebar-actions-container">
-                @if (string.IsNullOrEmpty(Model.CvUrl))
+                @if (ViewBag.IsOwner == true)
                 {
-                    <form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
-                        <input type="hidden" name="personId" value="@Model.Id" />
-                        <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
-                    </form>
-
-                    <button type="button" class="btn-action btn-primary" onclick="document.getElementById('cvFileInput').click();">
-                        Ladda upp mitt CV
-                    </button>
-                }
-                else
-                {
-                    <div class="cv-button-row">
-                        <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary">Visa CV</a>
-                        <form asp-controller="Person" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');">
-                            <input type="hidden" name="personId" value="@Model.Id" />
-                            <button type="submit" class="btn-action btn-danger">Ta bort</button>
-                        </form>
+                    @* --- SEKRETESSINSTÄLLNING (Privat/Offentlig) --- *@
+                    <div class="privacy-status" style="margin-bottom: 15px; padding: 12px; background-color: @(Model.IsPrivate ? "#fff3cd" : "#d1e7dd"); border-radius: 8px; font-size: 0.85em; text-align: center; border: 1px solid @(Model.IsPrivate ? "#ffeeba" : "#badbcc");">
+                        @if (Model.IsPrivate)
+                        {
+                            <p style="color: #856404; margin-bottom: 8px; font-weight: bold;"><i class="fas fa-lock"></i> Profilen är Privat</p>
+                            <form asp-controller="Person" asp-action="TogglePrivacy" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-sm btn-success" style="width: 100%;">Gör offentlig</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <p style="color: #0f5132; margin-bottom: 8px; font-weight: bold;"><i class="fas fa-globe"></i> Profilen är Offentlig</p>
+                            <form asp-controller="Person" asp-action="TogglePrivacy" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-sm btn-warning" style="width: 100%;">Gör privat</button>
+                            </form>
+                        }
                     </div>
-                }
 
-                <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">
-                    Redigera profil
-                </a>
+                    @* CV-Hantering *@
+                    @if (string.IsNullOrEmpty(Model.CvUrl))
+                    {
+                        <form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
+                            <input type="hidden" name="personId" value="@Model.Id" />
+                            <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
+                        </form>
+                        <button type="button" class="btn-action btn-primary" onclick="document.getElementById('cvFileInput').click();">Ladda upp mitt CV</button>
+                    }
+                    else
+                    {
+                        <div class="cv-button-row" style="display: flex; gap: 5px; margin-bottom: 5px;">
+                            <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary" style="flex: 3;">Visa CV</a>
+                            <form asp-controller="Person" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');" style="flex: 1;">
+                                <input type="hidden" name="personId" value="@Model.Id" />
+                                <button type="submit" class="btn-action btn-danger" style="width: 100%;"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    }
 
-                @if (Model.IsActive)
-                {
-                    <form asp-controller="Person" asp-action="Inactivate" method="post" style="margin-top:10px;">
-                        <input type="hidden" name="id" value="@Model.Id" />
-                        <button type="submit" class="btn-action btn-danger-outline">
-                            Inaktivera konto
-                        </button>
-                    </form>
-                }
-                else
-                {
-                    <form asp-controller="Person" asp-action="Activate" method="post" style="margin-top:10px;">
-                        <input type="hidden" name="id" value="@Model.Id" />
-                        <button type="submit" class="btn-action btn-success-outline">
-                            Återaktivera konto
-                        </button>
-                    </form>
+                    <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">Redigera profil</a>
+
+                    <a asp-controller="Person" asp-action="ExportToXml" class="btn-action" style="background-color: #17a2b8; color: white; border: none; margin-top: 5px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-file-export" style="margin-right: 8px;"></i> Exportera CV (XML)
+                    </a>
+
+                    @if (Model.IsActive)
+                    {
+                        <form asp-controller="Person" asp-action="Inactivate" method="post" style="margin-top:10px;">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn-action btn-danger-outline">Inaktivera konto</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-controller="Person" asp-action="Activate" method="post" style="margin-top:10px;">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn-action btn-success-outline">Återaktivera konto</button>
+                        </form>
+                    }
                 }
             </div>
         </div>
     </aside>
 
     <section class="profile-main-content">
-        @* --- KOMPETENSER --- *@
+        @* Kompetenser *@
         <div class="cv-section" id="section-Skills">
             <form asp-action="UpdateProfileField" method="post">
                 <input type="hidden" name="id" value="@Model.Id" />
                 <input type="hidden" name="fieldName" value="Skills" />
-
                 <div class="cv-header-row">
                     <h3 class="section-title">Kompetenser</h3>
                     @if (ViewBag.IsOwner == true)
@@ -119,12 +137,11 @@
             </form>
         </div>
 
-        @* --- UTBILDNINGAR --- *@
+        @* Utbildningar *@
         <div class="cv-section" id="section-Education">
             <form asp-action="UpdateProfileField" method="post">
                 <input type="hidden" name="id" value="@Model.Id" />
                 <input type="hidden" name="fieldName" value="Education" />
-
                 <div class="cv-header-row">
                     <h3 class="section-title">Utbildningar</h3>
                     @if (ViewBag.IsOwner == true)
@@ -138,12 +155,11 @@
             </form>
         </div>
 
-        @* --- TIDIGARE ERFARENHET --- *@
+        @* Erfarenheter *@
         <div class="cv-section" id="section-Experience">
             <form asp-action="UpdateProfileField" method="post">
                 <input type="hidden" name="id" value="@Model.Id" />
                 <input type="hidden" name="fieldName" value="Experience" />
-
                 <div class="cv-header-row">
                     <h3 class="section-title">Tidigare erfarenheter</h3>
                     @if (ViewBag.IsOwner == true)
@@ -157,26 +173,21 @@
             </form>
         </div>
 
-        @* --- PROJEKTBLOCK (Samlat i en vit box) --- *@
+        @* Projektblock *@
         <div class="projects-block" id="projects-section">
             <div class="cv-header-row">
                 <h3 class="section-title">Mina Projekt</h3>
             </div>
 
-            @* Sök och sortering *@
             <form asp-action="Profile" asp-fragment="projects-section" method="get" class="content-toolbar">
                 <input type="hidden" name="id" value="@Model.Id" />
-
                 <div class="toolbar-inputs">
-                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
-                           placeholder="Sök projekt..." class="form-control-custom">
-
+                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch" placeholder="Sök projekt..." class="form-control-custom">
                     <select name="sortBy" class="form-select-custom" onchange="this.form.submit()">
                         <option value="">Sortera efter...</option>
                         <option value="status">Status</option>
                         <option value="tid">Tid</option>
                     </select>
-
                     <button type="submit" class="btn-action btn-primary btn-small">Sök</button>
                 </div>
 
@@ -189,14 +200,35 @@
                 }
             </form>
 
-            @* Projektlista (Visas nu under sökfälten) *@
             @if (Model.PersonProjects != null && Model.PersonProjects.Any())
             {
-                <div class="projects-list" style="margin-top: 20px;">
+                <div class="projects-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
                     @foreach (var pp in Model.PersonProjects)
                     {
-                        <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Project.Id" class="project-pill">
-                            @pp.Project.ProjectName
+                        @* Kollar om profilens ägare också äger projektet *@
+                        bool isActuallyOwner = pp.Project.OwnerId == Model.Id;
+
+                        <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Project.Id"
+                           class="project-card"
+                           style="text-decoration: none; color: inherit; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s;">
+
+                            <div class="project-card-image" style="width: 100%; height: 120px; background-color: #3498db; display: flex; justify-content: center; align-items: center;">
+                                @if (!string.IsNullOrEmpty(pp.Project.ImageUrl))
+                                {
+                                    <img src="@Url.Content("~/images/projects/" + pp.Project.ImageUrl)" alt="@pp.Project.ProjectName" style="width: 100%; height: 100%; object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-project-diagram" style="font-size: 2rem; color: white;"></i>
+                                }
+                            </div>
+
+                            <div style="padding: 10px; text-align: center;">
+                                <span style="font-weight: bold; display: block; color: #002d5a; font-size: 0.9rem;">@pp.Project.ProjectName</span>
+                                <span style="font-size: 0.75rem; color: @(isActuallyOwner ? "#3498db" : "#7f8c8d"); font-weight: @(isActuallyOwner ? "bold" : "normal");">
+                                    @(isActuallyOwner ? "Projektägare" : (pp.Role ?? "Deltagare"))
+                                </span>
+                            </div>
                         </a>
                     }
                 </div>
