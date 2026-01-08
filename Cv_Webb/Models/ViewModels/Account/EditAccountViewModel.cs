@@ -24,6 +24,18 @@ namespace CV_siten.Models.ViewModels.Account
         [Display(Name = "Telefonnummer")]
         public string PhoneNumber { get; set; }
 
+        [Display(Name = "Privat profil")]
+        public bool IsPrivate { get; set; }
+
+        [Display(Name = "Adress")]
+        public string? Address { get; set; }
+
+        [Display(Name = "Postnummer")]
+        public string? PostalCode { get; set; }
+
+        [Display(Name = "Ort")]
+        public string? City { get; set; }
+
         [StringLength(100, ErrorMessage = "Yrkestiteln får inte överskrida 100 tecken.")]
         [Display(Name = "Yrkestitel")]
         public string JobTitle { get; set; }

@@ -48,7 +48,12 @@ namespace CV_siten.Controllers
                     Description = model.Description ?? "",
                     PhoneNumber = model.PhoneNumber,
                     IsActive = true,
-                    IdentityUserId = user.Id
+                    IdentityUserId = user.Id,
+                    Address = model.Address,
+                    PostalCode = model.PostalCode,
+                    City = model.City,
+                    IsPrivate = model.IsPrivate,
+                  
                 };
 
                 _context.Persons.Add(person);
