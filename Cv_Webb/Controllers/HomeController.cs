@@ -1,4 +1,4 @@
-ï»¿using CV_siten.Data.Data;
+using CV_siten.Data.Data;
 using CV_siten.Data.Models;
 using CV_siten.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -99,7 +99,7 @@ namespace CV_siten.Controllers
             return View(matches.Select(x => x.Person).ToList());
         }
 
-        // BERÃKNAR MATCHNINGSSCORE MELLAN TVÃ PERSONER
+        // BERÃKNAR MATCHNINGSSCORE MELLAN TVÃ PERSONER
         private int CalculateMatchScore(Person a, Person b)
         {
             int score = 0;
