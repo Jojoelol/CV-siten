@@ -1,11 +1,10 @@
-﻿using CV_siten.Data;
-using CV_siten.Data.Data;
+﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
 using CV_siten.Models.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using Microsoft.AspNetCore.Identity;
 
 namespace CV_siten.Controllers
 {
@@ -28,17 +27,22 @@ namespace CV_siten.Controllers
         public async Task<IActionResult> Index()
         {
             // Senaste projektet
-            var senasteProjekt = await _context.Projects
+            ViewBag.SenasteProjekt = await _context.Projects
                 .OrderByDescending(p => p.StartDate)
                 .FirstOrDefaultAsync();
 
-            ViewBag.SenasteProjekt = senasteProjekt;
-
-            // Om ingen är inloggad → visa INGA profiler
+            // Om utloggad → visa 3 utvalda profiler
             if (!User.Identity.IsAuthenticated)
             {
-                ViewBag.SectionTitle = "";
-                return View(new List<Person>()); // tom lista
+                ViewBag.SectionTitle = "UTVALDA PROFILER";
+                ViewBag.MatchData = new Dictionary<int, int>(); // viktigt!
+
+                var urvalCV = await _context.Persons
+                    .Where(p => p.IsActive && !p.IsPrivate)
+                    .Take(3)
+                    .ToListAsync();
+
+                return View(urvalCV);
             }
 
             // Hämta inloggad användare
@@ -46,19 +50,28 @@ namespace CV_siten.Controllers
             var currentPerson = await _context.Persons
                 .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
-            // Om något saknas → visa INGA profiler
+            // Om ingen Person-profil finns → visa utvalda
             if (currentPerson == null)
             {
-                ViewBag.SectionTitle = "";
-                return View(new List<Person>());
+                ViewBag.SectionTitle = "UTVALDA PROFILER";
+                ViewBag.MatchData = new Dictionary<int, int>();
+
+                var fallback = await _context.Persons
+                    .Where(p => p.IsActive && !p.IsPrivate)
+                    .Take(3)
+                    .ToListAsync();
+
+                return View(fallback);
             }
 
             // Hämta andra personer
             var others = await _context.Persons
-                .Where(p => p.Id != currentPerson.Id && p.IsActive)
+                .Where(p => p.Id != currentPerson.Id && p.IsActive && !p.IsPrivate)
                 .ToListAsync();
 
-            // Matchning + procent + 50%-gräns
+
+
+         // MATCHANDE AV PROFILER
             var matches = others
                 .Select(p =>
                 {
@@ -75,7 +88,7 @@ namespace CV_siten.Controllers
                 .Take(3)
                 .ToList();
 
-            // Skicka matchningsprocent till vyn
+            // Skicka procent till vyn
             ViewBag.MatchData = matches.ToDictionary(
                 x => x.Person.Id,
                 x => x.MatchPercent
@@ -86,7 +99,7 @@ namespace CV_siten.Controllers
             return View(matches.Select(x => x.Person).ToList());
         }
 
-        // Matchningslogik
+        // BERÄKNAR MATCHNINGSSCORE MELLAN TVÅ PERSONER
         private int CalculateMatchScore(Person a, Person b)
         {
             int score = 0;
@@ -118,50 +131,6 @@ namespace CV_siten.Controllers
             {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
-        }
-
-        public async Task<IActionResult> Search(string search, string skill)
-        {
-            var query = _context.Persons.AsQueryable();
-
-            query = query.Where(p => p.IsActive);
-
-            if (!User.Identity.IsAuthenticated)
-            {
-                query = query.Where(p => !p.IsPrivate);
-            }
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                string s = search.ToUpper();
-                query = query.Where(p =>
-                    p.FirstName.ToUpper().Contains(s) ||
-                    p.LastName.ToUpper().Contains(s));
-            }
-
-            if (!string.IsNullOrEmpty(skill))
-            {
-                string sk = skill.ToUpper();
-                query = query.Where(p =>
-                    (p.Skills != null && p.Skills.ToUpper().Contains(sk)) ||
-                    (p.Education != null && p.Education.ToUpper().Contains(sk)) ||
-                    (p.JobTitle != null && p.JobTitle.ToUpper().Contains(sk)) ||
-                    (p.Experience != null && p.Experience.ToUpper().Contains(sk))
-                );
-            }
-
-            var personResult = await query.ToListAsync();
-
-            var projektResult = await _context.Projects
-                .Where(p => string.IsNullOrEmpty(search) ||
-                            p.ProjectName.ToUpper().Contains(search.ToUpper()))
-                .ToListAsync();
-
-            ViewBag.SearchQuery = search;
-            ViewBag.SkillQuery = skill;
-            ViewBag.personResult = personResult;
-
-            return View("SearchResult", projektResult);
         }
     }
 }
