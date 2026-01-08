@@ -28,7 +28,7 @@
                                 <th>Ämne</th>
                                 <th>Datum</th>
                                 <th>Status</th>
-                                <th>Åtgärd</th>
+                                <th>Åtgärder</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -64,6 +64,15 @@
                                                     <button class="btn btn-sm btn-outline-dark">Markera läst</button>
                                                 </form>
                                             }
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger ms-2 btn-delete-message"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteMessageModal"
+                                                    data-id="@m.Id"
+                                                    data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
+                                                    data-subject="@m.Subject">
+                                                X
+                                            </button>
                                         </td>
                                         <td style="display:none;" class="message-content">
                                             @m.Content
@@ -174,6 +183,34 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="deleteMessageModal" tabindex="-1" aria-labelledby="deleteMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteMessageModalLabel">Ta bort meddelande</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Stäng"></button>
+            </div>
+
+            <div class="modal-body">
+                <p class="mb-2">Är du säker på att du vill ta bort meddelande?</p>
+                <div class="text-muted" id="deleteMessageInfo"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+
+                <form action="/Message/Delete" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteMessageId" />
+                    <button type="submit" class="btn btn-danger">Ta bort</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
@@ -262,6 +299,15 @@
 
             document.getElementById('readMessageFrom').textContent = "Från: " + from;
             document.getElementById('readMessageContent').textContent = content;
+        });
+    </script>
+    <script>
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-delete-message');
+            if (!btn) return;
+
+            const id = btn.getAttribute('data-id');
+            document.getElementById('deleteMessageId').value = id;
         });
     </script>
 

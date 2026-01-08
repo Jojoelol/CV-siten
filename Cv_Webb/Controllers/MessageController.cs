@@ -104,6 +104,24 @@ namespace CV_siten.Controllers
             return RedirectToAction(nameof(Inbox));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var me = await GetMyPersonAsync();
+
+            var msg = await _db.Messages
+                .FirstOrDefaultAsync(m => m.Id == id && m.ReceiverId == me.Id);
+
+            if (msg == null)
+                return NotFound();
+
+            _db.Messages.Remove(msg);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Inbox));
+        }
+
         public IActionResult Index()
         {
             return RedirectToAction(nameof(Inbox));
