@@ -40,7 +40,9 @@
                                         role="button"
                                         data-bs-toggle="modal"
                                         data-bs-target="#readMessageModal"
-                                        data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)">
+                                        data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
+                                        data-sender-id="@m.SenderId"
+                                        data-subject="@m.Subject">
 
                                         <td><strong>@m.Sender?.FirstName @m.Sender?.LastName</strong></td>
                                         <td>@m.Subject</td>
@@ -65,6 +67,7 @@
                                                 </form>
                                             }
                                             <button type="button"
+                                                    onclick="event.stopPropagation();"
                                                     class="btn btn-sm btn-outline-danger ms-2 btn-delete-message"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#deleteMessageModal"
@@ -131,7 +134,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Ämne</label>
-                            <input class="form-control"
+                            <input id="sendSubject"
+                                   class="form-control"
                                    type="text"
                                    name="Subject"
                                    value="@(ViewData["SendSubject"] ?? "")"
@@ -160,6 +164,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="readMessageModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -170,18 +175,19 @@
                 </div>
 
                 <div class="modal-body">
-                    <div id="readMessageContent" style="white-space: pre-wrap;"></div>
+                    <div id="readMessageContent"
+                         style="white-space: pre-wrap;">
+                    </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        Stäng
-                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="replyBtn">Svara</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stäng</button>
                 </div>
 
             </div>
         </div>
-    </div>
+    </div>  
 </div>
 <div class="modal fade" id="deleteMessageModal" tabindex="-1" aria-labelledby="deleteMessageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -218,7 +224,7 @@
             const searchInput = document.getElementById('receiverSearch');
             const resultsEl = document.getElementById('receiverResults');
             const receiverIdEl = document.getElementById('receiverId');
-
+            x§
             if (!searchInput) return;
 
             let timer = null;
@@ -311,5 +317,69 @@
         });
     </script>
 
+    <script>
+        let lastOpenedMessage = null;
+
+        document.addEventListener('click', function (e) {
+            const row = e.target.closest('.message-row');
+            if (!row) return;
+
+            if (e.target.closest('.btn-delete-message')) return;
+
+            const from = row.getAttribute('data-from') || '';
+            const senderId = row.getAttribute('data-sender-id') || '';
+            const subject = row.getAttribute('data-subject') || '';
+            const content = row.querySelector('.message-content')?.textContent || '';
+
+            document.getElementById('readMessageFrom').textContent = "Från: " + from;
+            document.getElementById('readMessageContent').textContent = content;
+
+            lastOpenedMessage = { from, senderId, subject };
+        });
+
+        document.getElementById('replyBtn')?.addEventListener('click', function () {
+            if (!lastOpenedMessage) return;
+
+            const receiverSearch = document.getElementById('receiverSearch');
+            const receiverId = document.getElementById('receiverId');
+            if (receiverSearch) receiverSearch.value = lastOpenedMessage.from || '';
+            if (receiverId) receiverId.value = lastOpenedMessage.senderId || '';
+
+            const subjectInput = document.getElementById('sendSubject');
+            if (subjectInput) {
+                const s = (lastOpenedMessage.subject || '').trim();
+                subjectInput.value = s.toLowerCase().startsWith('re:') ? s : ('Re: ' + s);
+            }
+
+            const receiverResults = document.getElementById('receiverResults');
+            if (receiverResults) receiverResults.innerHTML = '';
+
+            const readEl = document.getElementById('readMessageModal');
+            const sendEl = document.getElementById('sendMessageModal');
+
+            if (readEl && window.bootstrap) {
+                const readInstance = bootstrap.Modal.getInstance(readEl) || new bootstrap.Modal(readEl);
+                readInstance.hide();
+            }
+            if (sendEl && window.bootstrap) {
+                const sendInstance = bootstrap.Modal.getInstance(sendEl) || new bootstrap.Modal(sendEl);
+                sendInstance.show();
+            }
+        });
+    </script>
+
+    <script>
+        function cleanupModalArtifacts() {
+          document.body.classList.remove('modal-open');
+          document.body.style.removeProperty('padding-right');
+          document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+        }
+
+        ['sendMessageModal', 'readMessageModal', 'deleteMessageModal'].forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('hidden.bs.modal', cleanupModalArtifacts);
+        });
+    </script>
 }
 
