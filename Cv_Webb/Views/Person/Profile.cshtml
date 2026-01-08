@@ -7,7 +7,7 @@
             <div class="pic-placeholder">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+                    <img src="~/images/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
                 }
                 else
                 {
@@ -39,6 +39,14 @@
                 <div class="profile-bio">
                     <p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
                 </div>
+
+                @* --- VG-KRAV: BESÖKSSTATISTIK (Endast för ägaren) --- *@
+                @if (ViewBag.IsOwner == true)
+                {
+                    <div class="profile-stats" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ecf0f1; font-size: 0.9em; color: #7f8c8d;">
+                        <p><i class="fas fa-eye"></i> Antal visningar: <strong>@Model.ViewCount</strong></p>
+                    </div>
+                }
             </div>
 
             @* 5. Knappar i Sidebar *@
@@ -68,6 +76,7 @@
                 <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">
                     Redigera profil
                 </a>
+
                 @if (Model.IsActive)
                 {
                     <form asp-controller="Person" asp-action="Inactivate" method="post" style="margin-top:10px;">

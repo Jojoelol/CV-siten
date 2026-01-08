@@ -48,6 +48,9 @@ namespace CV_siten.Data.Models
         [Display(Name = "CV-sökväg")]
         public string? CvUrl { get; set; }
 
+        [Display(Name = "Antal besök")]
+        public int ViewCount { get; set; } = 0;
+
         [Display(Name = "Privat profil")]
         public bool IsPrivate { get; set; } = false; // Standardvärdet är offentligt
 
@@ -55,5 +58,6 @@ namespace CV_siten.Data.Models
 
         public string IdentityUserId { get; set; } = string.Empty;
         public virtual ApplicationUser IdentityUser { get; set; } = null!;
+
     }
 }

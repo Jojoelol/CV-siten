@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Serialization;
 
 namespace CV_siten.Controllers
 {
@@ -25,80 +26,41 @@ namespace CV_siten.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        //// --- VISA PROFIL ---
-        //[AllowAnonymous]
-        //public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
-        //{
-        //    Person person;
-        //    if (id.HasValue)
-        //    {
-        //        person = await _context.Persons
-        //            .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
-        //            .FirstOrDefaultAsync(p => p.Id == id);
-        //    }
-        //    else
-        //    {
-        //        var user = await _userManager.GetUserAsync(User);
-        //        if (user == null) return RedirectToAction("Login", "Account");
-        //        person = await _context.Persons
-        //            .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
-        //            .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-        //    }
-
-        //    if (person == null) return NotFound();
-
-        //    // Sökning
-        //    if (!string.IsNullOrEmpty(searchString))
-        //    {
-        //        person.PersonProjects = person.PersonProjects
-        //            .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
-        //    }
-
-        //    // Sortering
-        //    person.PersonProjects = sortBy switch
-        //    {
-        //        "status" => person.PersonProjects.OrderBy(pp => pp.Project.Status).ToList(),
-        //        "tid" => person.PersonProjects.OrderByDescending(pp => pp.Project.StartDate).ToList(),
-        //        _ => person.PersonProjects.OrderBy(pp => pp.Project.ProjectName).ToList()
-        //    };
-
-        //    ViewBag.CurrentSearch = searchString;
-        //    return View(person); 
-        //}
-
-        // --- VISA PROFIL ---
+        // --- VISA PROFIL (G-krav 1, 6 & VG-krav 1) ---
         [AllowAnonymous]
         public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
         {
-            // 1. Hämta den inloggade användaren (om någon)
             var user = await _userManager.GetUserAsync(User);
             var loggedInPerson = user != null
                 ? await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id)
                 : null;
 
-            // 2. Bestäm vilken person som ska visas
-            // Om id saknas i URL, visa den inloggades profil. Om inte inloggad, gå till login.
             if (!id.HasValue && loggedInPerson == null) return RedirectToAction("Login", "Account");
             int targetId = id ?? loggedInPerson.Id;
 
-            // 3. Kolla om besökaren är ägaren (för att visa/dölja knappar)
-            ViewBag.IsOwner = (loggedInPerson != null && targetId == loggedInPerson.Id);
-
-            // 4. Hämta personen från databasen
             var person = await _context.Persons
+                .Include(p => p.IdentityUser)
                 .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
                 .FirstOrDefaultAsync(p => p.Id == targetId);
 
             if (person == null) return NotFound();
 
-            //[cite_start]// 5. Krav 7: Hantera privat profil 
-                        // Om profilen är privat och besökaren INTE är inloggad -> skicka till login
-            //if (person.IsPrivate && user == null)
-            //{
-            //    return RedirectToAction("Login", "Account");
-           // }
+            // Säkerställ att vi inte räknar besök vid t.ex. bildanrop (Fix för dubbelräkning)
+            if (Request.Headers["Accept"].ToString().Contains("text/html"))
+            {
+                person.ViewCount++; // VG-krav #1
+                await _context.SaveChangesAsync();
+            }
 
-            // --- Sökning och sortering (din befintliga kod) ---
+            // Hantera privat profil (G-krav 7)
+            if (person.IsPrivate && user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            ViewBag.IsOwner = (loggedInPerson != null && targetId == loggedInPerson.Id);
+
+            // Sökning och sortering i projekt
             if (!string.IsNullOrEmpty(searchString))
             {
                 person.PersonProjects = person.PersonProjects
@@ -113,13 +75,10 @@ namespace CV_siten.Controllers
             };
 
             ViewBag.CurrentSearch = searchString;
-
-            // Om du flyttade filen till Views/Account måste du skriva hela sökvägen:
-            // return View("~/Views/Account/Profile.cshtml", person);
             return View(person);
         }
 
-        // --- REDIGERA PROFIL ---
+        // --- REDIGERA PROFIL (GET) ---
         [HttpGet]
         public async Task<IActionResult> Edit()
         {
@@ -135,63 +94,12 @@ namespace CV_siten.Controllers
                 PhoneNumber = person.PhoneNumber,
                 JobTitle = person.JobTitle,
                 Description = person.Description,
-                ImageUrl = person.ImageUrl
+                ImageUrl = person.ImageUrl // Viktigt för att visa bilden i Edit-vyn
             };
-            return View(model); 
+            return View(model);
         }
 
-        //INAKTIVERA PROFIL 
-        [HttpPost]
-        public async Task<IActionResult> Inactivate(int id)
-        {
-            var person = await _context.Persons.FindAsync(id);
-            if (person == null)
-                return NotFound();
-
-            person.IsActive = false;
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Profile", new { id = person.Id });
-        }
-        //AKTIVERA PROFIL
-        [HttpPost]
-        public async Task<IActionResult> Activate(int id)
-        {
-            var person = await _context.Persons.FindAsync(id);
-            if (person == null)
-                return NotFound();
-
-            person.IsActive = true;
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Profile", new { id = person.Id });
-        }
-
-
-        // --- REDIGERA KOMPETENSER, UTBILDNINGAR OCH TIDIGARE ERFARENHETER ---
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> UpdateProfileField(int id, string fieldName, string fieldValue)
-        {
-            var person = await _context.Persons.FindAsync(id);
-            if (person == null) return NotFound();
-
-            // Kontrollera att det är ägaren som försöker spara
-            var user = await _userManager.GetUserAsync(User);
-            if (person.IdentityUserId != user.Id) return Forbid();
-
-            // Uppdatera rätt fält baserat på namnet vi skickar in
-            switch (fieldName)
-            {
-                case "Skills": person.Skills = fieldValue; break;
-                case "Education": person.Education = fieldValue; break;
-                case "Experience": person.Experience = fieldValue; break;
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Profile", new { id = person.Id });
-        }
-
+        // --- REDIGERA PROFIL (POST) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditAccountViewModel model)
@@ -202,94 +110,125 @@ namespace CV_siten.Controllers
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             if (person == null) return NotFound();
 
-            user.Email = model.Email;
-            user.UserName = model.Email;
-            
-
+            // 1. Hantera ny bilduppladdning
             if (model.ImageFile != null)
             {
-                // 1. Skapa ett unikt filnamn för att undvika krockar
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+                string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "ProfilePicture");
 
-                // 2. Bestäm sökvägen till din mapp i wwwroot
-                // OBS: Se till att mappen "ProfilePicture" faktiskt existerar under wwwroot/images/
-                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "ProfilePicture");
+                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
                 string filePath = Path.Combine(uploadPath, fileName);
-
-                // 3. Spara filen fysiskt på servern
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await model.ImageFile.CopyToAsync(stream);
                 }
 
-                // 4. Uppdatera databasen med det nya filnamnet (strängen)
+                // Sparar "ProfilePicture/filnamn.jpg"
                 person.ImageUrl = "ProfilePicture/" + fileName;
             }
+            // Om ingen ny fil valts, behåll värdet som fanns i person.ImageUrl sedan tidigare.
+            // Vi rör inte person.ImageUrl här om model.ImageFile är null.
 
-            person.ImageUrl = model.ImageUrl;
+            // 2. Uppdatera övriga fält
             person.FirstName = model.FirstName;
             person.LastName = model.LastName;
             person.PhoneNumber = model.PhoneNumber;
             person.JobTitle = model.JobTitle;
             person.Description = model.Description;
 
+            user.Email = model.Email;
+            user.UserName = model.Email;
+
             await _userManager.UpdateAsync(user);
             await _context.SaveChangesAsync();
+
             TempData["SuccessMessage"] = "Profilen har uppdaterats!";
-            return RedirectToAction(nameof(Profile));
+            return RedirectToAction(nameof(Profile), new { id = person.Id });
         }
 
-        // --- CV-HANTERING ---
+        // --- EXPORTERA TILL XML (VG-krav 7) ---
+        [HttpGet]
+        public async Task<IActionResult> ExportToXml()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons
+                .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
+                .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person == null) return NotFound();
+
+            // Skapa en export-struktur för att undvika problem med tunga objekt
+            var export = new
+            {
+                Namn = $"{person.FirstName} {person.LastName}",
+                Titel = person.JobTitle,
+                Beskrivning = person.Description,
+                Kompetenser = person.Skills,
+                Projekt = person.PersonProjects.Select(pp => new { pp.Project.ProjectName, pp.Project.Description }).ToList()
+            };
+
+            var serializer = new XmlSerializer(export.GetType());
+            using (var sw = new StringWriter())
+            {
+                serializer.Serialize(sw, export);
+                return File(System.Text.Encoding.UTF8.GetBytes(sw.ToString()), "application/xml", $"CV_{person.LastName}.xml");
+            }
+        }
+
+        // --- AKTIVERA / INAKTIVERA (VG-krav 3) ---
+        [HttpPost]
+        public async Task<IActionResult> Inactivate(int id)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            if (person != null) { person.IsActive = false; await _context.SaveChangesAsync(); }
+            return RedirectToAction("Profile", new { id = id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Activate(int id)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            if (person != null) { person.IsActive = true; await _context.SaveChangesAsync(); }
+            return RedirectToAction("Profile", new { id = id });
+        }
+
+        // --- REDIGERA CV-FÄLT (G-krav 4c) ---
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfileField(int id, string fieldName, string fieldValue)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            if (person == null || person.IdentityUserId != user.Id) return Forbid();
+
+            switch (fieldName)
+            {
+                case "Skills": person.Skills = fieldValue; break;
+                case "Education": person.Education = fieldValue; break;
+                case "Experience": person.Experience = fieldValue; break;
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Profile", new { id = id });
+        }
+
+        // --- CV-FILSHANTERING ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UploadCv(IFormFile cvFile)
         {
-            if (cvFile == null || cvFile.Length == 0) return RedirectToAction(nameof(Profile));
-
-            var extension = Path.GetExtension(cvFile.FileName).ToLower();
-            if (extension != ".pdf") return BadRequest("Endast PDF tillåtet.");
+            if (cvFile == null || Path.GetExtension(cvFile.FileName).ToLower() != ".pdf") return BadRequest();
 
             var user = await _userManager.GetUserAsync(User);
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
             if (person != null)
             {
-                string folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "cvs");
-                if (!Directory.Exists(folderPath)) Directory.CreateDirectory(folderPath);
+                string fileName = Guid.NewGuid().ToString() + ".pdf";
+                string path = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "cvs", fileName);
 
-                string fileName = Guid.NewGuid().ToString() + extension;
-                string filePath = Path.Combine(folderPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await cvFile.CopyToAsync(stream);
-                }
-
-                if (!string.IsNullOrEmpty(person.CvUrl))
-                {
-                    var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, person.CvUrl.TrimStart('/'));
-                    if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
-                }
-
+                using (var stream = new FileStream(path, FileMode.Create)) { await cvFile.CopyToAsync(stream); }
                 person.CvUrl = "/uploads/cvs/" + fileName;
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction(nameof(Profile));
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteCv()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-
-            if (person != null && !string.IsNullOrEmpty(person.CvUrl))
-            {
-                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, person.CvUrl.TrimStart('/'));
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
-
-                person.CvUrl = null;
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Profile));
