@@ -134,7 +134,8 @@ namespace CV_siten.Controllers
                 Email = user.Email,
                 PhoneNumber = person.PhoneNumber,
                 JobTitle = person.JobTitle,
-                Description = person.Description
+                Description = person.Description,
+                ImageUrl = person.ImageUrl
             };
             return View(model); 
         }
@@ -203,14 +204,36 @@ namespace CV_siten.Controllers
 
             user.Email = model.Email;
             user.UserName = model.Email;
-            await _userManager.UpdateAsync(user);
+            
 
+            if (model.ImageFile != null)
+            {
+                // 1. Skapa ett unikt filnamn för att undvika krockar
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+
+                // 2. Bestäm sökvägen till din mapp i wwwroot
+                // OBS: Se till att mappen "ProfilePicture" faktiskt existerar under wwwroot/images/
+                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "ProfilePicture");
+                string filePath = Path.Combine(uploadPath, fileName);
+
+                // 3. Spara filen fysiskt på servern
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(stream);
+                }
+
+                // 4. Uppdatera databasen med det nya filnamnet (strängen)
+                person.ImageUrl = "ProfilePicture/" + fileName;
+            }
+
+            person.ImageUrl = model.ImageUrl;
             person.FirstName = model.FirstName;
             person.LastName = model.LastName;
             person.PhoneNumber = model.PhoneNumber;
             person.JobTitle = model.JobTitle;
             person.Description = model.Description;
 
+            await _userManager.UpdateAsync(user);
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Profilen har uppdaterats!";
             return RedirectToAction(nameof(Profile));
