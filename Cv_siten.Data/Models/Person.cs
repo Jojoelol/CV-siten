@@ -48,6 +48,9 @@ namespace CV_siten.Data.Models
         [Display(Name = "CV-sökväg")]
         public string? CvUrl { get; set; }
 
+        [Display(Name = "Privat profil")]
+        public bool IsPrivate { get; set; } = false; // Standardvärdet är offentligt
+
         public virtual ICollection<PersonProject> PersonProjects { get; set; } = new List<PersonProject>();
 
         public string IdentityUserId { get; set; } = string.Empty;

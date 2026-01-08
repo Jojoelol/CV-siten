@@ -1,56 +1,73 @@
-﻿/* 1. Sidans struktur */
+﻿/* _Layout.cshtml.css */
+
+/* 1. Sidans struktur */
 main {
     flex: 1 0 auto;
     display: flex;
     flex-direction: column;
-    background-color: #f4f7f6; /* Ljus bakgrund för att framhäva innehållet */
+    background-color: #f4f7f6;
 }
 
 /* 2. Header & Innehåll */
 .main-header {
-    padding: 20px 50px;
-    border-bottom: 3px solid #3498db; /* Ljusblå accentlinje */
-    background-color: #ecf0f1; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Ger lite djup */
+    padding: 10px 50px; /* Något mindre padding för att få plats med fler fält */
+    border-bottom: 3px solid #3498db;
+    background-color: #ecf0f1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .header-content {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start; /* Samlar logo och sök till vänster */
     align-items: center;
+    gap: 20px; /* Mellanrum mellan elementen */
 }
 
 .logo {
     font-weight: bold;
     color: #2c3e50;
     font-size: 1.2rem;
+    flex-shrink: 0;
 }
 
-/* 3. Sökfältet */
+/* 3. Sökfältet (Flyttat till vänster via flex-start i parent) */
 .search-bar {
     display: flex;
     gap: 10px;
+    margin-right: auto; /* Detta trycker allt efter sökfältet (login) till höger */
 }
 
-.search-bar input {
-    width: 300px;
-    padding: 8px 20px;
-    border: 2px solid #dee2e6; /* Mjukare grå kant */
-    border-radius: 4px; /* Lite mjukare hörn */
-    outline: none;
-    transition: border-color 0.2s;
+    .search-bar input {
+        width: 180px; /* Justerad bredd för att få plats med två fält */
+        padding: 6px 12px;
+        border: 2px solid #dee2e6;
+        border-radius: 4px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .search-bar input:focus {
+            border-color: #3498db;
+        }
+
+/* 4. Inloggningsinfo och knappar */
+.logged-in-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.search-bar input:focus {
-    border-color: #3498db; /* Blå kant när man skriver */
+.logged-in-text {
+    color: #333;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
-/* 4. Gemensam stil för Knappar (Sök & Logga in) */
 .login button,
 .search-bar button {
     display: inline-block;
-    padding: 8px 25px;
-    border: 2px solid #3498db; /* Blå ram istället för svart */
+    padding: 6px 15px;
+    border: 2px solid #3498db;
     background-color: transparent;
     color: #3498db !important;
     border-radius: 4px;
@@ -59,45 +76,24 @@ main {
     font-size: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
-/* Hover-effekt för båda knapparna */
-.login button:hover,
-.search-bar button:hover {
-    background-color: #3498db;
-    color: #ffffff !important;
-    transform: translateY(-1px);
-}
+    .login button:hover,
+    .search-bar button:hover {
+        background-color: #3498db;
+        color: #ffffff !important;
+        transform: translateY(-1px);
+    }
 
+/* Footer */
 .footer {
-    /* Ljusgrå bakgrund som bryter av mot den mörka .background sektionen */
-    background-color: #ecf0f1; 
-    /* Mörkblå text för att matcha temat och vara lättläst */
-    color: #2c3e50; 
+    background-color: #ecf0f1;
+    color: #2c3e50;
     padding: 25px 0;
     width: 100%;
     text-align: center;
     margin-top: auto;
-    /* En subtil mörkare grå linje för att definiera kanten */
-    border-top: 1px solid #bdc3c7; 
+    border-top: 1px solid #bdc3c7;
     display: block;
-}
-
-.footer div {
-    margin: 0;
-    padding: 0;
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-/* I _Layout.cshtml.css */
-.logged-in-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logged-in-text {
-    color: #333; /* Här styr du färgen (byt ut mot t.ex. black eller #000) */
-    font-weight: 500;
 }
