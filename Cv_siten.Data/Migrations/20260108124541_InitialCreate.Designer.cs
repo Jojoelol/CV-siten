@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260108124205_InitialCreate")]
+    [Migration("20260108124541_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,15 +94,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "eb0d1db6-cdb0-4319-aaec-331a07c9e3f7",
+                            ConcurrencyStamp = "1b78a88d-04ec-4aa9-96b3-ce11a3c1e95e",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBW+V0B5XkxuSf8aFqT8AA54kQFPYmJu8O7i2lDTlvvTlXS269maKjjqza4YQnAuaQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELJK3DG2eAx45o/DRgj9OJx/KDZMAGQGrKbsiHtTPtvSTymELwVBm+U5rIs7XDbDlQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6d28aa34-2cbe-4722-9c3c-3089a1a0657c",
+                            SecurityStamp = "f7860673-90d6-4827-a9be-7108915f64e9",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -229,6 +229,9 @@ namespace Cv_siten.Data.Migrations
                     b.Property<string>("Skills")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ViewCount")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityUserId");
@@ -253,7 +256,8 @@ namespace Cv_siten.Data.Migrations
                             LastName = "Test",
                             PhoneNumber = "0701234567",
                             PostalCode = "12345",
-                            Skills = "C#, ASP.NET Core, SQL"
+                            Skills = "C#, ASP.NET Core, SQL",
+                            ViewCount = 0
                         });
                 });
 
