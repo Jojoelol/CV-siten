@@ -34,6 +34,10 @@ namespace CV_siten.Controllers
                 .OrderByDescending(p => p.StartDate) 
                 .FirstOrDefaultAsync();
 
+            var offentligaProfiler = await _context.Persons
+    .Where(p => p.IsActive && !p.IsPrivate) // Visa bara de som är aktiva OCH inte privata
+    .ToListAsync();
+
             ViewBag.SenasteProjekt = senasteProjekt;
 
             return View(urvalCV);

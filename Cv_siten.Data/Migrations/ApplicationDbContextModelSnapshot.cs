@@ -91,15 +91,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1b78a88d-04ec-4aa9-96b3-ce11a3c1e95e",
+                            ConcurrencyStamp = "69d7c10b-f26e-4069-8ff7-97f976868761",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAELJK3DG2eAx45o/DRgj9OJx/KDZMAGQGrKbsiHtTPtvSTymELwVBm+U5rIs7XDbDlQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENFh+/DjxEBT0eaK6/IJnruXyrHDlowcqao2gKmpBNoT/nzjGhlK/PfHSQh0XmF5cw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f7860673-90d6-4827-a9be-7108915f64e9",
+                            SecurityStamp = "2d70cc8a-48b5-421a-980a-b60e206bb884",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -164,7 +164,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("CV_siten.Data.Models.Person", b =>
@@ -233,7 +233,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("IdentityUserId");
 
-                    b.ToTable("Persons");
+                    b.ToTable("Persons", (string)null);
 
                     b.HasData(
                         new
@@ -273,7 +273,7 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("PersonProjects");
+                    b.ToTable("PersonProjects", (string)null);
                 });
 
             modelBuilder.Entity("CV_siten.Data.Models.Project", b =>
@@ -294,6 +294,9 @@ namespace Cv_siten.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -311,7 +314,9 @@ namespace Cv_siten.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -503,12 +508,23 @@ namespace Cv_siten.Data.Migrations
                     b.HasOne("CV_siten.Data.Models.Project", "Project")
                         .WithMany("PersonProjects")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Person");
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("CV_siten.Data.Models.Project", b =>
+                {
+                    b.HasOne("CV_siten.Data.Models.Person", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

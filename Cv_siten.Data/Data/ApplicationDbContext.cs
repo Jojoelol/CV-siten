@@ -11,6 +11,7 @@ namespace CV_siten.Data.Data
             : base(options)
         {
         }
+
         public DbSet<Person> Persons { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Message> Messages { get; set; }
@@ -21,33 +22,51 @@ namespace CV_siten.Data.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // --- Tvinga tabellnamn (för att undvika "Invalid object name"-fel) ---
+            modelBuilder.Entity<Person>().ToTable("Persons");
+            modelBuilder.Entity<Project>().ToTable("Projects");
+            modelBuilder.Entity<PersonProject>().ToTable("PersonProjects");
+            modelBuilder.Entity<Message>().ToTable("Messages");
+
+            // --- Sammansatt nyckel för kopplingstabellen ---
             modelBuilder.Entity<PersonProject>()
                 .HasKey(pp => new { pp.PersonId, pp.ProjectId });
 
+            // --- Relationer för PersonProject ---
             modelBuilder.Entity<PersonProject>()
                 .HasOne(pp => pp.Person)
                 .WithMany(p => p.PersonProjects)
-                .HasForeignKey(pp => pp.PersonId);
+                .HasForeignKey(pp => pp.PersonId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PersonProject>()
                 .HasOne(pp => pp.Project)
                 .WithMany(p => p.PersonProjects)
-                .HasForeignKey(pp => pp.ProjectId);
+                .HasForeignKey(pp => pp.ProjectId)
+                .OnDelete(DeleteBehavior.NoAction); // FIX: Förhindrar cykliska raderingar
 
+            // --- Relation för Projektägare ---
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.Owner)
+                .WithMany()
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.NoAction); // FIX: Förhindrar cykliska raderingar
+
+            // --- Relationer för Meddelanden (Viktigt för att undvika felet du fick senast) ---
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
                 .WithMany()
                 .HasForeignKey(m => m.SenderId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict); // FIX: Förhindrar cykliska raderingar
 
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Receiver)
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); // FIX: Förhindrar cykliska raderingar
 
+            // --- Seed Data: Användare ---
             var hasher = new PasswordHasher<ApplicationUser>();
-
             var testUser = new ApplicationUser
             {
                 Id = "test-user-1",
@@ -62,6 +81,7 @@ namespace CV_siten.Data.Data
 
             modelBuilder.Entity<ApplicationUser>().HasData(testUser);
 
+            // --- Seed Data: Person ---
             modelBuilder.Entity<Person>().HasData(new Person
             {
                 Id = 1,
@@ -79,7 +99,8 @@ namespace CV_siten.Data.Data
                 IsActive = true,
                 IdentityUserId = "test-user-1",
                 IsPrivate = false,
-                ImageUrl="Bild1.png"
+                ImageUrl = "Bild1.png",
+                ViewCount = 0
             });
         }
     }

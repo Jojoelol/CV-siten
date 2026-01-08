@@ -45,5 +45,17 @@ namespace CV_siten.Models.ViewModels.Account
         [Display(Name = "Yrkestitel")]
         [MinLength(2, ErrorMessage = "Yrkestitel måste vara minst två tecken.")]
         public string? JobTitle { get; set; }
+
+        [Display(Name = "Privat profil")]
+        public bool IsPrivate { get; set; }
+
+        [Display(Name = "Adress")]
+        public string? Address { get; set; }
+
+        [Display(Name = "Postnummer")]
+        public string? PostalCode { get; set; }
+
+        [Display(Name = "Ort")]
+        public string? City { get; set; }
     }
 }

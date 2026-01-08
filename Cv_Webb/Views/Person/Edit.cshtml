@@ -5,6 +5,7 @@
     <h2>Redigera profil</h2>
     <hr />
 
+    @* Visar bekräftelse när profil uppdaterats eller lösenord ändrats *@
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
@@ -14,9 +15,11 @@
     }
 
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        @* Viktigt: Håller koll på den befintliga bildsökvägen om ingen ny laddas upp *@
         <input type="hidden" asp-for="ImageUrl" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+        @* --- PROFILBILD --- *@
         <div class="form-group mb-4 text-center">
             <label class="d-block mb-2 fw-bold">Profilbild</label>
 
@@ -38,43 +41,66 @@
             <small class="text-muted">Ladda upp en ny bild för att byta ut den nuvarande.</small>
         </div>
 
+        @* --- PERSONUPPGIFTER --- *@
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label asp-for="FirstName" class="form-label fw-bold">Förnamn</label>
+                <label asp-for="FirstName" class="form-label fw-bold"></label>
                 <input asp-for="FirstName" class="form-control" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="col-md-6 mb-3">
-                <label asp-for="LastName" class="form-label fw-bold">Efternamn</label>
+                <label asp-for="LastName" class="form-label fw-bold"></label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="Email" class="form-label fw-bold">E-post</label>
+            <label asp-for="Email" class="form-label fw-bold"></label>
             <input asp-for="Email" class="form-control" />
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="PhoneNumber" class="form-label fw-bold">Telefonnummer</label>
+            <label asp-for="PhoneNumber" class="form-label fw-bold"></label>
             <input asp-for="PhoneNumber" class="form-control" />
             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
+        @* --- ADRESS --- *@
         <div class="form-group mb-3">
-            <label asp-for="JobTitle" class="form-label fw-bold">Yrkesroll</label>
+            <label asp-for="Address" class="form-label fw-bold"></label>
+            <input asp-for="Address" class="form-control" />
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="PostalCode" class="form-label fw-bold"></label>
+                <input asp-for="PostalCode" class="form-control" />
+                <span asp-validation-for="PostalCode" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="City" class="form-label fw-bold"></label>
+                <input asp-for="City" class="form-control" />
+                <span asp-validation-for="City" class="text-danger"></span>
+            </div>
+        </div>
+
+        @* --- YRKESROLL OCH BESKRIVNING --- *@
+        <div class="form-group mb-3">
+            <label asp-for="JobTitle" class="form-label fw-bold"></label>
             <input asp-for="JobTitle" class="form-control" placeholder="t.ex. Fullstack-utvecklare" />
             <span asp-validation-for="JobTitle" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-4">
-            <label asp-for="Description" class="form-label fw-bold">Kort beskrivning</label>
+            <label asp-for="Description" class="form-label fw-bold"></label>
             <textarea asp-for="Description" class="form-control" rows="3"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
+        @* --- ÅTGÄRDSKNAPPAR --- *@
         <div class="d-grid gap-2 mb-4">
             <button type="submit" class="btn btn-primary" style="background-color: #002d5a;">
                 <i class="fas fa-save"></i> Spara ändringar
@@ -96,4 +122,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+}   
