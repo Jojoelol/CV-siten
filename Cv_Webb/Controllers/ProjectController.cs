@@ -28,14 +28,38 @@ namespace CV_siten.Controllers
         // --- PROJEKTDETALJER ---
         public async Task<IActionResult> ProjectDetails(int id)
         {
-            var projekt = await _context.Projects
+            // 1. Hämta projektet och inkludera deltagarna (Personer)
+            var project = await _context.Projects
                 .Include(p => p.PersonProjects)
                     .ThenInclude(pp => pp.Person)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (projekt == null) return NotFound();
+            if (project == null)
+            {
+                return NotFound();
+            }
 
-            return View(projekt);
+            // 2. Kontrollera vem som är inloggad
+            var user = await _userManager.GetUserAsync(User);
+            bool isOwner = false;
+
+            if (user != null)
+            {
+                // Hitta person-objektet som hör till Identity-användaren
+                var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+                if (person != null)
+                {
+                    // Kontrollera om den inloggade personen finns i projektets deltagarlista
+                    // TIPS: Om du har en bool "IsOwner" i PersonProject-tabellen bör du kolla den här istället
+                    isOwner = project.PersonProjects.Any(pp => pp.PersonId == person.Id);
+                }
+            }
+
+            // 3. Skicka resultatet till vyn via ViewBag
+            ViewBag.IsOwner = isOwner;
+
+            return View(project);
         }
 
         // --- SKAPA NYTT PROJEKT ---
@@ -90,6 +114,23 @@ namespace CV_siten.Controllers
 
             // Om valideringen misslyckas (t.ex. saknat namn), visa vyn igen med felmeddelanden
             return View(model);
+        }
+
+        //UIPPDATERA PROJEKTINFO
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UpdateDescription(int id, string description)
+        {
+            var project = await _context.Projects.FindAsync(id);
+
+            if (project != null)
+            {
+                project.Description = description;
+                await _context.SaveChangesAsync();
+            }
+
+            // Skicka tillbaka användaren till samma sida
+            return RedirectToAction("ProjectDetails", new { id = id });
         }
     }
 }
