@@ -357,7 +357,11 @@ body {
 
 .sr-main {
     background-color: #2c3e50;
-    height:676.2px;
+    margin: 0;
+    padding: 40px 0;
+    width: 100%;
+    /* Säkerställer att bakgrunden täcker hela skärmen även om listan är kort */
+    min-height: calc(100vh - 60px);
 }
 
 .sr-no-results {
