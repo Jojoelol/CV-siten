@@ -237,6 +237,7 @@ namespace Cv_siten.Data.Migrations
                     SenderId = table.Column<int>(type: "int", nullable: false),
                     ReceiverId = table.Column<int>(type: "int", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsRead = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -285,7 +286,7 @@ namespace Cv_siten.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "504c173b-a634-444b-825f-a00a3fa14cba", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAEBhAL/xtShwtLZC2aitsexAdBGHoQgAU2Rq1yQeKbw/rK8K2Cw9XP7+GyKXy9R7wHQ==", null, false, "8cf706ad-968a-460a-8267-155be553e7b4", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "eb3a6269-2dbb-492d-9931-6f75e32a1d78", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAELaizPl2WBPpGXouIyZfKdtr/I5hD09pQNFjY+EbL/gVgi2rE49WsJCXm0tsoVOI1w==", null, false, "9b81172f-aef0-4f52-81ae-d963cd76cd50", false, "test@test.se" });
 
             migrationBuilder.InsertData(
                 table: "Persons",
