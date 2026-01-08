@@ -139,6 +139,34 @@ namespace CV_siten.Controllers
             return View(model); 
         }
 
+        //INAKTIVERA PROFIL 
+        [HttpPost]
+        public async Task<IActionResult> Inactivate(int id)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            if (person == null)
+                return NotFound();
+
+            person.IsActive = false;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Profile", new { id = person.Id });
+        }
+        //AKTIVERA PROFIL
+        [HttpPost]
+        public async Task<IActionResult> Activate(int id)
+        {
+            var person = await _context.Persons.FindAsync(id);
+            if (person == null)
+                return NotFound();
+
+            person.IsActive = true;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Profile", new { id = person.Id });
+        }
+
+
         // --- REDIGERA KOMPETENSER, UTBILDNINGAR OCH TIDIGARE ERFARENHETER ---
         [HttpPost]
         [Authorize]
