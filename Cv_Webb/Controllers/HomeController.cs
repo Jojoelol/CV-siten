@@ -1,12 +1,11 @@
-using CV_siten.Data;
+ï»¿using CV_siten.Data;
 using CV_siten.Data.Data;
 using CV_siten.Data.Models;
 using CV_siten.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-
-
+using Microsoft.AspNetCore.Identity;
 
 namespace CV_siten.Controllers
 {
@@ -14,49 +13,124 @@ namespace CV_siten.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
+        public HomeController(
+            ILogger<HomeController> logger,
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
         {
-
-            var urvalCV = await _context.Persons
-                .Where(p => p.IsActive) 
-                .Take(3)
-                .ToListAsync();
-
-
+            // Senaste projektet
             var senasteProjekt = await _context.Projects
-                .OrderByDescending(p => p.StartDate) 
+                .OrderByDescending(p => p.StartDate)
                 .FirstOrDefaultAsync();
 
             ViewBag.SenasteProjekt = senasteProjekt;
 
-            return View(urvalCV);
+            // Om ingen Ã¤r inloggad â†’ visa INGA profiler
+            if (!User.Identity.IsAuthenticated)
+            {
+                ViewBag.SectionTitle = "";
+                return View(new List<Person>()); // tom lista
+            }
+
+            // HÃ¤mta inloggad anvÃ¤ndare
+            var userId = _userManager.GetUserId(User);
+            var currentPerson = await _context.Persons
+                .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
+
+            // Om nÃ¥got saknas â†’ visa INGA profiler
+            if (currentPerson == null)
+            {
+                ViewBag.SectionTitle = "";
+                return View(new List<Person>());
+            }
+
+            // HÃ¤mta andra personer
+            var others = await _context.Persons
+                .Where(p => p.Id != currentPerson.Id && p.IsActive)
+                .ToListAsync();
+
+            // Matchning + procent + 50%-grÃ¤ns
+            var matches = others
+                .Select(p =>
+                {
+                    var score = CalculateMatchScore(currentPerson, p);
+                    return new
+                    {
+                        Person = p,
+                        Score = score,
+                        MatchPercent = score * 10 // maxscore 10 â†’ 100%
+                    };
+                })
+                .Where(x => x.Score >= 5) // minst 50%
+                .OrderByDescending(x => x.Score)
+                .Take(3)
+                .ToList();
+
+            // Skicka matchningsprocent till vyn
+            ViewBag.MatchData = matches.ToDictionary(
+                x => x.Person.Id,
+                x => x.MatchPercent
+            );
+
+            ViewBag.SectionTitle = "LIKNANDE PROFILER";
+
+            return View(matches.Select(x => x.Person).ToList());
         }
+
+        // Matchningslogik
+        private int CalculateMatchScore(Person a, Person b)
+        {
+            int score = 0;
+
+            if (!string.IsNullOrEmpty(a.JobTitle) &&
+                a.JobTitle.Equals(b.JobTitle, StringComparison.OrdinalIgnoreCase))
+                score += 3;
+
+            if (!string.IsNullOrEmpty(a.Skills) &&
+                !string.IsNullOrEmpty(b.Skills))
+            {
+                var skillsA = a.Skills.Split(',').Select(s => s.Trim());
+                var skillsB = b.Skills.Split(',').Select(s => s.Trim());
+
+                if (skillsA.Intersect(skillsB).Any())
+                    score += 5;
+            }
+
+            if (!string.IsNullOrEmpty(a.Education) &&
+                a.Education.Equals(b.Education, StringComparison.OrdinalIgnoreCase))
+                score += 2;
+
+            return score;
+        }
+
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
 
         public async Task<IActionResult> Search(string search, string skill)
         {
             var query = _context.Persons.AsQueryable();
 
-            // VG-krav 3: Visa endast aktiva konton
             query = query.Where(p => p.IsActive);
 
-            // G-krav 12: Om användaren inte är inloggad, dölj privata profiler
             if (!User.Identity.IsAuthenticated)
             {
                 query = query.Where(p => !p.IsPrivate);
             }
 
-            // Fält 1 (name="search"): Sök endast på namn
             if (!string.IsNullOrEmpty(search))
             {
                 string s = search.ToUpper();
@@ -65,7 +139,6 @@ namespace CV_siten.Controllers
                     p.LastName.ToUpper().Contains(s));
             }
 
-            // Fält 2 (name="skill"): Sök på Skills, Education, JobTitle och Experience
             if (!string.IsNullOrEmpty(skill))
             {
                 string sk = skill.ToUpper();
@@ -79,12 +152,11 @@ namespace CV_siten.Controllers
 
             var personResult = await query.ToListAsync();
 
-            // Sök efter projekt (valfritt om du vill att search-fältet även ska trigga projekt)
             var projektResult = await _context.Projects
-                .Where(p => string.IsNullOrEmpty(search) || p.ProjectName.ToUpper().Contains(search.ToUpper()))
+                .Where(p => string.IsNullOrEmpty(search) ||
+                            p.ProjectName.ToUpper().Contains(search.ToUpper()))
                 .ToListAsync();
 
-            // Skicka tillbaka värdena till vyn så de ligger kvar i rutorna efter sökning
             ViewBag.SearchQuery = search;
             ViewBag.SkillQuery = skill;
             ViewBag.personResult = personResult;

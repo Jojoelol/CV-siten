@@ -11,6 +11,7 @@ namespace CV_siten.Data.Data
             : base(options)
         {
         }
+
         public DbSet<Person> Persons { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Message> Messages { get; set; }
@@ -38,7 +39,7 @@ namespace CV_siten.Data.Data
                 .HasOne(m => m.Sender)
                 .WithMany()
                 .HasForeignKey(m => m.SenderId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Receiver)
@@ -48,6 +49,7 @@ namespace CV_siten.Data.Data
 
             var hasher = new PasswordHasher<ApplicationUser>();
 
+            // --- USER 1 ---
             var testUser = new ApplicationUser
             {
                 Id = "test-user-1",
@@ -79,7 +81,42 @@ namespace CV_siten.Data.Data
                 IsActive = true,
                 IdentityUserId = "test-user-1",
                 IsPrivate = false,
-                ImageUrl="Bild1.png"
+                ImageUrl = "Bild1.png"
+            });
+
+            // --- USER 2 ---
+            var testUser2 = new ApplicationUser
+            {
+                Id = "test-user-2",
+                UserName = "testsson@test.se",
+                NormalizedUserName = "TESTSSON@TEST.SE",
+                Email = "testsson@test.se",
+                NormalizedEmail = "TESTSSON@TEST.SE",
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString("D")
+            };
+            testUser2.PasswordHash = hasher.HashPassword(testUser2, "Test123!");
+
+            modelBuilder.Entity<ApplicationUser>().HasData(testUser2);
+
+            modelBuilder.Entity<Person>().HasData(new Person
+            {
+                Id = 2,
+                FirstName = "Oscar",
+                LastName = "Test",
+                PhoneNumber = "0709876543",
+                JobTitle = "Systemutvecklare",
+                Description = "Testprofil.",
+                Address = "Testvägen 2",
+                PostalCode = "12345",
+                City = "Teststad",
+                Skills = "C#, ASP.NET Core, SQL",
+                Education = "Örebro Universitet",
+                Experience = "Junior utvecklare på Test AB",
+                IsActive = true,
+                IdentityUserId = "test-user-2",
+                IsPrivate = false,
+                ImageUrl = "Bild1.png"
             });
         }
     }
