@@ -43,26 +43,51 @@ namespace CV_siten.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult Search(string search)
+        public async Task<IActionResult> Search(string search, string skill)
         {
-            if (string.IsNullOrEmpty(search)){
-                return RedirectToAction("Index");
+            var query = _context.Persons.AsQueryable();
+
+            // VG-krav 3: Visa endast aktiva konton
+            query = query.Where(p => p.IsActive);
+
+            // G-krav 12: Om användaren inte är inloggad, dölj privata profiler
+            if (!User.Identity.IsAuthenticated)
+            {
+                query = query.Where(p => !p.IsPrivate);
             }
-            string searchUpper = search.ToUpper();
 
-            var projektResult = _context.Projects
-            .Where(p => p.ProjectName.ToUpper().Contains(searchUpper))
-            .ToList();
+            // Fält 1 (name="search"): Sök endast på namn
+            if (!string.IsNullOrEmpty(search))
+            {
+                string s = search.ToUpper();
+                query = query.Where(p =>
+                    p.FirstName.ToUpper().Contains(s) ||
+                    p.LastName.ToUpper().Contains(s));
+            }
 
-            var personResult = _context.Persons
-                    .Where(p => p.FirstName.ToUpper().Contains(searchUpper) ||
-                        p.LastName.ToUpper().Contains(searchUpper) ||
-                        p.JobTitle.ToUpper().Contains(searchUpper))
-                    .   ToList();
+            // Fält 2 (name="skill"): Sök på Skills, Education, JobTitle och Experience
+            if (!string.IsNullOrEmpty(skill))
+            {
+                string sk = skill.ToUpper();
+                query = query.Where(p =>
+                    (p.Skills != null && p.Skills.ToUpper().Contains(sk)) ||
+                    (p.Education != null && p.Education.ToUpper().Contains(sk)) ||
+                    (p.JobTitle != null && p.JobTitle.ToUpper().Contains(sk)) ||
+                    (p.Experience != null && p.Experience.ToUpper().Contains(sk))
+                );
+            }
 
+            var personResult = await query.ToListAsync();
+
+            // Sök efter projekt (valfritt om du vill att search-fältet även ska trigga projekt)
+            var projektResult = await _context.Projects
+                .Where(p => string.IsNullOrEmpty(search) || p.ProjectName.ToUpper().Contains(search.ToUpper()))
+                .ToListAsync();
+
+            // Skicka tillbaka värdena till vyn så de ligger kvar i rutorna efter sökning
             ViewBag.SearchQuery = search;
+            ViewBag.SkillQuery = skill;
             ViewBag.personResult = personResult;
-            
 
             return View("SearchResult", projektResult);
         }
