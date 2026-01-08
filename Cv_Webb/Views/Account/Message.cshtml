@@ -71,7 +71,7 @@
                                                     data-id="@m.Id"
                                                     data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
                                                     data-subject="@m.Subject">
-                                                Ta bort
+                                                X
                                             </button>
                                         </td>
                                         <td style="display:none;" class="message-content">
@@ -193,16 +193,16 @@
             </div>
 
             <div class="modal-body">
-                <p class="mb-2">Är du säker på att du vill ta bort detta meddelande?</p>
+                <p class="mb-2">Är du säker på att du vill ta bort meddelande?</p>
                 <div class="text-muted" id="deleteMessageInfo"></div>
             </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
 
-                <form asp-controller="Message" asp-action="Delete" method="post" class="d-inline">
+                <form action="/Message/Delete" method="post" class="d-inline">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="id" id="deleteMessageId" value="" />
+                    <input type="hidden" name="id" id="deleteMessageId" />
                     <button type="submit" class="btn btn-danger">Ta bort</button>
                 </form>
             </div>
@@ -299,6 +299,15 @@
 
             document.getElementById('readMessageFrom').textContent = "Från: " + from;
             document.getElementById('readMessageContent').textContent = content;
+        });
+    </script>
+    <script>
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-delete-message');
+            if (!btn) return;
+
+            const id = btn.getAttribute('data-id');
+            document.getElementById('deleteMessageId').value = id;
         });
     </script>
 
