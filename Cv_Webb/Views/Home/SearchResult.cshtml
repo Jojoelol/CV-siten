@@ -17,7 +17,7 @@
             {
                 <a class="sr-profile-card" asp-controller="Account" asp-action="Profile" asp-route-id="@pers.Id">
                     <div class="sr-img-wrapper">
-                        <img src="~/images/@(string.IsNullOrEmpty(pers.ImageUrl) ? "defaultPicture.jpg" : pers.ImageUrl)"
+                        <img src="~/images/ProfilePicture/@(string.IsNullOrEmpty(pers.ImageUrl) ? "defaultPicture.jpg" : pers.ImageUrl)"
                              alt="Profilbild" class="sr-profile-img" />
                     </div>
 
