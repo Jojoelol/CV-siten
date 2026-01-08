@@ -753,3 +753,59 @@ cursor: pointer;
         background-color: #27ae60;
         color: white;
     }
+
+.message-card {
+    max-width: 1100px; 
+    margin: 0 auto 40px auto;
+}
+
+.message-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.message-table thead th {
+    color: #2c3e50;
+    font-weight: 700;
+    border-bottom: 2px solid #3498db;
+}
+
+.message-row {
+    transition: background-color 0.15s ease;
+}
+
+    .message-row:hover {
+        background-color: rgba(52, 152, 219, 0.06);
+    }
+
+.message-badge-new {
+    background-color: #3498db !important;
+}
+
+.message-badge-read {
+    background-color: #95a5a6 !important;
+}
+
+.message-actions .btn {
+    width: auto !important;
+    min-width: unset !important;
+    padding: 4px 10px !important;
+}
+
+.btn-delete-message {
+    border-color: #e74c3c !important;
+    color: #e74c3c !important;
+}
+
+    .btn-delete-message:hover {
+        background-color: #e74c3c !important;
+        color: #fff !important;
+    }
+
+#sendMessageModal .modal-title,
+#readMessageModal .modal-title,
+#deleteMessageModal .modal-title {
+    color: #2c3e50;
+    font-weight: 700;
+}
