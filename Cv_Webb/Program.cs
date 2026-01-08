@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("Cv_siten.Data")));
+        b => b.MigrationsAssembly("CV_siten.Data")));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
