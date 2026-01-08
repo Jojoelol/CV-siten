@@ -77,7 +77,8 @@ namespace CV_siten.Data.Data
                 Education = "Örebro Universitet",
                 Experience = "Junior utvecklare på Test AB",
                 IsActive = true,
-                IdentityUserId = "test-user-1"
+                IdentityUserId = "test-user-1",
+                ImageUrl = "Bild1.png"
             });
         }
     }

@@ -286,12 +286,12 @@ namespace Cv_siten.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "test-user-1", 0, "eb3a6269-2dbb-492d-9931-6f75e32a1d78", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAELaizPl2WBPpGXouIyZfKdtr/I5hD09pQNFjY+EbL/gVgi2rE49WsJCXm0tsoVOI1w==", null, false, "9b81172f-aef0-4f52-81ae-d963cd76cd50", false, "test@test.se" });
+                values: new object[] { "test-user-1", 0, "cf855e83-63f4-4977-a783-a9f515ac4582", "test@test.se", true, false, null, "TEST@TEST.SE", "TEST@TEST.SE", "AQAAAAIAAYagAAAAENllS/Qmr04eZ77wjJpZWyDRs0NDwwzkfdW1vu+bgEo/7RLp6jY409JkFWNBKm03eQ==", null, false, "7d21c1be-348b-4a2c-a419-d4ec7897214c", false, "test@test.se" });
 
             migrationBuilder.InsertData(
                 table: "Persons",
                 columns: new[] { "Id", "Address", "City", "CvUrl", "Description", "Education", "Experience", "FirstName", "IdentityUserId", "ImageUrl", "IsActive", "JobTitle", "LastName", "PhoneNumber", "PostalCode", "Skills" },
-                values: new object[] { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", null, true, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL" });
+                values: new object[] { 1, "Testvägen 1", "Teststad", null, "Testprofil.", "Örebro Universitet", "Junior utvecklare på Test AB", "Joel", "test-user-1", "Bild1.png", true, "Systemutvecklare", "Test", "0701234567", "12345", "C#, ASP.NET Core, SQL" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

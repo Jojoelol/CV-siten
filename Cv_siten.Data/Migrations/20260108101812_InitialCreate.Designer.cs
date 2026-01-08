@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cv_siten.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260108095630_InitialCreate")]
+    [Migration("20260108101812_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -94,15 +94,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "eb3a6269-2dbb-492d-9931-6f75e32a1d78",
+                            ConcurrencyStamp = "cf855e83-63f4-4977-a783-a9f515ac4582",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAELaizPl2WBPpGXouIyZfKdtr/I5hD09pQNFjY+EbL/gVgi2rE49WsJCXm0tsoVOI1w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENllS/Qmr04eZ77wjJpZWyDRs0NDwwzkfdW1vu+bgEo/7RLp6jY409JkFWNBKm03eQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9b81172f-aef0-4f52-81ae-d963cd76cd50",
+                            SecurityStamp = "7d21c1be-348b-4a2c-a419-d4ec7897214c",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         });
@@ -243,6 +243,7 @@ namespace Cv_siten.Data.Migrations
                             Experience = "Junior utvecklare på Test AB",
                             FirstName = "Joel",
                             IdentityUserId = "test-user-1",
+                            ImageUrl = "Bild1.png",
                             IsActive = true,
                             JobTitle = "Systemutvecklare",
                             LastName = "Test",
