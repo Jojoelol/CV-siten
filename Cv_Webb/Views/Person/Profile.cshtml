@@ -7,7 +7,7 @@
             <div class="pic-placeholder">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="~/images/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+                    <img src="~/images/ProfilePicture/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
                 }
                 else
                 {
@@ -53,27 +53,15 @@
             <div class="sidebar-actions-container">
                 @if (ViewBag.IsOwner == true)
                 {
-                    @* --- SEKRETESSINSTÄLLNING (Privat/Offentlig) --- *@
-                    <div class="privacy-status" style="margin-bottom: 15px; padding: 12px; background-color: @(Model.IsPrivate ? "#fff3cd" : "#d1e7dd"); border-radius: 8px; font-size: 0.85em; text-align: center; border: 1px solid @(Model.IsPrivate ? "#ffeeba" : "#badbcc");">
-                        @if (Model.IsPrivate)
-                        {
-                            <p style="color: #856404; margin-bottom: 8px; font-weight: bold;"><i class="fas fa-lock"></i> Profilen är Privat</p>
-                            <form asp-controller="Person" asp-action="TogglePrivacy" method="post">
-                                <input type="hidden" name="id" value="@Model.Id" />
-                                <button type="submit" class="btn btn-sm btn-success" style="width: 100%;">Gör offentlig</button>
-                            </form>
-                        }
-                        else
-                        {
-                            <p style="color: #0f5132; margin-bottom: 8px; font-weight: bold;"><i class="fas fa-globe"></i> Profilen är Offentlig</p>
-                            <form asp-controller="Person" asp-action="TogglePrivacy" method="post">
-                                <input type="hidden" name="id" value="@Model.Id" />
-                                <button type="submit" class="btn btn-sm btn-warning" style="width: 100%;">Gör privat</button>
-                            </form>
-                        }
-                    </div>
+                    @* Bekräftelsemeddelande vid statusändring *@
+                    @if (TempData["StatusMessage"] != null)
+                    {
+                        <div class="alert alert-info py-1 text-center" style="font-size: 0.75rem; margin-bottom: 10px; border-radius: 8px;">
+                            @TempData["StatusMessage"]
+                        </div>
+                    }
 
-                    @* CV-Hantering *@
+                    @* --- HUVUDHANDLINGAR (Blå & Turkos) --- *@
                     @if (string.IsNullOrEmpty(Model.CvUrl))
                     {
                         <form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
@@ -85,7 +73,7 @@
                     else
                     {
                         <div class="cv-button-row" style="display: flex; gap: 5px; margin-bottom: 5px;">
-                            <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary" style="flex: 3;">Visa CV</a>
+                            <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary" style="flex: 3; text-align:center;">Visa CV</a>
                             <form asp-controller="Person" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');" style="flex: 1;">
                                 <input type="hidden" name="personId" value="@Model.Id" />
                                 <button type="submit" class="btn-action btn-danger" style="width: 100%;"><i class="fas fa-trash"></i></button>
@@ -99,20 +87,42 @@
                         <i class="fas fa-file-export" style="margin-right: 8px;"></i> Exportera CV (XML)
                     </a>
 
-                    @if (Model.IsActive)
-                    {
-                        <form asp-controller="Person" asp-action="Inactivate" method="post" style="margin-top:10px;">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="submit" class="btn-action btn-danger-outline">Inaktivera konto</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form asp-controller="Person" asp-action="Activate" method="post" style="margin-top:10px;">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="submit" class="btn-action btn-success-outline">Återaktivera konto</button>
-                        </form>
-                    }
+                    @* --- KONTOINSTÄLLNINGAR (Längst ner) --- *@
+                    <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+
+                        @* Sekretess-switch *@
+                        <div class="privacy-status" style="margin-bottom: 10px; padding: 10px; background-color: @(Model.IsPrivate ? "#2c3e50" : "#fff3cd"); border-radius: 8px; text-align: center; border: 1px solid @(Model.IsPrivate ? "#34495e" : "#ffeeba");">
+                            <p style="color: @(Model.IsPrivate ? "#ecf0f1" : "#856404"); font-size: 0.8em; margin-bottom: 5px; font-weight: bold;">
+                                STATUS: @(Model.IsPrivate ? "PRIVAT" : "OFFENTLIG")
+                            </p>
+                            <form asp-controller="Person" asp-action="TogglePrivacy" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-sm @(Model.IsPrivate ? "btn-success" : "btn-warning")" style="width: 100%; font-size: 0.8em;">
+                                    <i class="fas @(Model.IsPrivate ? "fa-toggle-off" : "fa-toggle-on")"></i> Ändra status
+                                </button>
+                            </form>
+                        </div>
+
+                        @* --- DYNAMISK INAKTIVERA/AKTIVERA KNAPP --- *@
+                        @if (Model.IsActive)
+                        {
+                            <form asp-controller="Person" asp-action="Inactivate" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn-action btn-danger-outline" style="font-size: 0.8em; opacity: 0.8; width: 100%;">
+                                    <i class="fas fa-user-slash"></i> Inaktivera profil
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Person" asp-action="Activate" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn-action" style="font-size: 0.8em; background-color: #28a745; color: white; border: none; width: 100%;">
+                                    <i class="fas fa-user-check"></i> Aktivera profil
+                                </button>
+                            </form>
+                        }
+                    </div>
                 }
             </div>
         </div>
@@ -243,5 +253,39 @@
                 </div>
             }
         </div>
+
+        @* --- HITTA LIKNANDE PERSONER (VG-Krav 5) --- *@
+        @if (ViewBag.SimilarPerson != null)
+        {
+            <div class="cv-section" style="margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px;">
+                <div class="cv-header-row">
+                    <h3 class="section-title"><i class="fas fa-user-friends"></i> Hitta liknande personer</h3>
+                </div>
+                <p class="text-muted">Baserat på profilens kompetenser föreslår vi även följande profil:</p>
+
+                <div class="similar-profile-card" style="display: flex; align-items: center; background: #f9f9f9; padding: 15px; border-radius: 12px; border: 1px solid #ddd; max-width: 450px;">
+                    <div style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; margin-right: 15px; border: 2px solid #002d5a;">
+                        @if (!string.IsNullOrEmpty(ViewBag.SimilarPerson.ImageUrl))
+                        {
+                            <img src="~/images/ProfilePicture/@ViewBag.SimilarPerson.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div style="width:100%; height:100%; background:#ccc; display:flex; align-items:center; justify-content:center; color:white;"><i class="fas fa-user"></i></div>
+                        }
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <h5 style="margin: 0; color: #002d5a; font-weight: bold;">@ViewBag.SimilarPerson.FirstName @ViewBag.SimilarPerson.LastName</h5>
+                        <p style="margin: 0 0 8px 0; font-size: 0.85em; color: #666;">@ViewBag.SimilarPerson.JobTitle</p>
+
+                        <div class="match-badge mb-2" style="background: #e7f3ff; color: #0056b3; padding: 3px 8px; border-radius: 15px; font-size: 0.75rem; font-weight: 700; display: inline-block; border: 1px solid #b3d7ff;">
+                            <i class="fas fa-bullseye"></i> @ViewBag.MatchScore% Matchning
+                        </div>
+                        <br />
+                        <a asp-action="Profile" asp-route-id="@ViewBag.SimilarPerson.Id" class="btn btn-sm btn-primary" style="background-color: #002d5a; border: none;">Visa profil</a>
+                    </div>
+                </div>
+            </div>
+        }
     </section>
 </div>

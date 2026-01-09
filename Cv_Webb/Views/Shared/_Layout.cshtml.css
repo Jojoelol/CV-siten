@@ -14,6 +14,12 @@ main {
     border-bottom: 3px solid #3498db;
     background-color: #ecf0f1;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: sticky;
+    /* FIX: Lägg till top: 0 för att aktivera sticky */
+    position: -webkit-sticky; /* För Safari */
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Säkerställ att den ligger ovanpå annat innehåll */
 }
 
 .header-content {
