@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (popup) {
             popup.style.display = 'flex';
             setTimeout(function () {
-                window.location.href = redirectUrl;
+                window.location.replace(redirectUrl);
             }, 2000);
         }
     }
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (redirectUrl) {
             setTimeout(function () {
-                window.location.href = redirectUrl;
+                window.location.replace(redirectUrl);
             }, 3000);
         }
     }
@@ -286,4 +286,35 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Slutdatumet har rensats eftersom det var före det nya startdatumet.");
         }
     });
+});
+
+//TILLBAKA KNAPP I PROJECTDETAILS, VETA VAR MAN KOM IFRÅN (PROFILE/ALLPROJECTS)
+document.addEventListener("DOMContentLoaded", function () {
+    // Kontrollera om vi är på en projektdetaljsida
+    if (window.location.pathname.includes("/Project/ProjectDetails")) {
+        const currentUrl = window.location.href;
+        const referrer = document.referrer;
+
+        // Om vi kommer från en annan sida (inte oss själva), spara den som vår "hembas"
+        if (referrer && !referrer.includes(window.location.pathname)) {
+            sessionStorage.setItem("originalProjectSource", referrer);
+        }
+    }
+
+    // Fix för tillbaka-knappen
+    const smartBackBtn = document.getElementById("smartBackBtn");
+    if (smartBackBtn) {
+        smartBackBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const source = sessionStorage.getItem("originalProjectSource");
+
+            if (source) {
+                window.location.href = source;
+            } else {
+                // Om ingen källa finns sparad (t.ex. man skrev in URL direkt), 
+                // gå till AllProjects som standard
+                window.location.href = "/Project/AllProjects";
+            }
+        });
+    }
 });

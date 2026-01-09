@@ -30,7 +30,7 @@
 
             @* 3. ÅTGÄRDSKNAPPAR *@
             <div class="sidebar-actions-container">
-                <a href="javascript:history.back()" class="btn-action btn-secondary-outline">
+                <a href="#" id="smartBackBtn" class="btn-action btn-secondary-outline">
                     <i class="fas fa-arrow-left"></i> Tillbaka
                 </a>
 
@@ -195,6 +195,23 @@
         </div>
     </div>
 </div>
+
+
+@* --- POPUP VID LYCKAD ANMÄLAN --- *@
+@if (TempData["SuccessMessage"] != null)
+{
+    @* data-redirect-url används av site.js för att veta vart man ska efter 3 sek *@
+    <div id="saveSuccessPopup" class="success-popup-overlay"
+         data-redirect-url="@Url.Action("ProjectDetails", new { id = Model.Id })">
+        <div class="success-popup-content animated-popup">
+            <i class="fas fa-check-circle success-icon" style="color: #28a745; font-size: 3rem;"></i>
+            <h3 style="color: #002d5a; font-weight: bold;">Välkommen till projektet!</h3>
+            <p class="text-muted">@TempData["SuccessMessage"]</p>
+            <p class="small">Sidan uppdateras om ett ögonblick...</p>
+            <div class="spinner-border spinner-border-sm text-primary mt-2" role="status"></div>
+        </div>
+    </div>
+}
 
 <script>
     function showJoinPopup(projectId, projectName) {

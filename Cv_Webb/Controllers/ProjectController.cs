@@ -279,6 +279,47 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", "Person");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        // Metoden heter JoinProject för att matcha formuläret i ProjectDetails.cshtml
+        public async Task<IActionResult> JoinProject(int projectId, string role)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person != null)
+            {
+                // Kontrollera om användaren redan är med i projektet
+                var isAlreadyMember = await _context.PersonProjects
+                    .AnyAsync(pp => pp.PersonId == person.Id && pp.ProjectId == projectId);
+
+                if (!isAlreadyMember)
+                {
+                    var newParticipant = new PersonProject
+                    {
+                        PersonId = person.Id,
+                        ProjectId = projectId,
+                        Role = role
+                    };
+
+                    _context.PersonProjects.Add(newParticipant);
+                    await _context.SaveChangesAsync();
+
+                    // Detta triggar din popup i site.js
+                    TempData["SuccessMessage"] = "Välkommen till projektet! Din anmälan är nu registrerad.";
+                }
+            }
+
+            // Istället för RedirectToAction, returnera vyn direkt:
+            // Detta gör att vi stannar på samma historik-post.
+            var project = await _context.Projects
+                .Include(p => p.PersonProjects).ThenInclude(pp => pp.Person)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
+
+            return View("ProjectDetails", project);
+        }
+
         // --- LÄMNA PROJEKT ---
         [HttpPost]
         [Authorize]
