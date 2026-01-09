@@ -66,7 +66,7 @@ namespace CV_siten.Controllers
 
             var bestMatch = others
                 .Select(p => new { Person = p, Score = CalculateMatchScore(person, p) })
-                .Where(x => x.Score >= 5) // Tröskel för relevans
+                .Where(x => x.Score >= 2) // Tröskel för relevans
                 .OrderByDescending(x => x.Score)
                 .FirstOrDefault();
 
