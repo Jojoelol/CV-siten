@@ -7,7 +7,7 @@
             <div class="pic-placeholder">
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))
                 {
-                    <img src="~/images/ProfilePicture/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+                    <img src="~/images/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
                 }
                 else
                 {
@@ -39,6 +39,19 @@
                 <div class="profile-bio">
                     <p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
                 </div>
+                @if (ViewBag.IsOwner != true)
+                {
+                    <button type="button"
+                            class="btn-action btn-primary"
+                            style="margin-top: 15px; width: 100%;"
+                            data-bs-toggle="modal"
+                            data-bs-target="#sendMessageModal"
+                            data-receiver-id="@Model.Id"
+                            data-receiver-name="@($"{Model.FirstName} {Model.LastName}")">
+                        Skicka meddelande
+                    </button>
+                }
+
 
                 @* Besöksstatistik *@
                 @if (ViewBag.IsOwner == true)
@@ -288,4 +301,5 @@
             </div>
         }
     </section>
+    <partial name="SendMessageModal" />
 </div>

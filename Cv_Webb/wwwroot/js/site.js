@@ -211,3 +211,23 @@ function initModalCleanup() {
         el.addEventListener('hidden.bs.modal', cleanup);
     });
 }
+    document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-bs-target="#sendMessageModal"][data-receiver-id]');
+    if (!btn) return;
+
+    const receiverId = btn.getAttribute('data-receiver-id');
+    const receiverName = btn.getAttribute('data-receiver-name') || '';
+
+    const receiverIdEl = document.getElementById('receiverId');
+    const receiverSearchEl = document.getElementById('receiverSearch');
+    const subjectEl = document.getElementById('sendSubject');
+    const resultsEl = document.getElementById('receiverResults');
+
+    if (receiverIdEl) receiverIdEl.value = receiverId;
+    if (receiverSearchEl) receiverSearchEl.value = receiverName;
+
+    if (subjectEl) subjectEl.value = '';
+
+    if (resultsEl) resultsEl.innerHTML = '';
+});
+
