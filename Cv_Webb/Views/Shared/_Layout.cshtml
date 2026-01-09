@@ -39,7 +39,7 @@
                 <div class="logged-in-info" style="display: flex; align-items: center; gap: 15px;">
                     <span class="logged-in-text">Inloggad som: @User.Identity.Name</span>
 
-                    <form class="login" asp-controller="Person" asp-action="Profile" method="get">
+                    <form class="login" asp-controller="Person" asp-action="Profile" asp-route-id="MyProfile" method="get">
                         <button type="submit">Min profil</button>
                     </form>
 

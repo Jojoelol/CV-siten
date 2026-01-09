@@ -30,12 +30,13 @@ namespace CV_siten.Data.Models
         [Display(Name = "Projektbild")]
         public string? ImageUrl { get; set; }
 
+        // --- NY EGENSKAP FÖR ZIP-FILER ---
+        [Display(Name = "Källkod (ZIP)")]
+        public string? ZipUrl { get; set; }
+
         [Display(Name = "Projektägare")]
-        public int OwnerId { get; set; } // ID på personen som skapade projektet
+        public int OwnerId { get; set; }
 
-        // Navigeringsattribut för att lätt kunna hämta ägarens namn etc.
         public virtual Person? Owner { get; set; }
-
-
     }
 }

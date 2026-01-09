@@ -1,9 +1,11 @@
 ﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
+using CV_siten.Models.ViewModels; // Se till att din EditProjectViewModel ligger här
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace CV_siten.Controllers
 {
@@ -46,8 +48,6 @@ namespace CV_siten.Controllers
                 {
                     currentPersonId = person.Id;
                     isParticipant = project.PersonProjects.Any(pp => pp.PersonId == person.Id);
-
-                    // ÄNDRING: Kontrollera mot OwnerId i databasen
                     isOwner = project.OwnerId == person.Id;
                 }
             }
@@ -59,15 +59,16 @@ namespace CV_siten.Controllers
             return View(project);
         }
 
-        // --- SKAPA NYTT PROJEKT ---
+        // --- SKAPA NYTT PROJEKT (GET) ---
         [Authorize]
         [HttpGet]
         public IActionResult AddProject() => View();
 
+        // --- SKAPA NYTT PROJEKT (POST) ---
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile) // Lägg till imageFile här
+        public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile, string Role)
         {
             if (ModelState.IsValid)
             {
@@ -75,44 +76,128 @@ namespace CV_siten.Controllers
                 var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
                 if (person == null) return RedirectToAction("Index", "Home");
 
-                // --- BILDHANTERING ---
+                // Hantera Projektbild
                 if (imageFile != null && imageFile.Length > 0)
                 {
-                    // Skapa ett unikt filnamn
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-
-                    // Sökväg: wwwroot/images/projects
-                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "projects");
-
-                    // Skapa mappen om den inte finns
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/projects");
                     if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
-
-                    string filePath = Path.Combine(uploadPath, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    using (var stream = new FileStream(Path.Combine(uploadPath, fileName), FileMode.Create))
                     {
                         await imageFile.CopyToAsync(stream);
                     }
-
-                    // Spara den relativa sökvägen i databasen
                     model.ImageUrl = fileName;
+                }
+
+                // Hantera ZIP-fil (Källkod)
+                if (zipFile != null && zipFile.Length > 0)
+                {
+                    string zipFileName = Guid.NewGuid().ToString() + Path.GetExtension(zipFile.FileName);
+                    string zipUploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/projects");
+                    if (!Directory.Exists(zipUploadPath)) Directory.CreateDirectory(zipUploadPath);
+                    using (var stream = new FileStream(Path.Combine(zipUploadPath, zipFileName), FileMode.Create))
+                    {
+                        await zipFile.CopyToAsync(stream);
+                    }
+                    model.ZipUrl = zipFileName;
                 }
 
                 model.OwnerId = person.Id;
                 _context.Projects.Add(model);
                 await _context.SaveChangesAsync();
 
-                // Skapa koppling i PersonProjects
-                _context.PersonProjects.Add(new PersonProject { PersonId = person.Id, ProjectId = model.Id });
-                await _context.SaveChangesAsync();
+                _context.PersonProjects.Add(new PersonProject
+                {
+                    PersonId = person.Id,
+                    ProjectId = model.Id,
+                    Role = Role
+                });
 
+                await _context.SaveChangesAsync();
                 ViewBag.ShowSuccessPopup = true;
                 return View(model);
             }
             return View(model);
         }
 
+        // --- REDIGERA PROJEKT (GET) ---
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var project = await _context.Projects.FindAsync(id);
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
+            // Säkerhetskontroll: Endast ägaren får redigera
+            if (project == null || person == null || project.OwnerId != person.Id)
+            {
+                return Forbid();
+            }
+
+            var viewModel = new EditProjectViewModel
+            {
+                Id = project.Id,
+                ProjectName = project.ProjectName,
+                Description = project.Description,
+                StartDate = project.StartDate,
+                EndDate = project.EndDate,
+                Type = project.Type,
+                Status = project.Status,
+                ImageUrl = project.ImageUrl,
+                ZipUrl = project.ZipUrl
+            };
+
+            // VIKTIGT: Vi pekar ut den specifika vyn EditProject.cshtml
+            return View("EditProject", viewModel);
+        }
+
+        // --- REDIGERA PROJEKT (POST) ---
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditProjectViewModel model)
+        {
+            if (!ModelState.IsValid) return View("EditProject", model);
+
+            var project = await _context.Projects.FindAsync(model.Id);
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (project == null || person == null || project.OwnerId != person.Id) return Forbid();
+
+            // Uppdatera Bild om ny fil skickats
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/projects", fileName);
+                using (var stream = new FileStream(path, FileMode.Create)) { await model.ImageFile.CopyToAsync(stream); }
+                project.ImageUrl = fileName;
+            }
+
+            // Uppdatera ZIP-fil om ny fil skickats
+            if (model.ZipFile != null && model.ZipFile.Length > 0)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ZipFile.FileName);
+                string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/projects", fileName);
+                using (var stream = new FileStream(path, FileMode.Create)) { await model.ZipFile.CopyToAsync(stream); }
+                project.ZipUrl = fileName;
+            }
+
+            // Uppdatera textfälten
+            project.ProjectName = model.ProjectName;
+            project.Description = model.Description ?? "";
+            project.StartDate = model.StartDate;
+            project.EndDate = model.EndDate;
+            project.Type = model.Type;
+            project.Status = model.Status;
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Projektet har uppdaterats!";
+            return RedirectToAction(nameof(ProjectDetails), new { id = project.Id });
+        }
+
+        // --- UPPDATERA BESKRIVNING (Snabb-redigering via AJAX/JS) ---
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> UpdateDescription(int id, string description)
@@ -121,55 +206,47 @@ namespace CV_siten.Controllers
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             var project = await _context.Projects.FindAsync(id);
 
-            // KONTROLL: Finns projektet och ägs det av den inloggade personen?
-            if (project == null || person == null || project.OwnerId != person.Id)
-            {
-                return Forbid(); // Ger "403 Forbidden" om man försöker ändra någon annans projekt
-            }
+            if (project == null || person == null || project.OwnerId != person.Id) return Forbid();
 
             project.Description = description;
             await _context.SaveChangesAsync();
-
             return RedirectToAction("ProjectDetails", new { id = id });
         }
 
+        // --- GÅ MED I PROJEKT (GET) ---
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> JoinProject()
         {
-            // 1. Hämta den inloggade användarens person-objekt
             var user = await _userManager.GetUserAsync(User);
-            var person = await _context.Persons
-                .Include(p => p.PersonProjects)
+            var person = await _context.Persons.Include(p => p.PersonProjects)
                 .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
             if (person == null) return NotFound();
 
-            // 2. Hitta ID:n på de projekt användaren redan är med i
             var joinedProjectIds = person.PersonProjects.Select(pp => pp.ProjectId).ToList();
-
-            // 3. Hämta ALLA projekt som användaren inte är med i ännu
-            var availableProjects = await _context.Projects
-           .Include(p => p.Owner) // Se till att Owner-objektet laddas
-           .Where(p => !joinedProjectIds.Contains(p.Id))
-           .ToListAsync();
+            var availableProjects = await _context.Projects.Include(p => p.Owner)
+                .Where(p => !joinedProjectIds.Contains(p.Id)).ToListAsync();
 
             return View(availableProjects);
         }
 
+        // --- GÅ MED I PROJEKT (POST) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Join(int projectId)
+        public async Task<IActionResult> Join(int projectId, string role) // Lägg till 'string role' här
         {
             var user = await _userManager.GetUserAsync(User);
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
             if (person != null)
             {
-                // Skapa den nya kopplingen mellan person och projekt
+                // Skapa den nya kopplingen med den angivna rollen
                 var newConnection = new PersonProject
                 {
                     PersonId = person.Id,
-                    ProjectId = projectId
+                    ProjectId = projectId,
+                    Role = role // Spara rollen användaren skrev in
                 };
 
                 _context.PersonProjects.Add(newConnection);
@@ -181,7 +258,7 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", "Person", new { id = person?.Id });
         }
 
-
+        // --- LÄMNA PROJEKT ---
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> LeaveProject(int id)
@@ -192,10 +269,9 @@ namespace CV_siten.Controllers
 
             if (person != null && project != null)
             {
-                // KONTROLL: Ägaren bör inte kunna lämna sitt eget projekt (de måste radera det istället)
                 if (project.OwnerId == person.Id)
                 {
-                    TempData["Error"] = "Som ägare kan du inte lämna projektet. Du måste radera det helt om du vill avsluta.";
+                    TempData["Error"] = "Som ägare kan du inte lämna projektet. Du måste radera det.";
                     return RedirectToAction("ProjectDetails", new { id = id });
                 }
 
@@ -208,10 +284,10 @@ namespace CV_siten.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
-
             return RedirectToAction("ProjectDetails", new { id = id });
         }
 
+        // --- RADERA PROJEKT ---
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -219,27 +295,27 @@ namespace CV_siten.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-            var project = await _context.Projects
-                .Include(p => p.PersonProjects) // Inkludera kopplingarna för säker radering
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var project = await _context.Projects.Include(p => p.PersonProjects).FirstOrDefaultAsync(p => p.Id == id);
 
-            // SÄKERHETSKONTROLL: Endast ägaren får radera
-            if (project == null || person == null || project.OwnerId != person.Id)
-            {
-                return Forbid();
-            }
+            if (project == null || person == null || project.OwnerId != person.Id) return Forbid();
 
-            // Ta bort kopplingar först (om det inte sker automatiskt i databasen)
             _context.PersonProjects.RemoveRange(project.PersonProjects);
-
-            // Ta bort projektet
             _context.Projects.Remove(project);
-
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Projektet har raderats helt.";
             return RedirectToAction("Profile", "Person", new { id = person.Id });
         }
+
+        public async Task<IActionResult> AllProjects()
+        {
+            // Vi hämtar alla projekt och inkluderar ägaren för att kunna skriva ut namnet
+            var projects = await _context.Projects
+                .Include(p => p.Owner)
+                .OrderByDescending(p => p.StartDate)
+                .ToListAsync();
+
+            return View(projects);
+        }
     }
 }
-

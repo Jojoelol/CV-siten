@@ -14,11 +14,17 @@
         </p>
     </div>
 
-    @* --- Senaste projektet --- *@
+    @* --- Senaste projektet (G-krav 1) --- *@
     <div class="project-highlight-area mb-5" style="background-color: #f8f9fa; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h4 style="color: #002d5a; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 20px;">
-            Senaste projektet
-        </h4>
+        @* --- UPPDATERAD RUBRIKRAD --- *@
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 20px;">
+            <h4 style="color: #002d5a; margin-bottom: 0;">
+                Senaste projektet
+            </h4>
+            <a asp-controller="Project" asp-action="AllProjects" class="btn btn-sm btn-outline-primary" style="font-weight: 600;">
+                Visa alla projekt <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
 
         @if (ViewBag.SenasteProjekt != null)
         {
@@ -44,77 +50,75 @@
         }
     </div>
 
-    @* --- Visa profiler ENDAST om användaren är inloggad --- *@
-    @if (User.Identity.IsAuthenticated)
-    {
-        <h4 class="text-white mb-4" style="font-weight: 300; letter-spacing: 1px;">
-            @ViewBag.SectionTitle
-        </h4>
+    @* --- Sektionstitel (Ändras beroende på om man är inloggad eller ej) --- *@
+    <h4 class="text-white mb-4" style="font-weight: 300; letter-spacing: 1px; text-transform: uppercase;">
+        @ViewBag.SectionTitle
+    </h4>
 
-        <div class="profile-grid-container"
-             style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px;">
+    @* --- Urval av CV:n (G-krav 1) --- *@
+    <div class="profile-grid-container"
+         style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px;">
 
-            @foreach (var person in Model)
-            {
-                <div class="profile-card"
-                     style="background-color: #ffffff; border-radius: 15px; overflow: hidden;
-                                                    transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: none;">
+        @foreach (var person in Model)
+        {
+            <div class="profile-card"
+                 style="background-color: #ffffff; border-radius: 15px; overflow: hidden;
+                            transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(0,0,0,0.2); border: none;">
 
-                    <div style="height: 10px; background-color: #0056b3;"></div>
+                <div style="height: 10px; background-color: #0056b3;"></div>
 
-                    <div class="p-4 text-center">
+                <div class="p-4 text-center">
 
-                        @* --- Profilbild --- *@
-                        @if (!string.IsNullOrEmpty(person.ImageUrl))
-                        {
-                            <img src="~/images/@person.ImageUrl"
-                                 style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
-                                                                            border: 4px solid #f0f2f5; margin-bottom: 15px;"
-                                 alt="Profilbild för @person.FirstName" />
-                        }
-                        else
-                        {
-                            <div style="width: 100px; height: 100px; background: #f0f2f5; border-radius: 50%;
-                                                                            margin: 0 auto 15px auto; line-height: 100px; color: #adb5bd; font-size: 2rem;">
-                                <i class="fas fa-user"></i>
-                            </div>
-                        }
-
-                        <h5 style="color: #002d5a; font-weight: bold; margin-bottom: 5px;">
-                            @person.FirstName @person.LastName
-                        </h5>
-
-                        <p style="color: #0056b3; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px;">
-                            @person.JobTitle
-                        </p>
-
-                        @* --- Matchningsprocent (tillagd) --- *@
-                        @if (ViewBag.MatchData != null && ViewBag.MatchData.ContainsKey(person.Id))
-                        {
-                            <p style="font-weight: 600; margin-bottom: 10px;">
-                                Matchning: @ViewBag.MatchData[person.Id]%
-                            </p>
-                        }
-
-                    <div style="background: #f8f9fa; border-radius: 8px; padding: 10px;
-                                                margin-bottom: 20px; min-height: 60px;">
-                        <p class="text-muted small mb-0"
-                           style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                            @(string.IsNullOrEmpty(person.Description)
-                                                    ? "Ingen beskrivning tillgänglig."
-                                                    : person.Description)
-                            </p>
+                    @* --- Profilbild --- *@
+                    @if (!string.IsNullOrEmpty(person.ImageUrl))
+                    {
+                        <img src="~/images/ProfilePicture/@person.ImageUrl"
+                             style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+                                            border: 4px solid #f0f2f5; margin-bottom: 15px;"
+                             alt="Profilbild för @person.FirstName" />
+                    }
+                    else
+                    {
+                        <div style="width: 100px; height: 100px; background: #f0f2f5; border-radius: 50%;
+                                            margin: 0 auto 15px auto; line-height: 100px; color: #adb5bd; font-size: 2rem;">
+                            <i class="fas fa-user"></i>
                         </div>
+                    }
 
-                        <a asp-controller="Person" asp-action="Profile" asp-route-id="@person.Id"
-                           class="btn btn-primary w-100"
-                           style="background-color: #002d5a; border: none; border-radius: 8px; padding: 10px; font-weight: 500;">
-                            Visa profil
-                        </a>
+                    <h5 style="color: #002d5a; font-weight: bold; margin-bottom: 5px;">
+                        @person.FirstName @person.LastName
+                    </h5>
 
-                    </div>
+                    <p style="color: #0056b3; font-size: 0.9rem; font-weight: 500; margin-bottom: 15px;">
+                        @person.JobTitle
+                    </p>
+
+                    @* --- Matchningsprocent (Visas endast om data finns, t.ex. när man är inloggad) --- *@
+                    @if (ViewBag.MatchData != null && ViewBag.MatchData.ContainsKey(person.Id))
+                    {
+                        <div class="match-badge mb-3" style="background: #e7f3ff; color: #0056b3; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; display: inline-block; border: 1px solid #b3d7ff;">
+                            <i class="fas fa-bullseye"></i> @ViewBag.MatchData[person.Id]% Matchning
+                        </div>
+                    }
+
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 10px;
+                                margin-bottom: 20px; min-height: 60px;">
+                    <p class="text-muted small mb-0"
+                       style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                        @(string.IsNullOrEmpty(person.Description)
+                                                ? "Ingen beskrivning tillgänglig."
+                                                : person.Description)
+                    </p>
                 </div>
-            }
-        </div>
-    }
+
+                    <a asp-controller="Person" asp-action="Profile" asp-route-id="@person.Id"
+                       class="btn btn-primary w-100"
+                       style="background-color: #002d5a; border: none; border-radius: 8px; padding: 10px; font-weight: 500;">
+                        Visa profil
+                    </a>
+
+                </div>
+            </div>
+                }
+    </div>
 </div>

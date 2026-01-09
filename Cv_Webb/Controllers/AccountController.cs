@@ -31,15 +31,47 @@ namespace CV_siten.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateAccount(CreateAccountViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            // 1. Kontrollera validering först
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
 
-            // Skapa Identity-användaren
-            var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+            // 2. Hantera bilduppladdningen (Spara filen på hårddisken)
+            string? uniqueFileName = null;
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                // Skapa ett unikt filnamn för att undvika krockar
+                uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
+
+                string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+
+                // Skapa mappen om den inte finns
+                if (!Directory.Exists(uploadPath))
+                {
+                    Directory.CreateDirectory(uploadPath);
+                }
+
+                string filePath = Path.Combine(uploadPath, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(stream);
+                }
+            }
+
+            // 3. Skapa Identity-användaren (Inloggningsuppgifterna)
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email
+            };
+
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
-                // Skapa den tillhörande Person-profilen i dataprojektet
+                // 4. Skapa Person-profilen (Kopplad till Identity-användaren)
                 var person = new Person
                 {
                     FirstName = model.FirstName,
@@ -47,25 +79,28 @@ namespace CV_siten.Controllers
                     JobTitle = model.JobTitle,
                     Description = model.Description ?? "",
                     PhoneNumber = model.PhoneNumber,
-                    IsActive = true,
-                    IdentityUserId = user.Id,
                     Address = model.Address,
                     PostalCode = model.PostalCode,
                     City = model.City,
-                    IsPrivate = model.IsPrivate,
-                  
+                    IdentityUserId = user.Id, // Kopplingen till inloggningskontot
+                    ImageUrl = uniqueFileName, // Spara namnet på den uppladdade bilden
+                    IsActive = true,
+                    IsPrivate = false // Eller model.IsPrivate om du har den i din ViewModel
                 };
 
                 _context.Persons.Add(person);
                 await _context.SaveChangesAsync();
 
-                // Logga in användaren direkt efter registrering
+                // 5. Logga in användaren direkt och skicka till startsidan
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToAction("Index", "Home");
             }
 
+            // 6. Om registreringen misslyckades (t.ex. lösenordet för enkelt), lägg till felen i vyn
             foreach (var error in result.Errors)
+            {
                 ModelState.AddModelError("", error.Description);
+            }
 
             return View(model);
         }
