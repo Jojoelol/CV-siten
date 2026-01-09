@@ -226,20 +226,27 @@ namespace CV_siten.Controllers
 
         // --- GÅ MED I PROJEKT (GET) ---
         [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> JoinProject()
+        [HttpPost]
+        public async Task<IActionResult> JoinProject(int projectId, string role)
         {
             var user = await _userManager.GetUserAsync(User);
-            var person = await _context.Persons.Include(p => p.PersonProjects)
-                .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
-            if (person == null) return NotFound();
+            if (person != null)
+            {
+                var participation = new PersonProject
+                {
+                    PersonId = person.Id,
+                    ProjectId = projectId,
+                    Role = role // Här sparas rollen du skrev i popup-rutan
+                };
 
-            var joinedProjectIds = person.PersonProjects.Select(pp => pp.ProjectId).ToList();
-            var availableProjects = await _context.Projects.Include(p => p.Owner)
-                .Where(p => !joinedProjectIds.Contains(p.Id)).ToListAsync();
+                _context.PersonProjects.Add(participation);
+                await _context.SaveChangesAsync();
+            }
 
-            return View(availableProjects);
+            // Skicka användaren tillbaka till projektet de just gick med i
+            return RedirectToAction("ProjectDetails", new { id = projectId });
         }
 
         // --- GÅ MED I PROJEKT (POST) ---
