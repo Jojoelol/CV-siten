@@ -809,3 +809,22 @@ cursor: pointer;
     color: #2c3e50;
     font-weight: 700;
 }
+
+.msg-btn {
+    position: relative;
+}
+
+.msg-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #dc3545;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 3px 7px;
+    min-width: 20px;
+    text-align: center;
+    border: 2px solid #f4f7f6;
+}
