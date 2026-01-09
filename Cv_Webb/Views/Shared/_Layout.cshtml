@@ -41,6 +41,7 @@
             @*räknar olästa meddelanden*@
             @{
                 var unreadCount = 0;
+                string displayName = User.Identity?.Name; // Standardfall: E-post
 
                 if (User.Identity?.IsAuthenticated == true)
                 {
@@ -51,6 +52,8 @@
                         if (me != null)
                         {
                             unreadCount = await Db.Messages.CountAsync(m => m.ReceiverId == me.Id && !m.IsRead);
+                            // HÄR: Sätt visningsnamnet till förnamn och efternamn
+                            displayName = $"{me.FirstName} {me.LastName}";
                         }
                     }
                 }
@@ -59,7 +62,7 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <div class="logged-in-info" style="display: flex; align-items: center; gap: 15px;">
-                    <span class="logged-in-text">Inloggad som: @User.Identity.Name</span>
+                    <span class="logged-in-text">Inloggad som: @displayName</span>
 
                     <form class="login" asp-controller="Person" asp-action="Profile" asp-route-id="MyProfile" method="get">
                         <button type="submit">Min profil</button>

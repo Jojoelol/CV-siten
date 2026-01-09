@@ -98,7 +98,7 @@
             </form>
         </div>
 
-        @* DELTAGARE *@
+        @* --- DELTAGARE --- *@
         <div class="projects-block">
             <div class="cv-header-row">
                 <h3 class="section-title">Deltagare</h3>
@@ -107,9 +107,10 @@
             @if (Model.PersonProjects != null && Model.PersonProjects.Any())
             {
                 <div class="projects-list" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px;">
-                    @foreach (var pp in Model.PersonProjects)
+                    @* Vi sorterar listan så att den person vars ID matchar projektets OwnerId hamnar först *@
+                    @foreach (var pp in Model.PersonProjects.OrderByDescending(p => p.PersonId == Model.OwnerId))
                     {
-                        @* 1. HÄR ÄR ÄNDRINGEN: Kontrollera om personen är publik ELLER om besökaren är inloggad *@
+                        @* Kontrollera om personen är publik ELLER om besökaren är inloggad *@
                         @if (!pp.Person.IsPrivate || User.Identity.IsAuthenticated)
                         {
                             bool isProjectOwner = pp.PersonId == Model.OwnerId;
@@ -120,14 +121,13 @@
                                     <div style="position: absolute; top: 0; right: 0; background: #3498db; color: white; font-size: 0.65rem; font-weight: bold; padding: 4px 8px; border-radius: 0 11px 0 8px;">ÄGARE</div>
                                 }
                                 <span style="font-weight: bold; font-size: 1.05rem; color: #212529;">@pp.Person.FirstName @pp.Person.LastName</span>
-                                <span style="font-size: 0.85rem; color: @(isProjectOwner ? "#0056b3" : "#495057");">
+                                <span style="font-size: 0.85rem;">
                                     @(string.IsNullOrEmpty(pp?.Role) ? "Deltagare" : pp.Role)
                                 </span>
                             </a>
                         }
                     }
 
-                    @* 2. VALFRITT: Visa ett meddelande om användaren är utloggad och det finns dolda profiler *@
                     @if (!User.Identity.IsAuthenticated && Model.PersonProjects.Any(pp => pp.Person.IsPrivate))
                     {
                         <p class="text-muted" style="width: 100%; margin-top: 10px;">
