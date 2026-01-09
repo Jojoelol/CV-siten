@@ -38,6 +38,7 @@
             </div>
 
             @* --- GRUNDUPPGIFTER --- *@
+
             <div class="col-md-12 mb-3">
                 <label asp-for="ProjectName" class="form-label fw-bold">Projektnamn</label>
                 <input asp-for="ProjectName" class="form-control" />
@@ -47,6 +48,7 @@
             <div class="col-md-6 mb-3">
                 <label asp-for="Type" class="form-label fw-bold">Typ</label>
                 <input asp-for="Type" class="form-control" placeholder="t.ex. Webbapplikation" />
+                <span asp-validation-for="Type" class="text-danger"></span>
             </div>
 
             <div class="col-md-6 mb-3">
@@ -56,16 +58,19 @@
                     <option value="Avslutatt">Avslutat</option>
                     <option value="Pausat">Pausat</option>
                 </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
             </div>
 
             <div class="col-md-6 mb-3">
                 <label asp-for="StartDate" class="form-label fw-bold">Startdatum</label>
                 <input asp-for="StartDate" type="date" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
 
             <div class="col-md-6 mb-3">
                 <label asp-for="EndDate" class="form-label fw-bold">Slutdatum (Valfritt)</label>
                 <input asp-for="EndDate" type="date" class="form-control" value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
 
             @* --- KÄLLKOD (ZIP) --- *@
