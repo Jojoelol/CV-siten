@@ -284,5 +284,18 @@ namespace CV_siten.Controllers
             }
             return RedirectToAction(nameof(Profile));
         }
+
+
+        public async Task<IActionResult> MyProfile()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+            if (person == null) return NotFound();
+
+            // Skickar vidare till Profile-metoden men med den inloggades ID
+            return RedirectToAction("Profile", new { id = person.Id });
+        }
     }
 }
