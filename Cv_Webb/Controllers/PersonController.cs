@@ -219,8 +219,8 @@ namespace CV_siten.Controllers
             user.Email = model.Email; user.UserName = model.Email;
             await _userManager.UpdateAsync(user); await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Profilen har uppdaterats!";
-            return RedirectToAction(nameof(Profile), new { id = person.Id });
+            TempData["SuccessMessage"] = "Profilen har sparats!";
+            return View(model);
         }
 
  

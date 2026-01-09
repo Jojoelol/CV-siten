@@ -231,3 +231,40 @@ function initModalCleanup() {
     if (resultsEl) resultsEl.innerHTML = '';
 });
 
+//VISA PROFILBILD LIVE
+document.addEventListener("DOMContentLoaded", function () {
+
+    // --- 1. Förhandsvisning av profilbild ---
+    const imageInput = document.getElementById('imageInput');
+    const previewContainer = document.getElementById('profile-image-preview');
+
+    if (imageInput && previewContainer) {
+        imageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewContainer.innerHTML = `
+                        <img src="${e.target.result}" 
+                             class="img-thumbnail mb-2" 
+                             style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid #002d5a;" />
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // --- 2. Automatisk omdirigering efter sparande ---
+    const successPopup = document.getElementById('saveSuccessPopup');
+    if (successPopup) {
+        // Hämta URL:en från data-attributet vi skapade i HTML
+        const redirectUrl = successPopup.getAttribute('data-redirect-url');
+
+        if (redirectUrl) {
+            setTimeout(function () {
+                window.location.href = redirectUrl;
+            }, 3000);
+        }
+    }
+});

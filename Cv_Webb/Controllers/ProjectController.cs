@@ -69,9 +69,10 @@ namespace CV_siten.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile, string Role)
+        // Parametern 'string Role' är borttagen här:
+        public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile)
         {
-
+            ModelState.Remove("OwnerId");
 
             if (ModelState.IsValid)
             {
@@ -107,7 +108,6 @@ namespace CV_siten.Controllers
                 }
 
                 // 4. Sätt ägare och spara projektet
-                // model.Type och model.Status kommer automatiskt från din nya vy här!
                 model.OwnerId = person.Id;
                 _context.Projects.Add(model);
                 await _context.SaveChangesAsync();
@@ -117,7 +117,7 @@ namespace CV_siten.Controllers
                 {
                     PersonId = person.Id,
                     ProjectId = model.Id,
-                    Role = Role ?? "Projektägare"
+                    Role = model.Role ?? "Projektägare" // ÄNDRAT: Hämtar från model.Role
                 });
 
                 await _context.SaveChangesAsync();
@@ -128,9 +128,9 @@ namespace CV_siten.Controllers
                 return View(model);
             }
 
-            // Om valideringen misslyckas skickas vi tillbaka till vyn med felen
             return View(model);
         }
+
         // --- REDIGERA PROJEKT (GET) ---
         [Authorize]
         [HttpGet]
