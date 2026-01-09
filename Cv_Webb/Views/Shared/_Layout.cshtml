@@ -1,4 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Http
+@using CV_siten.Data.Data
+@using CV_siten.Data.Models
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext Db
+@inject UserManager<ApplicationUser> UserManager
 @inject IHttpContextAccessor HttpContextAccessor
 
 <!DOCTYPE html>
@@ -32,7 +38,23 @@
                 <input type="text" name="skill" value="@ViewBag.SkillQuery" placeholder="Kompetens (t.ex. .Net)..." class="form-control" style="width: 200px;" />
                 <button type="submit" class="btn btn-outline-primary">Sök</button>
             </form>
+            @*räknar olästa meddelanden*@
+            @{
+                var unreadCount = 0;
 
+                if (User.Identity?.IsAuthenticated == true)
+                {
+                    var user = await UserManager.GetUserAsync(User);
+                    if (user != null)
+                    {
+                        var me = await Db.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+                        if (me != null)
+                        {
+                            unreadCount = await Db.Messages.CountAsync(m => m.ReceiverId == me.Id && !m.IsRead);
+                        }
+                    }
+                }
+            }
             @* Inloggningsinformation - Trycks till höger tack vare margin-right: auto på sökbaren *@
             @if (User.Identity?.IsAuthenticated == true)
             {
@@ -44,7 +66,13 @@
                     </form>
 
                     <form class="login" asp-controller="Message" asp-action="Inbox" method="get">
-                        <button type="submit">Meddelanden</button>
+                        <button type="submit" class="msg-btn">
+                            Meddelanden
+                            @if (unreadCount > 0)
+                            {
+                                <span class="msg-badge">@unreadCount</span>
+                            }
+                        </button>
                     </form>
 
                     <form class="login" asp-controller="Account" asp-action="Logout" method="post">
