@@ -306,5 +306,16 @@ namespace CV_siten.Controllers
             TempData["SuccessMessage"] = "Projektet har raderats helt.";
             return RedirectToAction("Profile", "Person", new { id = person.Id });
         }
+
+        public async Task<IActionResult> AllProjects()
+        {
+            // Vi hämtar alla projekt och inkluderar ägaren för att kunna skriva ut namnet
+            var projects = await _context.Projects
+                .Include(p => p.Owner)
+                .OrderByDescending(p => p.StartDate)
+                .ToListAsync();
+
+            return View(projects);
+        }
     }
 }
