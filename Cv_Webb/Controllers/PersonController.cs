@@ -220,9 +220,42 @@ namespace CV_siten.Controllers
             var serializer = new XmlSerializer(typeof(ProfileExportModel));
             using (var sw = new StringWriter()) { serializer.Serialize(sw, exportData); return File(Encoding.UTF8.GetBytes(sw.ToString()), "application/xml", $"CV_{person.FirstName}_{person.LastName}.xml"); }
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Bra för säkerhet/VG
+        public async Task<IActionResult> Inactivate(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FindAsync(id);
 
-        [HttpPost] public async Task<IActionResult> Inactivate(int id) { var person = await _context.Persons.FindAsync(id); if (person != null) { person.IsActive = false; await _context.SaveChangesAsync(); } return RedirectToAction("Profile", new { id = id }); }
-        [HttpPost] public async Task<IActionResult> Activate(int id) { var person = await _context.Persons.FindAsync(id); if (person != null) { person.IsActive = true; await _context.SaveChangesAsync(); } return RedirectToAction("Profile", new { id = id }); }
+            // Kontrollera att det är ägaren (Viktigt för VG-nivå!)
+            if (person != null && person.IdentityUserId == user?.Id)
+            {
+                person.IsActive = false;
+                _context.Update(person);
+                await _context.SaveChangesAsync();
+                TempData["StatusMessage"] = "Din profil är nu inaktiverad och syns inte för andra.";
+            }
+
+            return RedirectToAction("Profile", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Activate(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FindAsync(id);
+
+            if (person != null && person.IdentityUserId == user?.Id)
+            {
+                person.IsActive = true;
+                _context.Update(person);
+                await _context.SaveChangesAsync();
+                TempData["StatusMessage"] = "Din profil är nu aktiverad igen!";
+            }
+
+            return RedirectToAction("Profile", new { id = id });
+        }
 
         [HttpPost]
         public async Task<IActionResult> UpdateProfileField(int id, string fieldName, string fieldValue)

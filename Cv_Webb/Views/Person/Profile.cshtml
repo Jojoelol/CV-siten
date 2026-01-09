@@ -53,6 +53,14 @@
             <div class="sidebar-actions-container">
                 @if (ViewBag.IsOwner == true)
                 {
+                    @* Bekräftelsemeddelande vid statusändring *@
+                    @if (TempData["StatusMessage"] != null)
+                    {
+                        <div class="alert alert-info py-1 text-center" style="font-size: 0.75rem; margin-bottom: 10px; border-radius: 8px;">
+                            @TempData["StatusMessage"]
+                        </div>
+                    }
+
                     @* --- HUVUDHANDLINGAR (Blå & Turkos) --- *@
                     @if (string.IsNullOrEmpty(Model.CvUrl))
                     {
@@ -82,7 +90,7 @@
                     @* --- KONTOINSTÄLLNINGAR (Längst ner) --- *@
                     <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
 
-                        @* Sekretess-switch (Återställd gul färg för tydlighet) *@
+                        @* Sekretess-switch *@
                         <div class="privacy-status" style="margin-bottom: 10px; padding: 10px; background-color: @(Model.IsPrivate ? "#2c3e50" : "#fff3cd"); border-radius: 8px; text-align: center; border: 1px solid @(Model.IsPrivate ? "#34495e" : "#ffeeba");">
                             <p style="color: @(Model.IsPrivate ? "#ecf0f1" : "#856404"); font-size: 0.8em; margin-bottom: 5px; font-weight: bold;">
                                 STATUS: @(Model.IsPrivate ? "PRIVAT" : "OFFENTLIG")
@@ -95,11 +103,25 @@
                             </form>
                         </div>
 
-                        @* Inaktivera (Röd kontur) *@
-                        <form asp-controller="Person" asp-action="Inactivate" method="post">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="submit" class="btn-action btn-danger-outline" style="font-size: 0.8em; opacity: 0.8;">Inaktivera konto</button>
-                        </form>
+                        @* --- DYNAMISK INAKTIVERA/AKTIVERA KNAPP --- *@
+                        @if (Model.IsActive)
+                        {
+                            <form asp-controller="Person" asp-action="Inactivate" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn-action btn-danger-outline" style="font-size: 0.8em; opacity: 0.8; width: 100%;">
+                                    <i class="fas fa-user-slash"></i> Inaktivera profil
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Person" asp-action="Activate" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn-action" style="font-size: 0.8em; background-color: #28a745; color: white; border: none; width: 100%;">
+                                    <i class="fas fa-user-check"></i> Aktivera profil
+                                </button>
+                            </form>
+                        }
                     </div>
                 }
             </div>
@@ -256,7 +278,6 @@
                         <h5 style="margin: 0; color: #002d5a; font-weight: bold;">@ViewBag.SimilarPerson.FirstName @ViewBag.SimilarPerson.LastName</h5>
                         <p style="margin: 0 0 8px 0; font-size: 0.85em; color: #666;">@ViewBag.SimilarPerson.JobTitle</p>
 
-                        @* --- Matchnings-badge i samma stil som på Index --- *@
                         <div class="match-badge mb-2" style="background: #e7f3ff; color: #0056b3; padding: 3px 8px; border-radius: 15px; font-size: 0.75rem; font-weight: 700; display: inline-block; border: 1px solid #b3d7ff;">
                             <i class="fas fa-bullseye"></i> @ViewBag.MatchScore% Matchning
                         </div>

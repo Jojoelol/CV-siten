@@ -19,30 +19,53 @@ namespace CV_siten.Controllers
             _logger = logger; _context = context; _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string search, string skill)
         {
-            ViewBag.SenasteProjekt = await _context.Projects.OrderByDescending(p => p.Id).FirstOrDefaultAsync(); 
+            // Hämta senaste projektet för ViewBag (G-krav)
+            ViewBag.SenasteProjekt = await _context.Projects.OrderByDescending(p => p.Id).FirstOrDefaultAsync();
 
-            if (!User.Identity.IsAuthenticated)
-            {
-                ViewBag.SectionTitle = "UTVALDA PROFILER";
-                ViewBag.MatchData = new Dictionary<int, int>();
-                var urvalCV = await _context.Persons.Where(p => p.IsActive && !p.IsPrivate).Take(3).ToListAsync(); 
-                return View(urvalCV);
-            }
-
+            // Hämta inloggad användare och person-koppling
             var userId = _userManager.GetUserId(User);
             var currentPerson = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == userId);
 
-            if (currentPerson == null)
+            // Grundfilter: Visa endast profiler som är AKTIVA och INTE PRIVATA (VG-krav sekretess)
+            var query = _context.Persons.Where(p => p.IsActive && !p.IsPrivate);
+
+            // --- SÖKLOGIK (VG-Krav 6) ---
+            bool isSearching = false;
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => (p.FirstName + " " + p.LastName).Contains(search));
+                isSearching = true;
+            }
+            if (!string.IsNullOrEmpty(skill))
+            {
+                query = query.Where(p => p.Skills.Contains(skill));
+                isSearching = true;
+            }
+
+            // Om användaren söker, visa sökresultaten direkt
+            if (isSearching)
+            {
+                ViewBag.SectionTitle = "SÖKRESULTAT";
+                ViewBag.MatchData = new Dictionary<int, int>(); // Ingen matchningsscore vid vanlig sökning
+                var searchResults = await query.ToListAsync();
+                return View(searchResults);
+            }
+
+            // --- LOGIK FÖR STARTSIDAN (Matchning/Urval) ---
+
+            // Om inte inloggad eller ingen personprofil finns: Visa utvalda profiler
+            if (!User.Identity.IsAuthenticated || currentPerson == null)
             {
                 ViewBag.SectionTitle = "UTVALDA PROFILER";
                 ViewBag.MatchData = new Dictionary<int, int>();
-                return View(await _context.Persons.Where(p => p.IsActive && !p.IsPrivate).Take(3).ToListAsync());
+                var urvalCV = await query.Take(3).ToListAsync();
+                return View(urvalCV);
             }
 
-            // Matchningar för inloggad på startsidan
-            var others = await _context.Persons.Where(p => p.Id != currentPerson.Id && p.IsActive && !p.IsPrivate).ToListAsync();
+            // Matchningar för inloggad person (VG-Krav 5)
+            var others = await query.Where(p => p.Id != currentPerson.Id).ToListAsync();
             var matches = others.Select(p => {
                 var score = CalculateMatchScore(currentPerson, p);
                 return new { Person = p, Score = score, MatchPercent = Math.Min(score * 10, 100) };
@@ -50,6 +73,7 @@ namespace CV_siten.Controllers
 
             ViewBag.MatchData = matches.ToDictionary(x => x.Person.Id, x => x.MatchPercent);
             ViewBag.SectionTitle = "LIKNANDE PROFILER";
+
             return View(matches.Select(x => x.Person).ToList());
         }
 
