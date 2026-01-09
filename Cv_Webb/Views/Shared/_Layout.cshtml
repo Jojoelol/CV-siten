@@ -54,9 +54,15 @@
             }
             else
             {
-                <form class="login" asp-controller="Account" asp-action="Login" method="get">
-                    <button type="submit">Logga in</button>
-                </form>
+                <div class="logged-in-info" style="display: flex; align-items: center; gap: 15px;">
+                    <form class="login" asp-controller="Message" asp-action="Inbox" method="get">
+                        <button type="submit">Meddelanden</button>
+                    </form>
+
+                    <form class="login" asp-controller="Account" asp-action="Login" method="get">
+                        <button type="submit">Logga in</button>
+                    </form>
+                </div>
             }
         </div>
     </header>

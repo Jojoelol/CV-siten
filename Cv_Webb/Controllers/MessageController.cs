@@ -31,10 +31,24 @@ namespace CV_siten.Controllers
             return person;
         }
 
+        private async Task<Person?> TryGetMyPersonAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return null;
+
+            return await _db.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+        }
+
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> Inbox()
         {
-            var me = await GetMyPersonAsync();
+            var me = await TryGetMyPersonAsync();
+
+            if (me == null)
+            {
+                return View("~/Views/Account/Message.cshtml", new List<CV_siten.Data.Models.Message>());
+            }
 
             var messages = await _db.Messages
                 .Where(m => m.ReceiverId == me.Id)
@@ -45,12 +59,8 @@ namespace CV_siten.Controllers
             return View("~/Views/Account/Message.cshtml", messages);
         }
 
-        [HttpGet]
-        public IActionResult Send(int receiverId) 
-        {
-            return View(new SendMessageViewModel { ReceiverId = receiverId });
-        }
 
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Send(SendMessageViewModel vm)
@@ -58,14 +68,10 @@ namespace CV_siten.Controllers
             if (!ModelState.IsValid)
                 return await ReturnInboxWithModalAsync(vm);
 
-            Person? me = null;
+            var me = await TryGetMyPersonAsync();
 
-            if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                me = await GetMyPersonAsync();
-            }
-
-            if (vm.ReceiverId == me.Id)
+            // Om inloggad: blocka "skicka till dig själv"
+            if (me != null && vm.ReceiverId == me.Id)
             {
                 ModelState.AddModelError("ReceiverId", "Du kan inte skicka meddelande till dig själv.");
                 return await ReturnInboxWithModalAsync(vm);
@@ -80,7 +86,7 @@ namespace CV_siten.Controllers
 
             var entity = new CV_siten.Data.Models.Message
             {
-                SenderId = me?.Id,                 // null om anonym
+                SenderId = me?.Id,                      // OK nu när SenderId är int?
                 SenderName = me == null ? vm.SenderName : null,
                 SenderEmail = me == null ? vm.SenderEmail : null,
 
@@ -91,12 +97,12 @@ namespace CV_siten.Controllers
                 IsRead = false
             };
 
-
             _db.Messages.Add(entity);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Inbox));
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
