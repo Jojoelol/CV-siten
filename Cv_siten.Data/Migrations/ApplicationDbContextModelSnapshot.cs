@@ -91,15 +91,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2063b52c-a768-4bee-a20a-9fa9957b7981",
+                            ConcurrencyStamp = "f65395be-3b74-47d4-b07f-083cb604a380",
                             Email = "test@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@TEST.SE",
                             NormalizedUserName = "TEST@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBSamYIP7tW+YSg16D6c1uQysDuYpmKDZPg20QUakIaSIFr0E/lU2rk1z+ThKtQntA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPFoOWPs92VbWpysxlE8RhWqdvAW9NI2mn1laq0qMKOqleqcOCWqvjasUfi0jRhPHA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d42e5f75-b600-4b77-b3a1-e808b29b766d",
+                            SecurityStamp = "c22fd7a7-9fed-437b-819f-637e3c0fb799",
                             TwoFactorEnabled = false,
                             UserName = "test@test.se"
                         },
@@ -107,15 +107,15 @@ namespace Cv_siten.Data.Migrations
                         {
                             Id = "test-user-2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "612faea9-e069-45d2-80fb-7bb014fed138",
+                            ConcurrencyStamp = "7966bf90-07cb-4a36-97ad-1ad392889daa",
                             Email = "testsson@test.se",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TESTSSON@TEST.SE",
                             NormalizedUserName = "TESTSSON@TEST.SE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEMMo6/0bp3kiqjtyOU3JcvKFb3kc2ixO0ZwKa5uAM/xoFxn3zk4Ri/0ZJfDs0IwdA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEC/CkWYcr4xEUTGryByRUhMmuvk92X2Vrvovza5UF24CJLM9UvA5cxa0qT1A53nYKA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9e442700-7756-4fce-b13f-06b5e62b9c81",
+                            SecurityStamp = "f6e4a97e-6418-4048-9e5c-2e8a248ecbb1",
                             TwoFactorEnabled = false,
                             UserName = "testsson@test.se"
                         });
@@ -161,11 +161,17 @@ namespace Cv_siten.Data.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ReceiverId")
+                    b.Property<int?>("ReceiverId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SenderId")
+                    b.Property<string>("SenderEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("SenderId")
                         .HasColumnType("int");
+
+                    b.Property<string>("SenderName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Subject")
                         .IsRequired()
@@ -511,14 +517,12 @@ namespace Cv_siten.Data.Migrations
                     b.HasOne("CV_siten.Data.Models.Person", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("CV_siten.Data.Models.Person", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Receiver");
 

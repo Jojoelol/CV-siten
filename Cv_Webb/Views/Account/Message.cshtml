@@ -46,7 +46,13 @@
                                         data-sender-id="@m.SenderId"
                                         data-subject="@m.Subject">
 
-                                        <td><strong>@m.Sender?.FirstName @m.Sender?.LastName</strong></td>
+                                         <td>
+                                         <strong>
+                                         @(m.Sender != null
+                                         ? m.Sender.FirstName + " " + m.Sender.LastName
+                                         : m.SenderName + " (extern)")
+                                        </strong>
+                                        </td>
                                         <td>@m.Subject</td>
                                         <td>@m.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
                                         <td>
@@ -107,6 +113,13 @@
                     @Html.AntiForgeryToken()
 
                     <div class="modal-body">
+                            @if (!User.Identity.IsAuthenticated)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label">Ditt namn</label>
+                                    <input class="form-control" name="SenderName" required />
+                                </div>
+                            }
                         <div class="mb-3">
                             <label class="form-label">Sök mottagare (förnamn / efternamn)</label>
 
@@ -175,12 +188,19 @@
                          style="white-space: pre-wrap;">
                     </div>
                 </div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn-action btn-primary btn-small"
+                                id="replyBtn">
+                            Svara
+                        </button>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-primary" id="replyBtn">Svara</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Stäng</button>
-                </div>
-
+                        <button type="button"
+                                class="btn-action btn-outline btn-small"
+                                data-bs-dismiss="modal">
+                            Stäng
+                        </button>
+                    </div>
             </div>
         </div>
     </div>  
@@ -213,169 +233,4 @@
     </div>
    </div>
 </div>
-
-@section Scripts {
-    <script>
-        (function () {
-            const searchInput = document.getElementById('receiverSearch');
-            const resultsEl = document.getElementById('receiverResults');
-            const receiverIdEl = document.getElementById('receiverId');
-            x§
-            if (!searchInput) return;
-
-            let timer = null;
-
-            function clearResults() {
-                resultsEl.innerHTML = "";
-            }
-
-            function setSelected(person) {
-            receiverIdEl.value = person.id;
-            searchInput.value = person.name;
-            clearResults();
-            }
-
-            async function search(q) {
-                const res = await fetch(`/Message/SearchPerson?q=${encodeURIComponent(q)}`, {
-                    headers: { "Accept": "application/json" }
-                });
-                if (!res.ok) return [];
-                return await res.json();
-            }
-
-            function render(items) {
-                clearResults();
-
-                if (!items || items.length === 0) return;
-
-                for (const p of items) {
-                    const a = document.createElement('button');
-                    a.type = "button";
-                    a.className = "list-group-item list-group-item-action d-flex align-items-center gap-2";
-
-                    const img = document.createElement('img');
-                    img.src = p.imageUrl || "/img/default-avatar.png";
-                    img.alt = p.name;
-                    img.style.width = "32px";
-                    img.style.height = "32px";
-                    img.style.borderRadius = "50%";
-                    img.style.objectFit = "cover";
-
-                    const span = document.createElement('span');
-                    span.textContent = p.name;
-
-                    a.appendChild(img);
-                    a.appendChild(span);
-
-                    a.addEventListener('click', () => setSelected(p));
-                    resultsEl.appendChild(a);
-                }
-            }
-
-            searchInput.addEventListener('input', function () {
-                const q = (searchInput.value || "").trim();
-
-         
-                receiverIdEl.value = "";
-
-                clearTimeout(timer);
-                if (q.length < 2) {
-                    clearResults();
-                    return;
-                }
-
-                timer = setTimeout(async () => {
-                    const items = await search(q);
-                    render(items);
-                }, 200);
-            });
-        })();
-    </script>
-    <script>
-        document.addEventListener('click', function (e) {
-            const row = e.target.closest('.message-row');
-            if (!row) return;
-
-            const from = row.getAttribute('data-from') || '';
-            const content = row.querySelector('.message-content')?.textContent || '';
-
-            document.getElementById('readMessageFrom').textContent = "Från: " + from;
-            document.getElementById('readMessageContent').textContent = content;
-        });
-    </script>
-    <script>
-        document.addEventListener('click', function (e) {
-            const btn = e.target.closest('.btn-delete-message');
-            if (!btn) return;
-
-            const id = btn.getAttribute('data-id');
-            document.getElementById('deleteMessageId').value = id;
-        });
-    </script>
-
-    <script>
-        let lastOpenedMessage = null;
-
-        document.addEventListener('click', function (e) {
-            const row = e.target.closest('.message-row');
-            if (!row) return;
-
-            if (e.target.closest('.btn-delete-message')) return;
-
-            const from = row.getAttribute('data-from') || '';
-            const senderId = row.getAttribute('data-sender-id') || '';
-            const subject = row.getAttribute('data-subject') || '';
-            const content = row.querySelector('.message-content')?.textContent || '';
-
-            document.getElementById('readMessageFrom').textContent = "Från: " + from;
-            document.getElementById('readMessageContent').textContent = content;
-
-            lastOpenedMessage = { from, senderId, subject };
-        });
-
-        document.getElementById('replyBtn')?.addEventListener('click', function () {
-            if (!lastOpenedMessage) return;
-
-            const receiverSearch = document.getElementById('receiverSearch');
-            const receiverId = document.getElementById('receiverId');
-            if (receiverSearch) receiverSearch.value = lastOpenedMessage.from || '';
-            if (receiverId) receiverId.value = lastOpenedMessage.senderId || '';
-
-            const subjectInput = document.getElementById('sendSubject');
-            if (subjectInput) {
-                const s = (lastOpenedMessage.subject || '').trim();
-                subjectInput.value = s.toLowerCase().startsWith('re:') ? s : ('Re: ' + s);
-            }
-
-            const receiverResults = document.getElementById('receiverResults');
-            if (receiverResults) receiverResults.innerHTML = '';
-
-            const readEl = document.getElementById('readMessageModal');
-            const sendEl = document.getElementById('sendMessageModal');
-
-            if (readEl && window.bootstrap) {
-                const readInstance = bootstrap.Modal.getInstance(readEl) || new bootstrap.Modal(readEl);
-                readInstance.hide();
-            }
-            if (sendEl && window.bootstrap) {
-                const sendInstance = bootstrap.Modal.getInstance(sendEl) || new bootstrap.Modal(sendEl);
-                sendInstance.show();
-            }
-        });
-    </script>
-
-    <script>
-        function cleanupModalArtifacts() {
-          document.body.classList.remove('modal-open');
-          document.body.style.removeProperty('padding-right');
-          document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
-        }
-
-        ['sendMessageModal', 'readMessageModal', 'deleteMessageModal'].forEach(id => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          el.addEventListener('hidden.bs.modal', cleanupModalArtifacts);
-        });
-    </script>
-}
 

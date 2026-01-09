@@ -8,9 +8,9 @@ namespace CV_siten.Data.Models
     {
         public int Id { get; set; }
 
-        public int SenderId { get; set; }
+        public int? SenderId { get; set; }
 
-        public int ReceiverId { get; set; }
+        public int? ReceiverId { get; set; }
 
         [Required]
         public string Content { get; set; } = string.Empty;
@@ -26,5 +26,8 @@ namespace CV_siten.Data.Models
 
         [ForeignKey("ReceiverId")]
         public virtual Person Receiver { get; set; } = null!;
+        public string? SenderName { get; set; }
+        public string? SenderEmail { get; set; }
+
     }
 }
