@@ -53,4 +53,161 @@ document.addEventListener("DOMContentLoaded", function () {
         window.scrollTo(0, scrollPos);
         sessionStorage.removeItem("scrollPos");
     }
+
+    initReceiverSearch();
+    initMessagesPage();
+    initModalCleanup();
+
 });
+// --- MESSAGES PAGE ---
+function initReceiverSearch() {
+    const searchInput = document.getElementById('receiverSearch');
+    const resultsEl = document.getElementById('receiverResults');
+    const receiverIdEl = document.getElementById('receiverId');
+    if (!searchInput || !resultsEl || !receiverIdEl) return;
+
+    let timer = null;
+
+    function clearResults() {
+        resultsEl.innerHTML = "";
+    }
+
+    function setSelected(person) {
+        receiverIdEl.value = person.id;
+        searchInput.value = person.name;
+        clearResults();
+    }
+
+    async function search(q) {
+        const res = await fetch(`/Message/SearchPerson?q=${encodeURIComponent(q)}`, {
+            headers: { "Accept": "application/json" }
+        });
+        if (!res.ok) return [];
+        return await res.json();
+    }
+
+    function render(items) {
+        clearResults();
+        if (!items || items.length === 0) return;
+
+        for (const p of items) {
+            const btn = document.createElement('button');
+            btn.type = "button";
+            btn.className = "list-group-item list-group-item-action d-flex align-items-center gap-2";
+
+            const img = document.createElement('img');
+            img.alt = p.name;
+            img.style.width = "32px";
+            img.style.height = "32px";
+            img.style.borderRadius = "50%";
+            img.style.objectFit = "cover";
+            img.src = p.imageUrl || "/images/profilePicture/defaultPicture.jpg";
+            img.onerror = () => { img.src = "/images/profilePicture/defaultPicture.jpg"; };
+
+            const span = document.createElement('span');
+            span.textContent = p.name;
+
+            btn.appendChild(img);
+            btn.appendChild(span);
+
+            btn.addEventListener('click', () => setSelected(p));
+            resultsEl.appendChild(btn);
+        }
+    }
+
+    searchInput.addEventListener('input', function () {
+        const q = (searchInput.value || "").trim();
+        receiverIdEl.value = "";
+        clearTimeout(timer);
+
+        if (q.length < 2) {
+            clearResults();
+            return;
+        }
+
+        timer = setTimeout(async () => {
+            const items = await search(q);
+            render(items);
+        }, 200);
+    });
+}
+
+function initMessagesPage() {
+    const readFromEl = document.getElementById('readMessageFrom');
+    const readContentEl = document.getElementById('readMessageContent');
+    const deleteIdEl = document.getElementById('deleteMessageId');
+    const replyBtn = document.getElementById('replyBtn');
+
+    // Om sidan inte ens har message-table/modaler, gör inget
+    if (!readFromEl && !deleteIdEl && !replyBtn) return;
+
+    let lastOpenedMessage = null;
+
+    document.addEventListener('click', function (e) {
+
+        // DELETE-knapp (bara fyll hidden input)
+        const deleteBtn = e.target.closest('.btn-delete-message');
+        if (deleteBtn) {
+            e.stopPropagation();
+            if (deleteIdEl) deleteIdEl.value = deleteBtn.getAttribute('data-id') || '';
+            return;
+        }
+
+        // Klick på en rad -> fyll READ-modalen
+        const row = e.target.closest('.message-row');
+        if (row) {
+            const from = row.getAttribute('data-from') || '';
+            const senderId = row.getAttribute('data-sender-id') || '';
+            const subject = row.getAttribute('data-subject') || '';
+            const content = row.querySelector('.message-content')?.textContent?.trim() || '';
+
+            if (readFromEl) readFromEl.textContent = "Från: " + from;
+            if (readContentEl) readContentEl.textContent = content;
+
+            lastOpenedMessage = { from, senderId, subject };
+            return;
+        }
+    });
+
+    // Reply-knapp: fyll send-modal och växla modaler
+    replyBtn?.addEventListener('click', function () {
+        if (!lastOpenedMessage) return;
+
+        const receiverSearch = document.getElementById('receiverSearch');
+        const receiverId = document.getElementById('receiverId');
+        const subjectInput = document.getElementById('sendSubject');
+        const receiverResults = document.getElementById('receiverResults');
+
+        if (receiverSearch) receiverSearch.value = lastOpenedMessage.from || '';
+        if (receiverId) receiverId.value = lastOpenedMessage.senderId || '';
+        if (subjectInput) {
+            const s = (lastOpenedMessage.subject || '').trim();
+            subjectInput.value = s.toLowerCase().startsWith('re:') ? s : ('Re: ' + s);
+        }
+        if (receiverResults) receiverResults.innerHTML = "";
+
+        const readEl = document.getElementById('readMessageModal');
+        const sendEl = document.getElementById('sendMessageModal');
+
+        if (readEl && window.bootstrap) {
+            (bootstrap.Modal.getInstance(readEl) || new bootstrap.Modal(readEl)).hide();
+        }
+        if (sendEl && window.bootstrap) {
+            (bootstrap.Modal.getInstance(sendEl) || new bootstrap.Modal(sendEl)).show();
+        }
+    });
+}
+
+function initModalCleanup() {
+    function cleanup() {
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+    }
+
+    ['sendMessageModal', 'readMessageModal', 'deleteMessageModal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('hidden.bs.modal', cleanup);
+    });
+}

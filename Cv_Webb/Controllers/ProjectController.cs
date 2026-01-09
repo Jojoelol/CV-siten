@@ -1,11 +1,10 @@
 ﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
-using CV_siten.Models.ViewModels; // Se till att din EditProjectViewModel ligger här
+using CV_siten.Models.ViewModels; 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 
 namespace CV_siten.Controllers
 {
@@ -65,18 +64,23 @@ namespace CV_siten.Controllers
         public IActionResult AddProject() => View();
 
         // --- SKAPA NYTT PROJEKT (POST) ---
+
+
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile, string Role)
         {
+
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
                 var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
                 if (person == null) return RedirectToAction("Index", "Home");
 
-                // Hantera Projektbild
+                // 2. Hantera Projektbild
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
@@ -89,7 +93,7 @@ namespace CV_siten.Controllers
                     model.ImageUrl = fileName;
                 }
 
-                // Hantera ZIP-fil (Källkod)
+                // 3. Hantera ZIP-fil
                 if (zipFile != null && zipFile.Length > 0)
                 {
                     string zipFileName = Guid.NewGuid().ToString() + Path.GetExtension(zipFile.FileName);
@@ -102,24 +106,31 @@ namespace CV_siten.Controllers
                     model.ZipUrl = zipFileName;
                 }
 
+                // 4. Sätt ägare och spara projektet
+                // model.Type och model.Status kommer automatiskt från din nya vy här!
                 model.OwnerId = person.Id;
                 _context.Projects.Add(model);
                 await _context.SaveChangesAsync();
 
+                // 5. Skapa kopplingen till personen
                 _context.PersonProjects.Add(new PersonProject
                 {
                     PersonId = person.Id,
                     ProjectId = model.Id,
-                    Role = Role
+                    Role = Role ?? "Projektägare"
                 });
 
                 await _context.SaveChangesAsync();
+
+                // 6. BEHÅLL DIN POPUP-LOGIK
                 ViewBag.ShowSuccessPopup = true;
+
                 return View(model);
             }
+
+            // Om valideringen misslyckas skickas vi tillbaka till vyn med felen
             return View(model);
         }
-
         // --- REDIGERA PROJEKT (GET) ---
         [Authorize]
         [HttpGet]

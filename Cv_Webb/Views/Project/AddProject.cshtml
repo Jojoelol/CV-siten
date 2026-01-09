@@ -1,5 +1,4 @@
-﻿@* 1. Ändrat från Projekt till Project *@
-@model CV_siten.Data.Models.Project
+﻿@model CV_siten.Data.Models.Project
 
 @{
     ViewData["Title"] = "Lägg till projekt";
@@ -23,24 +22,46 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold" style="color: #002d5a;">Roll:</label>
+                        <label class="form-label fw-bold" style="color: #002d5a;">Roll i projektet:</label>
                         <input name="Role" class="form-control" style="border-radius: 8px;" placeholder="t.ex. Databasansvarig" />
+                    </div>
+
+                    @* --- NYTT: TYP OCH STATUS --- *@
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Type" class="form-label fw-bold" style="color: #002d5a;">Typ:</label>
+                            <input asp-for="Type" class="form-control" style="border-radius: 8px;" placeholder="t.ex. Webbapplikation" />
+                            <span asp-validation-for="Type" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Status" class="form-label fw-bold" style="color: #002d5a;">Status:</label>
+                            <select asp-for="Status" class="form-select" style="border-radius: 8px;">
+                                <option value="Aktivt">Aktivt</option>
+                                <option value="Avslutat">Avslutat</option>
+                                <option value="Pausat">Pausat</option>
+                                <option value="Planerat">Planerat</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold" style="color: #002d5a;">Startdatum:</label>
                             <input asp-for="StartDate" type="date" class="form-control" style="border-radius: 8px;" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold" style="color: #002d5a;">Slutdatum:</label>
                             <input asp-for="EndDate" type="date" class="form-control" style="border-radius: 8px;" />
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold" style="color: #002d5a;">Beskrivning:</label>
                         <textarea asp-for="Description" class="form-control" rows="6" style="border-radius: 8px;" placeholder="Berätta om projektet..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
                     <div class="mt-4 d-flex gap-2">
@@ -58,7 +79,6 @@
                     <h4 style="color: #002d5a; margin-top: 20px; font-weight: bold;">Projektbild</h4>
                     <p class="text-muted">Ladda upp en bild som representerar ditt projekt (t.ex. en skärmdump).</p>
 
-                    @* --- Uppdaterad del för filuppladdning --- *@
                     <div class="mt-3 w-75">
                         <input type="file" name="imageFile" class="form-control" accept="image/*" style="border-radius: 8px;" />
                     </div>
@@ -72,6 +92,7 @@
             </div>
         </div>
     </form>
+
 </div>
 
 @* vi skapar ett dolt element som JS kan läsa av *@
