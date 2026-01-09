@@ -226,54 +226,51 @@ namespace CV_siten.Controllers
 
         // --- GÅ MED I PROJEKT (GET) ---
         [Authorize]
-        [HttpPost]
-        public async Task<IActionResult> JoinProject(int projectId, string role)
+        // 1. Visar listan över projekt man kan gå med i
+        [HttpGet]
+        public async Task<IActionResult> JoinProject()
         {
+            // Hämta inloggad användare
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
+
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
-            if (person != null)
-            {
-                var participation = new PersonProject
-                {
-                    PersonId = person.Id,
-                    ProjectId = projectId,
-                    Role = role // Här sparas rollen du skrev i popup-rutan
-                };
+            // Hämta alla projekt som personen INTE redan är med i
+            var projects = await _context.Projects
+                .Include(p => p.Owner)
+                .Where(p => !p.PersonProjects.Any(pp => pp.PersonId == person.Id))
+                .ToListAsync();
 
-                _context.PersonProjects.Add(participation);
-                await _context.SaveChangesAsync();
-            }
-
-            // Skicka användaren tillbaka till projektet de just gick med i
-            return RedirectToAction("ProjectDetails", new { id = projectId });
+            return View(projects);
         }
 
-        // --- GÅ MED I PROJEKT (POST) ---
+        // 2. Hanterar när man klickar på "Gå med" i modalen
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Join(int projectId, string role) // Lägg till 'string role' här
+        public async Task<IActionResult> Join(int projectId, string role)
         {
             var user = await _userManager.GetUserAsync(User);
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
             if (person != null)
             {
-                // Skapa den nya kopplingen med den angivna rollen
-                var newConnection = new PersonProject
+                // Skapa kopplingen i join-tabellen
+                var personProject = new PersonProject
                 {
                     PersonId = person.Id,
                     ProjectId = projectId,
-                    Role = role // Spara rollen användaren skrev in
+                    Role = role
                 };
 
-                _context.PersonProjects.Add(newConnection);
+                _context.PersonProjects.Add(personProject);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Du har nu gått med i projektet!";
+                TempData["StatusMessage"] = "Du har nu gått med i projektet!";
             }
 
-            return RedirectToAction("Profile", "Person", new { id = person?.Id });
+            // Skicka tillbaka användaren till sin egen profil
+            return RedirectToAction("Profile", "Person");
         }
 
         // --- LÄMNA PROJEKT ---
