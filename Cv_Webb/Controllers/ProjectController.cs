@@ -245,7 +245,9 @@ namespace CV_siten.Controllers
             // Hämta alla projekt som personen INTE redan är med i
             var projects = await _context.Projects
                 .Include(p => p.Owner)
-                .Where(p => !p.PersonProjects.Any(pp => pp.PersonId == person.Id))
+                .Include(p => p.PersonProjects)
+                .Where(p => !p.PersonProjects
+                .Any(pp => pp.PersonId == person.Id))
                 .ToListAsync();
 
             return View(projects);
@@ -369,13 +371,47 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", "Person", new { id = person.Id });
         }
 
-        public async Task<IActionResult> AllProjects()
+        [HttpGet]
+        public async Task<IActionResult> AllProjects(string searchString, string sortBy)
         {
-            // Vi hämtar alla projekt och inkluderar ägaren för att kunna skriva ut namnet
-            var projects = await _context.Projects
+            // Spara sök/sort i ViewBag för att behålla värdena i formuläret
+            ViewBag.CurrentSearch = searchString;
+            ViewBag.CurrentSort = sortBy;
+
+            // Börja med en grundfråga
+            var query = _context.Projects
                 .Include(p => p.Owner)
-                .OrderByDescending(p => p.StartDate)
-                .ToListAsync();
+                .Include(p => p.PersonProjects)
+                .AsQueryable();
+
+            // --- FILTRERING (Sökning) ---
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(p => p.ProjectName.Contains(searchString) ||
+                                         p.Owner.FirstName.Contains(searchString) ||
+                                         p.Owner.LastName.Contains(searchString));
+            }
+
+            // --- SORTERING ---
+            query = sortBy switch
+            {
+                "name_desc" => query.OrderByDescending(p => p.ProjectName),
+                "status_aktivt" => query.OrderBy(p => p.Status != "Aktivt").ThenBy(p => p.ProjectName),
+                "status_avslutat" => query.OrderBy(p => p.Status != "Avslutat").ThenBy(p => p.ProjectName),
+                "members_desc" => query.OrderByDescending(p => p.PersonProjects.Count),
+                "tid" => query.OrderByDescending(p => p.StartDate),
+                _ => query.OrderBy(p => p.ProjectName), // Standard: Namn A-Ö
+            };
+
+            var projects = await query.ToListAsync();
+
+            // Hämta inloggad person för "Gå med"-knapp logik
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+                ViewBag.CurrentPersonId = person?.Id;
+            }
 
             return View(projects);
         }
