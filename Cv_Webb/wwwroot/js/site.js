@@ -268,3 +268,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 });
+
+//GÖRA SLUTDATUM EFTER STARTDATUM GRÅA OSV
+document.addEventListener("DOMContentLoaded", function () {
+    const startDateInput = document.querySelector('input[name="StartDate"]');
+    const endDateInput = document.querySelector('input[name="EndDate"]');
+
+    startDateInput.addEventListener("change", function () {
+        // Sätt 'min'-attributet på slutdatum till det valda startdatumet
+        if (startDateInput.value) {
+            endDateInput.min = startDateInput.value;
+        }
+
+        // Om användaren redan valt ett slutdatum som nu är ogiltigt, rensa det
+        if (endDateInput.value && endDateInput.value < startDateInput.value) {
+            endDateInput.value = "";
+            alert("Slutdatumet har rensats eftersom det var före det nya startdatumet.");
+        }
+    });
+});

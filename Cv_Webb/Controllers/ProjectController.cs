@@ -72,6 +72,12 @@ namespace CV_siten.Controllers
         // Parametern 'string Role' är borttagen här:
         public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile)
         {
+            // Kontrollera om slutdatum är före startdatum
+            if (model.EndDate.HasValue && model.EndDate < model.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "Slutdatum kan inte vara före startdatum.");
+            }
+
             ModelState.Remove("OwnerId");
 
             if (ModelState.IsValid)
