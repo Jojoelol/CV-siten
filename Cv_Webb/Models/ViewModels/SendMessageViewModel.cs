@@ -15,5 +15,8 @@ namespace CV_siten.Models.ViewModels
         [Required(ErrorMessage = "Du måste skriva ett ämne.")]
         [StringLength(120, ErrorMessage = "Ämnet får inte vara längre än 120 tecken")]
         public string Subject { get; set; } = string.Empty;
+        public string? SenderName { get; set; }
+        public string? SenderEmail { get; set; }
+
     }
 }
