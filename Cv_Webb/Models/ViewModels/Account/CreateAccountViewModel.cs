@@ -6,13 +6,13 @@ namespace CV_siten.Models.ViewModels.Account
     {
         [Required(ErrorMessage = "Förnamn är obligatoriskt")]
         [MinLength(2, ErrorMessage = "Förnamn måste vara minst två bokstäver.")]
-        [RegularExpression(@"^[A-Öa-ö]+$", ErrorMessage = "Förnamn får endast innehålla bokstäver.")]
+        [RegularExpression(@"^[A-Öa-ö\s]+$", ErrorMessage = "Förnamn får endast innehålla bokstäver.")]
         [Display(Name = "Förnamn")]
         public string FirstName { get; set; }
 
         [Required(ErrorMessage = "Efternamn är obligatoriskt")]
         [MinLength(2, ErrorMessage = "Efternamn måste vara minst två bokstäver.")]
-        [RegularExpression(@"^[A-Öa-ö]+$", ErrorMessage = "Efternamn får endast innehålla bokstäver.")]
+        [RegularExpression(@"^[A-Öa-ö\s]+$", ErrorMessage = "Efternamn får endast innehålla bokstäver.")]
         [Display(Name = "Efternamn")]
         public string LastName { get; set; }
 
