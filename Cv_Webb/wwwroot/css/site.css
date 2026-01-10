@@ -1275,3 +1275,34 @@ cursor: pointer;
     background-color: #002d5a;
     border: none;
 }
+
+
+/* ====== ChangePassword (flyttat från inline styles) ====== */
+
+.change-password-card {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.change-password-title {
+    color: #002d5a;
+    font-weight: bold;
+}
+
+.change-password-label {
+    color: #002d5a;
+}
+
+.change-password-submit {
+    background-color: #002d5a;
+    border: none;
+    padding: 10px 20px;
+}
+
+.change-password-cancel {
+    padding: 10px 20px;
+}
