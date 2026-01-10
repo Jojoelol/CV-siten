@@ -12,7 +12,7 @@ namespace CV_siten.Data.Models
         public string ProjectName { get; set; } = string.Empty;
 
         [Display(Name = "Beskrivning")]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
 
         [Display(Name = "Startdatum")]
         public DateTimeOffset StartDate { get; set; }
