@@ -557,3 +557,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+
+// ====== Join/All Projects: öppna "joinRoleModal" och fyll projektinfo ======
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.__joinProjectModalHandlerAdded) return;
+    window.__joinProjectModalHandlerAdded = true;
+
+    const modalEl = document.getElementById("joinRoleModal");
+    const projectTextEl = document.getElementById("modalProjectText");
+    const projectIdInput = document.getElementById("modalProjectId");
+
+    if (!modalEl || !window.bootstrap) return;
+
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-join-project-id]");
+        if (!btn) return;
+
+        const projectId = btn.getAttribute("data-join-project-id") || "";
+        const projectName = btn.getAttribute("data-join-project-name") || "";
+
+        if (projectIdInput) projectIdInput.value = projectId;
+        if (projectTextEl) projectTextEl.textContent = projectName ? `Gå med i: ${projectName}` : "Gå med i projekt";
+
+        const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    });
+});
