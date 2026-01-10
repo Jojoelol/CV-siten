@@ -1957,3 +1957,40 @@ cursor: pointer;
     background-color: #002d5a;
     color: white;
 }
+
+
+
+/* ====== EditProject (flyttat från inline styles) ====== */
+
+.edit-project-card {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 30px;
+}
+
+/* Projektbild (när den finns) */
+.edit-project-image {
+    width: 250px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #002d5a;
+}
+
+/* Placeholder (ingen bild vald) */
+.edit-project-image-placeholder {
+    width: 250px;
+    height: 150px;
+    background: #eee;
+    border-radius: 8px;
+    display: inline-block;
+    line-height: 150px;
+    color: #aaa;
+    border: 2px dashed #ccc;
+}
+
+/* Spara-knapp */
+.edit-project-save-btn {
+    background-color: #002d5a;
+    padding: 12px;
+}
