@@ -1335,3 +1335,21 @@ cursor: pointer;
     margin: 20px auto;
     padding: 20px;
 }
+
+/* ====== Messages (flyttat från inline styles) ====== */
+
+/* Om du redan har .u-hidden från tidigare så kan du skippa den här.
+   Annars: */
+.u-hidden {
+    display: none !important;
+}
+
+/* Inline-form (tidigare style="display:inline") */
+.u-inline-form {
+    display: inline;
+}
+
+/* Pre-wrap (tidigare style="white-space: pre-wrap") */
+.u-prewrap {
+    white-space: pre-wrap;
+}

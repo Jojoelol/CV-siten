@@ -411,3 +411,89 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+
+// ====== Messages: modal-logik (Read / Reply / Delete) ======
+document.addEventListener("DOMContentLoaded", () => {
+    // --- Läs meddelande modal ---
+    const readModalEl = document.getElementById("readMessageModal");
+    const readTitleEl = document.getElementById("readMessageFrom");
+    const readContentEl = document.getElementById("readMessageContent");
+    const replyBtn = document.getElementById("replyBtn");
+
+    // Fält i "Skicka meddelande"-modalen (för reply)
+    const sendModalEl = document.getElementById("sendMessageModal");
+    const receiverIdInput = document.getElementById("receiverId");
+    const receiverSelectedEl = document.getElementById("receiverSelected");
+    const sendSubjectInput = document.getElementById("sendSubject");
+
+    // Håll info om senaste öppnade meddelande så "Svara" vet vem/ämne
+    let lastMessage = { senderId: "", from: "", subject: "" };
+
+    if (readModalEl) {
+        readModalEl.addEventListener("show.bs.modal", (event) => {
+            const triggerRow = event.relatedTarget; // <tr>
+            if (!triggerRow) return;
+
+            const from = triggerRow.getAttribute("data-from") || "";
+            const subject = triggerRow.getAttribute("data-subject") || "";
+            const senderId = triggerRow.getAttribute("data-sender-id") || "";
+
+            const contentCell = triggerRow.querySelector(".message-content");
+            const content = contentCell ? contentCell.textContent.trim() : "";
+
+            lastMessage = { senderId, from, subject };
+
+            if (readTitleEl) {
+                // Visas som: "Namn – Ämne"
+                const title = subject ? `${from} – ${subject}` : from;
+                readTitleEl.textContent = title;
+            }
+
+            if (readContentEl) {
+                readContentEl.textContent = content;
+            }
+        });
+    }
+
+    // --- Svara-knapp: fyller "Skicka meddelande"-modalen ---
+    if (replyBtn && sendModalEl && window.bootstrap) {
+        replyBtn.addEventListener("click", () => {
+            // Stäng read-modal
+            const readInstance = window.bootstrap.Modal.getInstance(readModalEl);
+            if (readInstance) readInstance.hide();
+
+            // Förifyll mottagare + ämne
+            if (receiverIdInput && lastMessage.senderId) receiverIdInput.value = lastMessage.senderId;
+            if (receiverSelectedEl) receiverSelectedEl.textContent = lastMessage.from ? `Till: ${lastMessage.from}` : "";
+
+            if (sendSubjectInput) {
+                const s = lastMessage.subject || "";
+                sendSubjectInput.value = s.toLowerCase().startsWith("re:") ? s : `Re: ${s}`.trim();
+            }
+
+            // Öppna send-modal
+            const sendInstance = window.bootstrap.Modal.getOrCreateInstance(sendModalEl);
+            sendInstance.show();
+        });
+    }
+
+    // --- Ta bort modal: fyller id + info ---
+    const deleteModalEl = document.getElementById("deleteMessageModal");
+    const deleteInfoEl = document.getElementById("deleteMessageInfo");
+    const deleteIdInput = document.getElementById("deleteMessageId");
+
+    if (deleteModalEl) {
+        deleteModalEl.addEventListener("show.bs.modal", (event) => {
+            const triggerBtn = event.relatedTarget; // delete-knappen
+            if (!triggerBtn) return;
+
+            const id = triggerBtn.getAttribute("data-id") || "";
+            const from = triggerBtn.getAttribute("data-from") || "";
+            const subject = triggerBtn.getAttribute("data-subject") || "";
+
+            if (deleteIdInput) deleteIdInput.value = id;
+            if (deleteInfoEl) deleteInfoEl.textContent = `${from} – ${subject}`.trim();
+        });
+    }
+});
