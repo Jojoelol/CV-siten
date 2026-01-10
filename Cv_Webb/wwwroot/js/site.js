@@ -533,3 +533,27 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = redirectUrl;
     }, 3000);
 });
+
+
+// ====== AllProjects: "Gå med" -> öppna modal och fyll projektinfo ======
+document.addEventListener("DOMContentLoaded", () => {
+    const modalEl = document.getElementById("joinRoleModal");
+    const projectTextEl = document.getElementById("modalProjectText");
+    const projectIdInput = document.getElementById("modalProjectId");
+
+    if (!modalEl || !window.bootstrap) return;
+
+    document.querySelectorAll("[data-join-project-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const projectId = btn.getAttribute("data-join-project-id");
+            const projectName = btn.getAttribute("data-join-project-name") || "";
+
+            if (projectTextEl) projectTextEl.textContent = projectName ? `Projekt: ${projectName}` : "";
+            if (projectIdInput) projectIdInput.value = projectId || "";
+
+            const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        });
+    });
+});
+

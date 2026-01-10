@@ -1693,3 +1693,267 @@ cursor: pointer;
     color: #28a745;
     font-size: 3rem;
 }
+
+
+/* ====== AllProjects (flyttat från inline styles) ====== */
+
+.all-projects-page {
+    padding: 40px;
+}
+
+.all-projects-wrapper {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.all-projects-title {
+    color: #002d5a;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #3498db;
+    display: inline-block;
+}
+
+/* Toolbar */
+.all-projects-toolbar {
+    margin-bottom: 30px;
+}
+
+.all-projects-toolbar-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.all-projects-search-col {
+    flex: 1;
+    min-width: 200px;
+}
+
+.all-projects-sort-col {
+    width: 220px;
+}
+
+.all-projects-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.all-projects-input {
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    height: 40px;
+}
+
+/* Buttons column */
+.all-projects-buttons-col {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 110px;
+    min-height: 85px;
+    justify-content: flex-end;
+}
+
+.all-projects-search-btn {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+}
+
+.all-projects-clear-btn {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.all-projects-btn-icon {
+    margin-right: 6px;
+}
+
+.all-projects-clear-spacer {
+    height: 40px;
+    width: 100%;
+}
+
+/* Empty state */
+.all-projects-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border: 2px dashed #dee2e6;
+    margin-top: 20px;
+}
+
+.all-projects-empty-icon {
+    font-size: 4rem;
+    color: #cbd5e0;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.all-projects-empty-title {
+    color: #4a5568;
+    font-weight: bold;
+}
+
+.all-projects-empty-create {
+    background-color: #002d5a;
+    border: none;
+    padding: 10px 20px;
+}
+
+/* Grid */
+.all-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Card */
+.all-projects-card {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    border: 1px solid #eee;
+}
+
+.all-projects-card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.all-projects-card-image {
+    width: 100%;
+    height: 160px;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.all-projects-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.all-projects-card-head {
+    padding: 20px 20px 5px 20px;
+}
+
+.all-projects-card-name {
+    font-weight: 800;
+    display: block;
+    color: #002d5a;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.all-projects-card-owner {
+    font-size: 0.85rem;
+    color: #3498db;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.all-projects-owner-icon {
+    font-size: 0.8rem;
+}
+
+/* Body details */
+.all-projects-card-body {
+    padding: 5px 20px 20px 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.all-projects-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.all-projects-status-dot {
+    font-size: 0.6rem;
+}
+
+    .all-projects-status-dot.is-active {
+        color: #48bb78;
+    }
+
+    .all-projects-status-dot.is-inactive {
+        color: #a0aec0;
+    }
+
+/* Footer */
+.all-projects-card-footer {
+    margin-top: auto;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f0f2f5;
+}
+
+.all-projects-members-badge {
+    background: #ebf5ff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: #2b6cb0;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.all-projects-member-btn {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.all-projects-join-btn {
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* Modal header */
+.all-projects-modal-header {
+    background-color: #002d5a;
+    color: white;
+}
