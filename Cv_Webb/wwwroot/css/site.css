@@ -1306,3 +1306,24 @@ cursor: pointer;
 .change-password-cancel {
     padding: 10px 20px;
 }
+
+
+/* ====== CreateAccount (flyttat från inline styles) ====== */
+
+.create-account-card {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+}
+
+/* Profilbild-placeholder (ingen bild) */
+.create-account-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background: #eee;
+    border-radius: 50%;
+    display: inline-block;
+    line-height: 150px;
+    color: #aaa;
+    border: 2px dashed #ccc;
+}
