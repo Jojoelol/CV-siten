@@ -1327,3 +1327,11 @@ cursor: pointer;
     color: #aaa;
     border: 2px dashed #ccc;
 }
+
+/* ====== Login (flyttat från inline styles) ====== */
+
+.login-card {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+}
