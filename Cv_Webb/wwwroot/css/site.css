@@ -876,3 +876,9 @@ cursor: pointer;
     color: #28a745;
     margin-bottom: 15px;
 }
+
+.project-card:hover {
+    transform: translateY(-5px); /* Lyfter vid hover för bättre UX */
+    background: #2980b9;
+    transition: transform 0.2s;
+}
