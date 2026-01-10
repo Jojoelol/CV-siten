@@ -335,3 +335,79 @@ function showJoinPopup(projectId, projectName) {
         myModal.show();
     }
 }
+
+
+
+//PROFILE, KANSKE INTE BEHÖVS
+
+
+function enableEdit(fieldName) {
+    const section = document.getElementById(`section-${fieldName}`);
+    if (!section) return;
+
+    const display = section.querySelector(".display-mode");
+    const edit = section.querySelector(".edit-mode");
+    const editBtn = section.querySelector(".edit-btn");
+    const saveBtn = section.querySelector(".save-btn");
+
+    if (display) display.classList.add("u-hidden");
+    if (edit) edit.classList.remove("u-hidden");
+    if (editBtn) editBtn.classList.add("u-hidden");
+    if (saveBtn) saveBtn.classList.remove("u-hidden");
+
+    // Sätt fokus i textarea om den finns
+    if (edit && typeof edit.focus === "function") edit.focus();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // 1) Koppla "Redigera"-knappar utan inline onclick
+    document.querySelectorAll("[data-edit-field]").forEach((btn) => {
+        btn.addEventListener("click", () => enableEdit(btn.dataset.editField));
+    });
+
+    // 2) CV-upload utan inline onclick/onchange
+    const uploadBtn = document.querySelector('[data-action="cv-upload"]');
+    const fileInput = document.getElementById("cvFileInput");
+    const uploadForm = document.getElementById("cvUploadForm");
+
+    if (uploadBtn && fileInput) {
+        uploadBtn.addEventListener("click", () => fileInput.click());
+
+        fileInput.addEventListener("change", () => {
+            if (uploadForm) uploadForm.submit();
+        });
+    }
+
+    // 3) Confirm dialogs utan inline onsubmit
+    document.querySelectorAll("form[data-confirm]").forEach((form) => {
+        form.addEventListener("submit", (e) => {
+            const msg = form.getAttribute("data-confirm") || "Är du säker?";
+            if (!window.confirm(msg)) e.preventDefault();
+        });
+    });
+
+    // 4) (Valfritt) Bootstrap modal: om din SendMessageModal har inputs för receiver.
+    // Den här delen är "safe" – den gör inget om fälten inte finns.
+    const modalEl = document.getElementById("sendMessageModal");
+    if (modalEl && window.bootstrap) {
+        modalEl.addEventListener("show.bs.modal", (event) => {
+            const trigger = event.relatedTarget;
+            if (!trigger) return;
+
+            const receiverId = trigger.getAttribute("data-receiver-id");
+            const receiverName = trigger.getAttribute("data-receiver-name");
+
+            // Försök hitta vanliga fältnamn i modalens form
+            const idInput =
+                modalEl.querySelector('input[name="ReceiverId"]') ||
+                modalEl.querySelector("#ReceiverId");
+
+            const nameEl =
+                modalEl.querySelector('[data-role="receiver-name"]') ||
+                modalEl.querySelector("#ReceiverName");
+
+            if (idInput && receiverId) idInput.value = receiverId;
+            if (nameEl && receiverName) nameEl.textContent = receiverName;
+        });
+    }
+});

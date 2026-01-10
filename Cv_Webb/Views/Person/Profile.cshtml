@@ -3,20 +3,12 @@
 <div class="profile-page-wrapper">
 	<aside class="profile-sidebar">
 		<div class="sidebar-card">
+
 			@* 1. Profilbild *@
 			<div class="pic-placeholder">
-				@if (!string.IsNullOrEmpty(Model.ImageUrl))
-				{
-					<img src="~/images/ProfilePicture/@Model.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
-				}
-				else
-				{
-					<img src="~/images/ProfilePicture/defaultPicture.jpg" alt="Profilbild" style="width: 100%; height: 100%; object-fit: cover;" />
-				}
-				else
-				{
-					<span style="color: #ecf0f1;">Profilbild</span>
-				}
+				<img class="u-img-cover-full"
+					 src="~/images/ProfilePicture/@(string.IsNullOrEmpty(Model.ImageUrl) ? "defaultPicture.jpg" : Model.ImageUrl)"
+					 alt="Profilbild" />
 			</div>
 
 			<div class="profile-info-text">
@@ -43,11 +35,11 @@
 				<div class="profile-bio">
 					<p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
 				</div>
+
 				@if (ViewBag.IsOwner != true)
 				{
 					<button type="button"
-							class="btn-action btn-primary"
-							style="margin-top: 15px; width: 100%;"
+							class="btn-action btn-primary u-btn-fullwidth-top"
 							data-bs-toggle="modal"
 							data-bs-target="#sendMessageModal"
 							data-receiver-id="@Model.Id"
@@ -56,11 +48,10 @@
 					</button>
 				}
 
-
 				@* Besöksstatistik *@
 				@if (ViewBag.IsOwner == true)
 				{
-					<div class="profile-stats" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ecf0f1; font-size: 0.9em; color: #7f8c8d;">
+					<div class="profile-stats u-profile-stats">
 						<p><i class="fas fa-eye"></i> Antal visningar: <strong>@Model.ViewCount</strong></p>
 					</div>
 				}
@@ -73,7 +64,7 @@
 					@* Bekräftelsemeddelande vid statusändring *@
 					@if (TempData["StatusMessage"] != null)
 					{
-						<div class="alert alert-info py-1 text-center" style="font-size: 0.75rem; margin-bottom: 10px; border-radius: 8px;">
+						<div class="alert alert-info py-1 text-center u-status-alert">
 							@TempData["StatusMessage"]
 						</div>
 					}
@@ -81,40 +72,53 @@
 					@* --- HUVUDHANDLINGAR (Blå & Turkos) --- *@
 					@if (string.IsNullOrEmpty(Model.CvUrl))
 					{
-						<form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
+						<form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" class="u-hidden">
 							<input type="hidden" name="personId" value="@Model.Id" />
-							<input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
+							<input type="file" id="cvFileInput" name="cvFile" accept=".pdf" />
 						</form>
-						<button type="button" class="btn-action btn-primary" onclick="document.getElementById('cvFileInput').click();">Ladda upp mitt CV</button>
+
+						<button type="button"
+								class="btn-action btn-primary"
+								data-action="cv-upload">
+							Ladda upp mitt CV
+						</button>
 					}
 					else
 					{
-						<div class="cv-button-row" style="display: flex; gap: 5px; margin-bottom: 5px;">
-							<a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary" style="flex: 3; text-align:center;">Visa CV</a>
-							<form asp-controller="Person" asp-action="DeleteCv" method="post" onsubmit="return confirm('Vill du ta bort ditt CV?');" style="flex: 1;">
+						<div class="cv-button-row u-cv-row">
+							<a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary u-cv-view-btn">Visa CV</a>
+
+							<form asp-controller="Person"
+								  asp-action="DeleteCv"
+								  method="post"
+								  class="u-cv-delete-form"
+								  data-confirm="Vill du ta bort ditt CV?">
 								<input type="hidden" name="personId" value="@Model.Id" />
-								<button type="submit" class="btn-action btn-danger" style="width: 100%;"><i class="fas fa-trash"></i></button>
+								<button type="submit" class="btn-action btn-danger u-cv-delete-btn">
+									<i class="fas fa-trash"></i>
+								</button>
 							</form>
 						</div>
 					}
 
 					<a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">Redigera profil</a>
 
-					<a asp-controller="Person" asp-action="ExportToXml" class="btn-action" style="background-color: #17a2b8; color: white; border: none; margin-top: 5px; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-						<i class="fas fa-file-export" style="margin-right: 8px;"></i> Exportera CV (XML)
+					<a asp-controller="Person" asp-action="ExportToXml" class="btn-action u-export-xml-btn">
+						<i class="fas fa-file-export u-export-xml-icon"></i> Exportera CV (XML)
 					</a>
 
 					@* --- KONTOINSTÄLLNINGAR (Längst ner) --- *@
-					<div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+					<div class="u-account-settings">
 
 						@* Sekretess-switch *@
-						<div class="privacy-status" style="margin-bottom: 10px; padding: 10px; background-color: @(Model.IsPrivate ? "#2c3e50" : "#fff3cd"); border-radius: 8px; text-align: center; border: 1px solid @(Model.IsPrivate ? "#34495e" : "#ffeeba");">
-							<p style="color: @(Model.IsPrivate ? "#ecf0f1" : "#856404"); font-size: 0.8em; margin-bottom: 5px; font-weight: bold;">
+						<div class="privacy-status @(Model.IsPrivate ? "is-private" : "is-public")">
+							<p class="privacy-status-text">
 								STATUS: @(Model.IsPrivate ? "PRIVAT" : "OFFENTLIG")
 							</p>
+
 							<form asp-controller="Person" asp-action="TogglePrivacy" method="post">
 								<input type="hidden" name="id" value="@Model.Id" />
-								<button type="submit" class="btn btn-sm @(Model.IsPrivate ? "btn-success" : "btn-warning")" style="width: 100%; font-size: 0.8em;">
+								<button type="submit" class="btn btn-sm @(Model.IsPrivate ? "btn-success" : "btn-warning") u-privacy-btn">
 									<i class="fas @(Model.IsPrivate ? "fa-toggle-off" : "fa-toggle-on")"></i> Ändra status
 								</button>
 							</form>
@@ -125,7 +129,7 @@
 						{
 							<form asp-controller="Person" asp-action="Inactivate" method="post">
 								<input type="hidden" name="id" value="@Model.Id" />
-								<button type="submit" class="btn-action btn-danger-outline" style="font-size: 0.8em; opacity: 0.8; width: 100%;">
+								<button type="submit" class="btn-action btn-danger-outline u-inactivate-btn">
 									<i class="fas fa-user-slash"></i> Inaktivera profil
 								</button>
 							</form>
@@ -134,7 +138,7 @@
 						{
 							<form asp-controller="Person" asp-action="Activate" method="post">
 								<input type="hidden" name="id" value="@Model.Id" />
-								<button type="submit" class="btn-action" style="font-size: 0.8em; background-color: #28a745; color: white; border: none; width: 100%;">
+								<button type="submit" class="btn-action u-activate-btn">
 									<i class="fas fa-user-check"></i> Aktivera profil
 								</button>
 							</form>
@@ -155,12 +159,17 @@
 					<h3 class="section-title">Kompetenser</h3>
 					@if (ViewBag.IsOwner == true)
 					{
-						<button type="button" class="btn-action btn-outline btn-edit-small edit-btn" onclick="enableEdit('Skills')">Redigera</button>
-						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn" style="display:none;">Spara</button>
+						<button type="button"
+								class="btn-action btn-outline btn-edit-small edit-btn"
+								data-edit-field="Skills">
+							Redigera
+						</button>
+
+						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
 					}
 				</div>
 				<p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Skills) ? "Inga kompetenser angivna." : Model.Skills)</p>
-				<textarea name="fieldValue" class="form-control-custom edit-mode" style="display:none; width:100%; min-height:100px;">@Model.Skills</textarea>
+				<textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Skills</textarea>
 			</form>
 		</div>
 
@@ -173,12 +182,17 @@
 					<h3 class="section-title">Utbildningar</h3>
 					@if (ViewBag.IsOwner == true)
 					{
-						<button type="button" class="btn-action btn-outline btn-edit-small edit-btn" onclick="enableEdit('Education')">Redigera</button>
-						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn" style="display:none;">Spara</button>
+						<button type="button"
+								class="btn-action btn-outline btn-edit-small edit-btn"
+								data-edit-field="Education">
+							Redigera
+						</button>
+
+						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
 					}
 				</div>
 				<p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Education) ? "Ingen utbildningsinformation angiven." : Model.Education)</p>
-				<textarea name="fieldValue" class="form-control-custom edit-mode" style="display:none; width:100%; min-height:100px;">@Model.Education</textarea>
+				<textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Education</textarea>
 			</form>
 		</div>
 
@@ -191,12 +205,17 @@
 					<h3 class="section-title">Tidigare erfarenheter</h3>
 					@if (ViewBag.IsOwner == true)
 					{
-						<button type="button" class="btn-action btn-outline btn-edit-small edit-btn" onclick="enableEdit('Experience')">Redigera</button>
-						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn" style="display:none;">Spara</button>
+						<button type="button"
+								class="btn-action btn-outline btn-edit-small edit-btn"
+								data-edit-field="Experience">
+							Redigera
+						</button>
+
+						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
 					}
 				</div>
 				<p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Experience) ? "Ingen tidigare erfarenhet angiven." : Model.Experience)</p>
-				<textarea name="fieldValue" class="form-control-custom edit-mode" style="display:none; width:100%; min-height:100px;">@Model.Experience</textarea>
+				<textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Experience</textarea>
 			</form>
 		</div>
 
@@ -211,13 +230,11 @@
 				<input type="hidden" name="id" value="@Model.Id" />
 
 				@* ÖVRE RADEN (Sök & Sortering) *@
-				<div class="toolbar-top-row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+				<div class="toolbar-top-row u-toolbar-top-row">
 					<input type="text" name="searchString" value="@ViewBag.CurrentSearch"
-						   placeholder="Sök projekt eller roll..." class="form-control-custom"
-						   style="flex-grow: 1; margin: 0;">
+						   placeholder="Sök projekt eller roll..." class="form-control-custom u-toolbar-search">
 
-					<select name="sortBy" class="form-select-custom" onchange="this.form.submit()"
-							style="width: auto; min-width: 200px; margin: 0;">
+					<select name="sortBy" class="form-select-custom u-toolbar-sort" onchange="this.form.submit()">
 						<option value="">Sortera efter...</option>
 						<optgroup label="Namn">
 							<option value="name_asc" selected="@(ViewBag.CurrentSort == "name_asc")">Projektnamn: A-Ö</option>
@@ -234,30 +251,26 @@
 							<option value="members_desc" selected="@(ViewBag.CurrentSort == "members_desc")">Antal deltagare: Fallande</option>
 						</optgroup>
 						<optgroup label="Tid">
-						<option value="tid" selected="@(ViewBag.CurrentSort == "tid")">Tid (Nyast först)</option>
+							<option value="tid" selected="@(ViewBag.CurrentSort == "tid")">Tid (Nyast först)</option>
 						</optgroup>
 					</select>
 
-					<button type="submit" class="btn-action btn-primary btn-small" style="width: 100px; margin: 0;">Sök</button>
+					<button type="submit" class="btn-action btn-primary btn-small u-toolbar-search-btn">Sök</button>
 				</div>
 
 				@* HÖGER SIDA: Admin-knappar och Rensa-knapp *@
-				<div class="right-buttons" style="display: flex; gap: 10px; align-items: center; width: 100%;">
+				<div class="right-buttons u-right-buttons">
 
 					@if (ViewBag.IsOwner == true)
 					{
-						<a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline btn-small" style="margin: 0; white-space: nowrap;">Lägg till projekt</a>
-						<a asp-controller="Project" asp-action="AllProjects" class="btn-action btn-outline btn-small" style="margin: 0; white-space: nowrap;">Gå med i projekt</a>
+						<a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline btn-small u-nowrap-btn">Lägg till projekt</a>
+						<a asp-controller="Project" asp-action="AllProjects" class="btn-action btn-outline btn-small u-nowrap-btn">Gå med i projekt</a>
 					}
 
-					@* Genom att lägga till 'margin-left: auto' tvingar vi denna knapp 
-						att tryckas så långt till höger som möjligt i raden. 
-					*@
 					@if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || !string.IsNullOrEmpty(ViewBag.CurrentSort))
 					{
 						<a asp-action="Profile" asp-route-id="@Model.Id" asp-fragment="projects-section"
-						   class="btn-action btn-small"
-						   style="margin-left: auto; width: 100px; background-color: #e74c3c; color: white; text-decoration: none; text-align: center; border: none; display: flex; align-items: center; justify-content: center;">
+						   class="btn-action btn-small u-clear-search-btn">
 							Rensa sökning
 						</a>
 					}
@@ -267,73 +280,74 @@
 			@* --- PROJEKTGRID --- *@
 			@if (Model.PersonProjects != null && Model.PersonProjects.Any())
 			{
-				<div class="projects-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+				<div class="projects-grid u-projects-grid">
 					@foreach (var pp in Model.PersonProjects)
 					{
 						bool isProjectOwner = pp.Project.OwnerId == Model.Id;
 
 						<a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Project.Id"
-						   class="project-card"
-						   style="position: relative; text-decoration: none; color: inherit; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; min-height: 380px; border: 1px solid #eee;">
+						   class="project-card u-project-card">
 
 							@if (isProjectOwner)
 							{
-								<div style="position: absolute; top: 0; right: 0; background: #3498db; color: white; font-size: 0.7rem; font-weight: bold; padding: 5px 12px; border-radius: 0 12px 0 10px; letter-spacing: 0.5px; z-index: 5; box-shadow: -2px 2px 5px rgba(0,0,0,0.1);">
+								<div class="u-project-owner-badge">
 									ÄGARE
 								</div>
 							}
 
 							@* 1. PROJEKTBILD *@
-							<div class="project-card-image" style="width: 100%; height: 160px; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #f0f0f0;">
+							<div class="project-card-image u-project-card-image">
 								@if (!string.IsNullOrEmpty(pp.Project.ImageUrl))
 								{
-									<img src="@Url.Content("~/images/projects/" + pp.Project.ImageUrl)" alt="@pp.Project.ProjectName" style="width: 100%; height: 100%; object-fit: cover;" />
+									<img src="@Url.Content("~/images/projects/" + pp.Project.ImageUrl)"
+										 alt="@pp.Project.ProjectName"
+										 class="u-img-cover-full" />
 								}
 								else
 								{
-									<i class="fas fa-project-diagram" style="font-size: 3rem; color: #cbd5e0;"></i>
+									<i class="fas fa-project-diagram u-project-placeholder-icon"></i>
 								}
 							</div>
 
 							@* 2. INNEHÅLL *@
-							<div style="padding: 20px; flex-grow: 1; display: flex; flex-direction: column;">
+							<div class="u-project-card-body">
 
-								@* RUBRIK OCH ROLL (I FOKUS) *@
-								<div style="margin-bottom: 15px; border-bottom: 1px solid #f0f2f5; padding-bottom: 10px;">
-									<span style="font-weight: 800; display: block; color: #002d5a; font-size: 1.2rem; line-height: 1.2; margin-bottom: 4px;">
+								<div class="u-project-title-block">
+									<span class="u-project-name">
 										@pp.Project.ProjectName
 									</span>
-									<span style="font-size: 0.9rem; color: #3498db; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-										<i class="fas fa-user-tag" style="font-size: 0.8rem; margin-right: 5px;"></i>
+
+									<span class="u-project-role">
+										<i class="fas fa-user-tag u-user-tag-icon"></i>
 										@(string.IsNullOrEmpty(pp.Role) ? "Deltagare" : pp.Role)
 									</span>
 								</div>
 
-								@* DETALJER (KOMPAKT INFO) *@
-								<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem; color: #4a5568;">
+								<div class="u-project-details-grid">
 									<div title="Typ">
-										<i class="fas fa-layer-group" style="width: 15px; color: #718096;"></i>
+										<i class="fas fa-layer-group u-detail-icon"></i>
 										<strong>Typ:</strong> @(pp.Project.Type ?? "Ej angiven")
 									</div>
+
 									<div title="Status">
-										<i class="fas fa-circle" style="width: 15px; color: @(pp.Project.Status == "Aktivt" ? "#48bb78" : "#a0aec0"); font-size: 0.6rem; vertical-align: middle;"></i>
+										<i class="fas fa-circle u-status-dot @(pp.Project.Status == "Aktivt" ? "is-active" : "is-inactive")"></i>
 										<strong>Status:</strong> @(pp.Project.Status ?? "Aktivt")
 									</div>
+
 									<div title="Startdatum">
-										<i class="fas fa-calendar-alt" style="width: 15px; color: #718096;"></i>
+										<i class="fas fa-calendar-alt u-detail-icon"></i>
 										<strong>Start:</strong> @pp.Project.StartDate.ToString("yyyy-MM-dd")
 									</div>
+
 									<div title="Slutdatum">
-										<i class="fas fa-calendar-check" style="width: 15px; color: #718096;"></i>
+										<i class="fas fa-calendar-check u-detail-icon"></i>
 										<strong>Slut:</strong> @pp.Project.EndDate?.ToString("yyyy-MM-dd")
 									</div>
 								</div>
 
-								@* DELTAGAR-COUNT *@
-								<div style="margin-top: auto; padding-top: 15px; display: flex; align-items: center; border-top: 1px solid #f0f2f5;">
-									<div style="display: flex; align-items: center; background: #ebf5ff; padding: 4px 10px; border-radius: 20px; color: #2b6cb0; font-weight: 600; font-size: 0.75rem;">
-										<i class="fas fa-users" style="margin-right: 6px;"></i>
-										@* Här räknas nu alla som är kopplade till projektet *@
+								<div class="u-project-participants-row">
+									<div class="u-project-participants-badge">
+										<i class="fas fa-users u-participants-icon"></i>
 										@(pp.Project.PersonProjects?.Count ?? 0) deltagare
 									</div>
 								</div>
@@ -347,36 +361,44 @@
 		@* --- HITTA LIKNANDE PERSONER (VG-Krav 5) --- *@
 		@if (ViewBag.SimilarPerson != null)
 		{
-			<div class="cv-section" style="margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px;">
+			<div class="cv-section u-similar-section">
 				<div class="cv-header-row">
 					<h3 class="section-title"><i class="fas fa-user-friends"></i> Hitta liknande personer</h3>
 				</div>
+
 				<p class="text-muted">Baserat på profilens kompetenser föreslår vi även följande profil:</p>
 
-				<div class="similar-profile-card" style="display: flex; align-items: center; background: #f9f9f9; padding: 15px; border-radius: 12px; border: 1px solid #ddd; max-width: 450px;">
-					<div style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; margin-right: 15px; border: 2px solid #002d5a;">
+				<div class="similar-profile-card u-similar-card">
+					<div class="u-similar-avatar">
 						@if (!string.IsNullOrEmpty(ViewBag.SimilarPerson.ImageUrl))
 						{
-							<img src="~/images/ProfilePicture/@ViewBag.SimilarPerson.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
+							<img src="~/images/ProfilePicture/@ViewBag.SimilarPerson.ImageUrl" alt="Profilbild" class="u-img-cover-full" />
 						}
 						else
 						{
-							<div style="width:100%; height:100%; background:#ccc; display:flex; align-items:center; justify-content:center; color:white;"><i class="fas fa-user"></i></div>
+							<div class="u-similar-avatar-fallback"><i class="fas fa-user"></i></div>
 						}
 					</div>
-					<div style="flex-grow: 1;">
-						<h5 style="margin: 0; color: #002d5a; font-weight: bold;">@ViewBag.SimilarPerson.FirstName @ViewBag.SimilarPerson.LastName</h5>
-						<p style="margin: 0 0 8px 0; font-size: 0.85em; color: #666;">@ViewBag.SimilarPerson.JobTitle</p>
 
-						<div class="match-badge mb-2" style="background: #e7f3ff; color: #0056b3; padding: 3px 8px; border-radius: 15px; font-size: 0.75rem; font-weight: 700; display: inline-block; border: 1px solid #b3d7ff;">
+					<div class="u-similar-content">
+						<h5 class="u-similar-name">@ViewBag.SimilarPerson.FirstName @ViewBag.SimilarPerson.LastName</h5>
+						<p class="u-similar-title">@ViewBag.SimilarPerson.JobTitle</p>
+
+						<div class="match-badge mb-2 u-match-badge">
 							<i class="fas fa-bullseye"></i> @ViewBag.MatchScore% Matchning
 						</div>
+
 						<br />
-						<a asp-action="Profile" asp-route-id="@ViewBag.SimilarPerson.Id" class="btn btn-sm btn-primary" style="background-color: #002d5a; border: none;">Visa profil</a>
+
+						<a asp-action="Profile" asp-route-id="@ViewBag.SimilarPerson.Id" class="btn btn-sm btn-primary u-similar-btn">
+							Visa profil
+						</a>
 					</div>
 				</div>
 			</div>
 		}
+
 	</section>
+
 	<partial name="SendMessageModal" />
 </div>
