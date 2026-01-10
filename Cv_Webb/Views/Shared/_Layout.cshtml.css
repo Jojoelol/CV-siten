@@ -103,3 +103,41 @@ main {
     border-top: 1px solid #bdc3c7;
     display: block;
 }
+
+
+/* ====== Layout (flyttat från inline styles) ====== */
+
+.layout-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+/* Logo */
+.layout-logo {
+    flex-shrink: 0;
+}
+
+.layout-logo-img {
+    height: 45px;
+    width: auto;
+}
+
+/* Searchbar (pushar resten åt höger via margin-right:auto) */
+.layout-searchbar {
+    display: flex;
+    gap: 10px;
+    margin-right: auto;
+}
+
+.layout-search-input {
+    width: 200px;
+}
+
+/* Right-side auth area */
+.layout-logged-in-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
