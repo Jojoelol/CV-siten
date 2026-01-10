@@ -1353,3 +1353,179 @@ cursor: pointer;
 .u-prewrap {
     white-space: pre-wrap;
 }
+
+
+/* ====== Home/Startsida (flyttat från inline styles) ====== */
+
+.home-page {
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Welcome */
+.home-welcome {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    border-left: 8px solid #002d5a;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.home-welcome-title {
+    color: #002d5a;
+    font-weight: bold;
+}
+
+.home-welcome-text {
+    color: #444;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+/* Latest project area */
+.home-latest-project {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.home-latest-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.home-latest-project-title {
+    color: #002d5a;
+    margin-bottom: 0;
+}
+
+.home-latest-project-link {
+    font-weight: 600;
+}
+
+.home-latest-project-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.home-latest-project-name {
+    color: #0056b3;
+    font-weight: bold;
+}
+
+.home-latest-project-desc {
+    color: #555;
+}
+
+.home-latest-project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+/* Section title */
+.home-section-title {
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Profile grid */
+.home-profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+/* Profile cards */
+.home-profile-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    border: none;
+}
+
+.home-profile-card-topbar {
+    height: 10px;
+    background-color: #0056b3;
+}
+
+.home-profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f0f2f5;
+    margin-bottom: 15px;
+}
+
+.home-profile-img-fallback {
+    width: 100px;
+    height: 100px;
+    background: #f0f2f5;
+    border-radius: 50%;
+    margin: 0 auto 15px auto;
+    line-height: 100px;
+    color: #adb5bd;
+    font-size: 2rem;
+}
+
+.home-profile-name {
+    color: #002d5a;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.home-profile-jobtitle {
+    color: #0056b3;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+/* Match badge */
+.home-match-badge {
+    background: #e7f3ff;
+    color: #0056b3;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-block;
+    border: 1px solid #b3d7ff;
+}
+
+/* Description box + clamp */
+.home-profile-descbox {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 20px;
+    min-height: 60px;
+}
+
+.home-profile-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Button */
+.home-profile-btn {
+    background-color: #002d5a;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 500;
+}

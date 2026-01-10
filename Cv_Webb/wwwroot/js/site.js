@@ -413,7 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// ====== Messages: modal-logik (Read / Reply / Delete) ======
+// ====== Messages: modal-logik (Read / Reply / Delete) ====== KANSKE ÖVERFLÖDIG
 document.addEventListener("DOMContentLoaded", () => {
     // --- Läs meddelande modal ---
     const readModalEl = document.getElementById("readMessageModal");
@@ -497,3 +497,5 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+
