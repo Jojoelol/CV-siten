@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CV_siten.Data.Models
 {
@@ -37,6 +38,8 @@ namespace CV_siten.Data.Models
         [Display(Name = "Projektägare")]
         public int OwnerId { get; set; }
 
+        [NotMapped]
+        public string? Role { get; set; }
         public virtual Person? Owner { get; set; }
     }
 }

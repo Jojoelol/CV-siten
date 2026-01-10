@@ -69,9 +69,16 @@ namespace CV_siten.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile, string Role)
+        // Parametern 'string Role' är borttagen här:
+        public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile)
         {
+            // Kontrollera om slutdatum är före startdatum
+            if (model.EndDate.HasValue && model.EndDate < model.StartDate)
+            {
+                ModelState.AddModelError("EndDate", "Slutdatum kan inte vara före startdatum.");
+            }
 
+            ModelState.Remove("OwnerId");
 
             if (ModelState.IsValid)
             {
@@ -107,7 +114,6 @@ namespace CV_siten.Controllers
                 }
 
                 // 4. Sätt ägare och spara projektet
-                // model.Type och model.Status kommer automatiskt från din nya vy här!
                 model.OwnerId = person.Id;
                 _context.Projects.Add(model);
                 await _context.SaveChangesAsync();
@@ -117,7 +123,7 @@ namespace CV_siten.Controllers
                 {
                     PersonId = person.Id,
                     ProjectId = model.Id,
-                    Role = Role ?? "Projektägare"
+                    Role = model.Role ?? "Projektägare" // ÄNDRAT: Hämtar från model.Role
                 });
 
                 await _context.SaveChangesAsync();
@@ -128,9 +134,9 @@ namespace CV_siten.Controllers
                 return View(model);
             }
 
-            // Om valideringen misslyckas skickas vi tillbaka till vyn med felen
             return View(model);
         }
+
         // --- REDIGERA PROJEKT (GET) ---
         [Authorize]
         [HttpGet]
@@ -226,47 +232,94 @@ namespace CV_siten.Controllers
 
         // --- GÅ MED I PROJEKT (GET) ---
         [Authorize]
+        // 1. Visar listan över projekt man kan gå med i
         [HttpGet]
         public async Task<IActionResult> JoinProject()
         {
+            // Hämta inloggad användare
             var user = await _userManager.GetUserAsync(User);
-            var person = await _context.Persons.Include(p => p.PersonProjects)
-                .FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+            if (user == null) return RedirectToAction("Login", "Account");
 
-            if (person == null) return NotFound();
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
-            var joinedProjectIds = person.PersonProjects.Select(pp => pp.ProjectId).ToList();
-            var availableProjects = await _context.Projects.Include(p => p.Owner)
-                .Where(p => !joinedProjectIds.Contains(p.Id)).ToListAsync();
+            // Hämta alla projekt som personen INTE redan är med i
+            var projects = await _context.Projects
+                .Include(p => p.Owner)
+                .Include(p => p.PersonProjects)
+                .Where(p => !p.PersonProjects
+                .Any(pp => pp.PersonId == person.Id))
+                .ToListAsync();
 
-            return View(availableProjects);
+            return View(projects);
         }
 
-        // --- GÅ MED I PROJEKT (POST) ---
+        // 2. Hanterar när man klickar på "Gå med" i modalen
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Join(int projectId, string role) // Lägg till 'string role' här
+        public async Task<IActionResult> Join(int projectId, string role)
         {
             var user = await _userManager.GetUserAsync(User);
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
             if (person != null)
             {
-                // Skapa den nya kopplingen med den angivna rollen
-                var newConnection = new PersonProject
+                // Skapa kopplingen i join-tabellen
+                var personProject = new PersonProject
                 {
                     PersonId = person.Id,
                     ProjectId = projectId,
-                    Role = role // Spara rollen användaren skrev in
+                    Role = role
                 };
 
-                _context.PersonProjects.Add(newConnection);
+                _context.PersonProjects.Add(personProject);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Du har nu gått med i projektet!";
+                TempData["StatusMessage"] = "Du har nu gått med i projektet!";
             }
 
-            return RedirectToAction("Profile", "Person", new { id = person?.Id });
+            // Skicka tillbaka användaren till sin egen profil
+            return RedirectToAction("Profile", "Person");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        // Metoden heter JoinProject för att matcha formuläret i ProjectDetails.cshtml
+        public async Task<IActionResult> JoinProject(int projectId, string role)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person != null)
+            {
+                // Kontrollera om användaren redan är med i projektet
+                var isAlreadyMember = await _context.PersonProjects
+                    .AnyAsync(pp => pp.PersonId == person.Id && pp.ProjectId == projectId);
+
+                if (!isAlreadyMember)
+                {
+                    var newParticipant = new PersonProject
+                    {
+                        PersonId = person.Id,
+                        ProjectId = projectId,
+                        Role = role
+                    };
+
+                    _context.PersonProjects.Add(newParticipant);
+                    await _context.SaveChangesAsync();
+
+                    // Detta triggar din popup i site.js
+                    TempData["SuccessMessage"] = "Välkommen till projektet! Din anmälan är nu registrerad.";
+                }
+            }
+
+            // Istället för RedirectToAction, returnera vyn direkt:
+            // Detta gör att vi stannar på samma historik-post.
+            var project = await _context.Projects
+                .Include(p => p.PersonProjects).ThenInclude(pp => pp.Person)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
+
+            return View("ProjectDetails", project);
         }
 
         // --- LÄMNA PROJEKT ---
@@ -318,13 +371,47 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", "Person", new { id = person.Id });
         }
 
-        public async Task<IActionResult> AllProjects()
+        [HttpGet]
+        public async Task<IActionResult> AllProjects(string searchString, string sortBy)
         {
-            // Vi hämtar alla projekt och inkluderar ägaren för att kunna skriva ut namnet
-            var projects = await _context.Projects
+            // Spara sök/sort i ViewBag för att behålla värdena i formuläret
+            ViewBag.CurrentSearch = searchString;
+            ViewBag.CurrentSort = sortBy;
+
+            // Börja med en grundfråga
+            var query = _context.Projects
                 .Include(p => p.Owner)
-                .OrderByDescending(p => p.StartDate)
-                .ToListAsync();
+                .Include(p => p.PersonProjects)
+                .AsQueryable();
+
+            // --- FILTRERING (Sökning) ---
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(p => p.ProjectName.Contains(searchString) ||
+                                         p.Owner.FirstName.Contains(searchString) ||
+                                         p.Owner.LastName.Contains(searchString));
+            }
+
+            // --- SORTERING ---
+            query = sortBy switch
+            {
+                "name_desc" => query.OrderByDescending(p => p.ProjectName),
+                "status_aktivt" => query.OrderBy(p => p.Status != "Aktivt").ThenBy(p => p.ProjectName),
+                "status_avslutat" => query.OrderBy(p => p.Status != "Avslutat").ThenBy(p => p.ProjectName),
+                "members_desc" => query.OrderByDescending(p => p.PersonProjects.Count),
+                "tid" => query.OrderByDescending(p => p.StartDate),
+                _ => query.OrderBy(p => p.ProjectName), // Standard: Namn A-Ö
+            };
+
+            var projects = await query.ToListAsync();
+
+            // Hämta inloggad person för "Gå med"-knapp logik
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+                ViewBag.CurrentPersonId = person?.Id;
+            }
 
             return View(projects);
         }

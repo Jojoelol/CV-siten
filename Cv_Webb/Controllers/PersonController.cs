@@ -32,6 +32,7 @@ namespace CV_siten.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
         {
+            // 1. Hantera inloggning och identifiera vems profil som ska visas
             var user = await _userManager.GetUserAsync(User);
             var loggedInPerson = user != null
                 ? await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id)
@@ -40,63 +41,88 @@ namespace CV_siten.Controllers
             if (!id.HasValue && loggedInPerson == null) return RedirectToAction("Login", "Account");
             int targetId = id ?? loggedInPerson.Id;
 
+            // 2. Hämta person-datan med alla nödvändiga kopplingar
             var person = await _context.Persons
                 .Include(p => p.IdentityUser)
-                .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
+                .Include(p => p.PersonProjects)
+                    .ThenInclude(pp => pp.Project)
+                        .ThenInclude(proj => proj.PersonProjects) // Viktigt för deltagarantal
                 .FirstOrDefaultAsync(p => p.Id == targetId);
 
             if (person == null) return NotFound();
 
+            // 3. Säkerhet: Kontrollera om profilen är privat
+            if (person.IsPrivate && user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // 4. Hantera ViewCount (räkna endast vid riktiga sidvisningar)
             if (Request.Headers["Accept"].ToString().Contains("text/html"))
             {
                 person.ViewCount++;
                 await _context.SaveChangesAsync();
             }
 
-            if (person.IsPrivate && user == null)
+            // 5. Spara undan metadata för vyn
+            ViewBag.IsOwner = (loggedInPerson != null && targetId == loggedInPerson.Id);
+            ViewBag.CurrentSort = sortBy;
+            ViewBag.CurrentSearch = searchString;
+
+            // 6. Sök- och Sorteringslogik för projekt
+            if (person.PersonProjects != null)
             {
-                return RedirectToAction("Login", "Account");
+                var projects = person.PersonProjects.AsQueryable();
+
+                // Filtrering
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    projects = projects.Where(pp =>
+                          pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase) ||
+                          (pp.Role != null && pp.Role.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+                    );
+                }
+
+                // Avancerad sortering
+                projects = sortBy switch
+                {
+                    "name_asc" => projects.OrderBy(pp => pp.Project.ProjectName),
+                    "name_desc" => projects.OrderByDescending(pp => pp.Project.ProjectName),
+
+                    "status_planerat" => projects.OrderByDescending(pp => pp.Project.Status == "Planerat").ThenBy(pp => pp.Project.ProjectName),
+                    "status_aktivt" => projects.OrderByDescending(pp => pp.Project.Status == "Aktivt").ThenBy(pp => pp.Project.ProjectName),
+                    "status_pausat" => projects.OrderByDescending(pp => pp.Project.Status == "Pausat").ThenBy(pp => pp.Project.ProjectName),
+                    "status_avslutat" => projects.OrderByDescending(pp => pp.Project.Status == "Avslutat").ThenBy(pp => pp.Project.ProjectName),
+
+                    "members_asc" => projects.OrderBy(pp => pp.Project.PersonProjects.Count),
+                    "members_desc" => projects.OrderByDescending(pp => pp.Project.PersonProjects.Count),
+
+                    "tid" => projects.OrderByDescending(pp => pp.Project.StartDate),
+                    _ => projects.OrderBy(pp => pp.Project.ProjectName)
+                };
+
+                person.PersonProjects = projects.ToList();
             }
 
-            ViewBag.IsOwner = (loggedInPerson != null && targetId == loggedInPerson.Id);
-
+            // 7. Logik för "Liknande personer"
             var others = await _context.Persons
                .Where(p => p.Id != targetId && p.IsActive && !p.IsPrivate)
                .ToListAsync();
 
             var bestMatch = others
                 .Select(p => new { Person = p, Score = CalculateMatchScore(person, p) })
-                .Where(x => x.Score >= 2) // Tröskel för relevans
+                .Where(x => x.Score >= 2)
                 .OrderByDescending(x => x.Score)
                 .FirstOrDefault();
 
             if (bestMatch != null)
             {
                 ViewBag.SimilarPerson = bestMatch.Person;
-                // RÄKNA UT PROCENTEN HÄR OCH SKICKA TILL VY:
                 ViewBag.MatchScore = Math.Min(bestMatch.Score * 10, 100);
             }
 
-            ViewBag.SimilarPerson = bestMatch?.Person;
-
-            // Sökning och sortering i projekt
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                person.PersonProjects = person.PersonProjects
-                    .Where(pp => pp.Project.ProjectName.Contains(searchString, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
-
-            person.PersonProjects = sortBy switch
-            {
-                "status" => person.PersonProjects.OrderBy(pp => pp.Project.Status).ToList(),
-                "tid" => person.PersonProjects.OrderByDescending(pp => pp.Project.StartDate).ToList(),
-                _ => person.PersonProjects.OrderBy(pp => pp.Project.ProjectName).ToList()
-            };
-
-            ViewBag.CurrentSearch = searchString;
             return View(person);
         }
-
 
         private bool FuzzySkillMatch(string a, string b)
         {
@@ -193,8 +219,8 @@ namespace CV_siten.Controllers
             user.Email = model.Email; user.UserName = model.Email;
             await _userManager.UpdateAsync(user); await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Profilen har uppdaterats!";
-            return RedirectToAction(nameof(Profile), new { id = person.Id });
+            TempData["SuccessMessage"] = "Profilen har sparats!";
+            return View(model);
         }
 
  

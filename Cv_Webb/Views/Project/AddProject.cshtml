@@ -11,6 +11,7 @@
     </div>
 
     <form asp-action="AddProject" method="post" enctype="multipart/form-data">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
         <div class="row">
             <div class="col-md-5">
                 <div style="background-color: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
@@ -22,8 +23,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold" style="color: #002d5a;">Roll i projektet:</label>
-                        <input name="Role" class="form-control" style="border-radius: 8px;" placeholder="t.ex. Databasansvarig" />
+                        <label asp-for="Role" class="form-label fw-bold" style="color: #002d5a;">Roll i projektet:</label>
+                        <input asp-for="Role" class="form-control" style="border-radius: 8px;" placeholder="t.ex. Databasansvarig" />
+                        @* Detta gör att du ser exakt vad som är fel om det inte går att spara *@
+                        <span asp-validation-for="Role" class="text-danger"></span>
                     </div>
 
                     @* --- NYTT: TYP OCH STATUS --- *@

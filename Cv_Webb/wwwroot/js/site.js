@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (popup) {
             popup.style.display = 'flex';
             setTimeout(function () {
-                window.location.href = redirectUrl;
+                window.location.replace(redirectUrl);
             }, 2000);
         }
     }
@@ -211,3 +211,110 @@ function initModalCleanup() {
         el.addEventListener('hidden.bs.modal', cleanup);
     });
 }
+    document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-bs-target="#sendMessageModal"][data-receiver-id]');
+    if (!btn) return;
+
+    const receiverId = btn.getAttribute('data-receiver-id');
+    const receiverName = btn.getAttribute('data-receiver-name') || '';
+
+    const receiverIdEl = document.getElementById('receiverId');
+    const receiverSearchEl = document.getElementById('receiverSearch');
+    const subjectEl = document.getElementById('sendSubject');
+    const resultsEl = document.getElementById('receiverResults');
+
+    if (receiverIdEl) receiverIdEl.value = receiverId;
+    if (receiverSearchEl) receiverSearchEl.value = receiverName;
+
+    if (subjectEl) subjectEl.value = '';
+
+    if (resultsEl) resultsEl.innerHTML = '';
+});
+
+//VISA PROFILBILD LIVE
+document.addEventListener("DOMContentLoaded", function () {
+
+    // --- 1. Förhandsvisning av profilbild ---
+    const imageInput = document.getElementById('imageInput');
+    const previewContainer = document.getElementById('profile-image-preview');
+
+    if (imageInput && previewContainer) {
+        imageInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewContainer.innerHTML = `
+                        <img src="${e.target.result}" 
+                             class="img-thumbnail mb-2" 
+                             style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid #002d5a;" />
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // --- 2. Automatisk omdirigering efter sparande ---
+    const successPopup = document.getElementById('saveSuccessPopup');
+    if (successPopup) {
+        // Hämta URL:en från data-attributet vi skapade i HTML
+        const redirectUrl = successPopup.getAttribute('data-redirect-url');
+
+        if (redirectUrl) {
+            setTimeout(function () {
+                window.location.replace(redirectUrl);
+            }, 3000);
+        }
+    }
+});
+
+//GÖRA SLUTDATUM EFTER STARTDATUM GRÅA OSV
+document.addEventListener("DOMContentLoaded", function () {
+    const startDateInput = document.querySelector('input[name="StartDate"]');
+    const endDateInput = document.querySelector('input[name="EndDate"]');
+
+    startDateInput.addEventListener("change", function () {
+        // Sätt 'min'-attributet på slutdatum till det valda startdatumet
+        if (startDateInput.value) {
+            endDateInput.min = startDateInput.value;
+        }
+
+        // Om användaren redan valt ett slutdatum som nu är ogiltigt, rensa det
+        if (endDateInput.value && endDateInput.value < startDateInput.value) {
+            endDateInput.value = "";
+            alert("Slutdatumet har rensats eftersom det var före det nya startdatumet.");
+        }
+    });
+});
+
+//TILLBAKA KNAPP I PROJECTDETAILS, VETA VAR MAN KOM IFRÅN (PROFILE/ALLPROJECTS)
+document.addEventListener("DOMContentLoaded", function () {
+    // Kontrollera om vi är på en projektdetaljsida
+    if (window.location.pathname.includes("/Project/ProjectDetails")) {
+        const currentUrl = window.location.href;
+        const referrer = document.referrer;
+
+        // Om vi kommer från en annan sida (inte oss själva), spara den som vår "hembas"
+        if (referrer && !referrer.includes(window.location.pathname)) {
+            sessionStorage.setItem("originalProjectSource", referrer);
+        }
+    }
+
+    // Fix för tillbaka-knappen
+    const smartBackBtn = document.getElementById("smartBackBtn");
+    if (smartBackBtn) {
+        smartBackBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const source = sessionStorage.getItem("originalProjectSource");
+
+            if (source) {
+                window.location.href = source;
+            } else {
+                // Om ingen källa finns sparad (t.ex. man skrev in URL direkt), 
+                // gå till AllProjects som standard
+                window.location.href = "/Project/AllProjects";
+            }
+        });
+    }
+});
