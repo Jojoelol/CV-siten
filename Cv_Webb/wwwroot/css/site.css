@@ -1551,3 +1551,43 @@ cursor: pointer;
     height: 100%;
     object-fit: cover;
 }
+
+
+/* ====== EditAccount (flyttat från inline styles) ====== */
+
+.edit-account-card {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+}
+
+.edit-account-success-title {
+    color: #002d5a;
+    font-weight: bold;
+}
+
+/* Profilbild (när det finns en bild) */
+.edit-account-profile-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #002d5a;
+}
+
+/* Placeholder (när ingen bild finns) */
+.edit-account-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background: #eee;
+    border-radius: 50%;
+    display: inline-block;
+    line-height: 150px;
+    color: #aaa;
+    border: 2px dashed #ccc;
+}
+
+/* Spara-knapp */
+.edit-account-save-btn {
+    background-color: #002d5a;
+}

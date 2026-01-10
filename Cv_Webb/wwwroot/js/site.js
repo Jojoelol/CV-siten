@@ -499,3 +499,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
+// ====== EditAccount: redirect efter lyckad sparning (3s) ======
+document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById("saveSuccessPopup");
+    if (!popup) return;
+
+    const redirectUrl = popup.getAttribute("data-redirect-url");
+    if (!redirectUrl) return;
+
+    setTimeout(() => {
+        window.location.href = redirectUrl;
+    }, 3000);
+});
+
