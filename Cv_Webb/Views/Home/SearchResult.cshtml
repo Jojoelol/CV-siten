@@ -5,26 +5,25 @@
     var personer = ViewBag.personResult as List<CV_siten.Data.Models.Person>;
 }
 
-<section class="sr-main" style="background-color:#2c3e50;">
-    <h2 class="text-center" style="color:white">Sökresultat för "@ViewBag.SearchQuery"</h2>
+<section class="sr-main">
+    <h2 class="text-center sr-title">Sökresultat för "@ViewBag.SearchQuery"</h2>
 
     <div class="sr-results-list">
-        <h3 class="sr-matchPerson" style="color:white;">Matchande Personer</h3>
-        
+        <h3 class="sr-matchPerson">Matchande Personer</h3>
+
         @if (personer != null && personer.Any())
         {
             @foreach (var pers in personer)
             {
-                <a class="sr-profile-card" asp-controller="Person" asp-action="Profile" asp-route-id="@pers.Id">
+                <a class="sr-profile-card"
+                   asp-controller="Person"
+                   asp-action="Profile"
+                   asp-route-id="@pers.Id">
+
                     <div class="sr-img-wrapper">
-                        @if (!string.IsNullOrEmpty(pers.ImageUrl))
-                        {
-                            <img src="~/images/ProfilePicture/@pers.ImageUrl" alt="Profilbild" style="width:100%; height:100%; object-fit:cover;" />
-                        }
-                        else
-                        {
-                            <img src="~/images/ProfilePicture/defaultPicture.jpg" alt="Profilbild" style="width: 100%; height: 100%; object-fit: cover;" />
-                        }
+                        <img class="sr-img"
+                             src="~/images/ProfilePicture/@(string.IsNullOrEmpty(pers.ImageUrl) ? "defaultPicture.jpg" : pers.ImageUrl)"
+                             alt="Profilbild" />
                     </div>
 
                     <div class="sr-identity-box">
