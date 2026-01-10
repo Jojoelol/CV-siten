@@ -583,3 +583,35 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.show();
     });
 });
+
+
+// ====== ProjectDetails/Profile: enableEdit utan inline script ======
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.__enableEditHandlerAdded) return;
+    window.__enableEditHandlerAdded = true;
+
+    function enableEdit(sectionId) {
+        const section = document.getElementById("section-" + sectionId);
+        if (!section) return;
+
+        const display = section.querySelector(".display-mode");
+        const edit = section.querySelector(".edit-mode");
+        const editBtn = section.querySelector(".edit-btn");
+        const saveBtn = section.querySelector(".save-btn");
+
+        if (display) display.classList.add("u-hidden");
+        if (edit) edit.classList.remove("u-hidden");
+        if (editBtn) editBtn.classList.add("u-hidden");
+        if (saveBtn) saveBtn.classList.remove("u-hidden");
+    }
+
+    document.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-enable-edit]");
+        if (!btn) return;
+
+        const sectionId = btn.getAttribute("data-enable-edit");
+        if (!sectionId) return;
+
+        enableEdit(sectionId);
+    });
+});

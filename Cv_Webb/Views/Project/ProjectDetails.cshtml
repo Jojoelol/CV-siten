@@ -4,22 +4,12 @@
     @* --- SIDEBAR: PROJEKT-INFO --- *@
     <aside class="profile-sidebar">
         <div class="sidebar-card">
+
             @* 1. PROJEKTBILD *@
-            <div class="project-image-placeholder" style="width: 100%; height: 180px; background-color: #3498db; border-radius: 8px; justify-content: center; align-items: center; margin-bottom: 20px; overflow: hidden;">
-                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                {
-                    <img src="~/images/projects/@(string.IsNullOrEmpty(Model.ImageUrl) ? "defaultbildProjekt.jpg" : Model.ImageUrl)"
-                         alt="Projektbild"
-                    style="width: 100%; height: 100%; object-fit: cover;" />
-                }
-                else
-                {
-                    <img src="~/images/projects/defaultbildProjekt.jpg" alt="Projektbild" style="width: 100%; height: 100%; object-fit: cover;" />
-                }
-                @* else
-                {
-                    <i class="fas fa-project-diagram" style="font-size: 3.5rem; color: white;"></i>
-                } *@
+            <div class="project-image-placeholder project-details-image-wrap">
+                <img src="~/images/projects/@(string.IsNullOrEmpty(Model.ImageUrl) ? "defaultbildProjekt.jpg" : Model.ImageUrl)"
+                     alt="Projektbild"
+                     class="project-details-image" />
             </div>
 
             @* 2. INFO-TEXT *@
@@ -44,18 +34,23 @@
                 {
                     @if (ViewBag.IsOwner == true)
                     {
-                        @* Redigera-knapp för ägare *@
-                        <a asp-controller="Project" asp-action="Edit" asp-route-id="@Model.Id" class="btn-action btn-primary" style="margin-top: 10px; background-color: #002d5a; border: none;">
+                        <a asp-controller="Project"
+                           asp-action="Edit"
+                           asp-route-id="@Model.Id"
+                           class="btn-action btn-primary project-details-edit-btn">
                             <i class="fas fa-edit"></i> Redigera projekt
                         </a>
 
-                        @* Admin-sektion *@
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <div class="project-details-admin-box">
                             <p class="small text-muted mb-2 text-center">PROJEKT-ADMIN</p>
-                            <form asp-action="DeleteProject" asp-controller="Project" method="post" onsubmit="return confirm('Är du helt säker?');">
+
+                            <form asp-action="DeleteProject"
+                                  asp-controller="Project"
+                                  method="post"
+                                  onsubmit="return confirm('Är du helt säker?');">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@Model.Id" />
-                                <button type="submit" class="btn-action btn-danger" style="width: 100%;">
+                                <button type="submit" class="btn-action btn-danger project-details-delete-btn">
                                     <i class="fas fa-trash-alt"></i> Radera projekt
                                 </button>
                             </form>
@@ -71,35 +66,54 @@
                     }
                     else
                     {
-                        @* Knappen anropar nu funktionen som öppnar popupen *@
-                        <button type="button" class="btn-action btn-primary" onclick="showJoinPopup(@Model.Id, '@Model.ProjectName')">
+                        <button type="button"
+                                class="btn-action btn-primary"
+                                data-join-project-id="@Model.Id"
+                                data-join-project-name="@Model.ProjectName">
                             Gå med i projektet
                         </button>
                     }
                 }
             </div>
+
         </div>
     </aside>
 
     @* --- HUVUDINNEHÅLL --- *@
     <section class="profile-main-content">
+
         @* OM PROJEKTET *@
         <div class="cv-section" id="section-Description">
             <form asp-action="UpdateDescription" asp-controller="Project" method="post">
                 <input type="hidden" name="id" value="@Model.Id" />
+
                 <div class="cv-header-row">
                     <h3 class="section-title">Om projektet</h3>
+
                     @if (ViewBag.IsOwner == true)
                     {
-                        <button type="button" class="btn-action btn-outline btn-edit-small edit-btn" onclick="enableEdit('Description')">Redigera</button>
-                        <button type="submit" class="btn-action btn-primary btn-edit-small save-btn" style="display:none;">Spara</button>
+                        <button type="button"
+                                class="btn-action btn-outline btn-edit-small edit-btn"
+                                data-enable-edit="Description">
+                            Redigera
+                        </button>
+
+                        <button type="submit"
+                                class="btn-action btn-primary btn-edit-small save-btn u-hidden">
+                            Spara
+                        </button>
                     }
                 </div>
+
                 <div class="cv-text">
                     <div class="display-mode">
-                        <p style="white-space: pre-line;">@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
+                        <p class="project-details-preline">
+                            @(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)
+                        </p>
                     </div>
-                    <textarea name="description" class="form-control-custom edit-mode" style="display:none; width:100%; min-height:150px;">@Model.Description</textarea>
+
+                    <textarea name="description"
+                              class="form-control-custom edit-mode project-details-desc-textarea u-hidden">@Model.Description</textarea>
                 </div>
             </form>
         </div>
@@ -112,22 +126,28 @@
 
             @if (Model.PersonProjects != null && Model.PersonProjects.Any())
             {
-                <div class="projects-list" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px;">
-                    @* Vi sorterar listan så att den person vars ID matchar projektets OwnerId hamnar först *@
+                <div class="projects-list project-details-participants-list">
                     @foreach (var pp in Model.PersonProjects.OrderByDescending(p => p.PersonId == Model.OwnerId))
                     {
-                        @* Kontrollera om personen är publik ELLER om besökaren är inloggad *@
                         @if (!pp.Person.IsPrivate || User.Identity.IsAuthenticated)
                         {
                             bool isProjectOwner = pp.PersonId == Model.OwnerId;
 
-                            <a asp-controller="Person" asp-action="Profile" asp-route-id="@pp.Person.Id" class="project-pill" style="background-color: #ebf5ff; color: #2c3e50; border: @(isProjectOwner ? "2px solid #3498db" : "1px solid #dee2e6"); text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; border-radius: 12px; width: 160px; height: 140px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <a asp-controller="Person"
+                               asp-action="Profile"
+                               asp-route-id="@pp.Person.Id"
+                               class="project-pill project-details-pill @(isProjectOwner ? "is-owner" : "")">
+
                                 @if (isProjectOwner)
                                 {
-                                    <div style="position: absolute; top: 0; right: 0; background: #3498db; color: white; font-size: 0.65rem; font-weight: bold; padding: 4px 8px; border-radius: 0 11px 0 8px;">ÄGARE</div>
+                                    <div class="project-details-owner-badge">ÄGARE</div>
                                 }
-                                <span style="font-weight: bold; font-size: 1.05rem; color: #212529;">@pp.Person.FirstName @pp.Person.LastName</span>
-                                <span style="font-size: 0.85rem;">
+
+                                <span class="project-details-pill-name">
+                                    @pp.Person.FirstName @pp.Person.LastName
+                                </span>
+
+                                <span class="project-details-pill-role">
                                     @(string.IsNullOrEmpty(pp?.Role) ? "Deltagare" : pp.Role)
                                 </span>
                             </a>
@@ -136,7 +156,7 @@
 
                     @if (!User.Identity.IsAuthenticated && Model.PersonProjects.Any(pp => pp.Person.IsPrivate))
                     {
-                        <p class="text-muted" style="width: 100%; margin-top: 10px;">
+                        <p class="text-muted project-details-private-note">
                             <em>Vissa deltagare har privata profiler och visas endast för inloggade användare.</em>
                         </p>
                     }
@@ -144,22 +164,26 @@
             }
             else
             {
-                <p class="text-muted" style="margin-top: 15px;">Inga deltagare registrerade i detta projekt.</p>
+                <p class="text-muted project-details-no-participants">Inga deltagare registrerade i detta projekt.</p>
             }
         </div>
 
         @* RESURSER *@
-        <div class="cv-section" style="margin-top: 30px;">
+        <div class="cv-section project-details-resources">
             <div class="cv-header-row">
                 <h3 class="section-title">Resurser</h3>
             </div>
+
             @if (!string.IsNullOrEmpty(Model.ZipUrl))
             {
-                <div class="resource-container" style="max-width: 280px; margin-top: 15px;">
-                    <div class="file-card-v2" style="padding: 20px; border: 1px solid #dee2e6; border-radius: 8px; text-align: center; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                        <i class="fas fa-file-archive" style="font-size: 2.5rem; color: #e67e22; display: block; margin-bottom: 10px;"></i>
-                        <span style="font-weight: bold; color: #2c3e50; display: block; margin-bottom: 15px;">Projektfiler (.zip)</span>
-                        <a href="~/uploads/projects/@Model.ZipUrl" class="btn-action btn-primary" download="@(Model.ProjectName + "_kod.zip")" style="text-decoration: none; display: inline-block; width: 100%;">
+                <div class="resource-container project-details-resource-wrap">
+                    <div class="file-card-v2 project-details-file-card">
+                        <i class="fas fa-file-archive project-details-file-icon"></i>
+                        <span class="project-details-file-title">Projektfiler (.zip)</span>
+
+                        <a href="~/uploads/projects/@Model.ZipUrl"
+                           class="btn-action btn-primary project-details-download-btn"
+                           download="@(Model.ProjectName + "_kod.zip")">
                             <i class="fas fa-download"></i> Ladda ned
                         </a>
                     </div>
@@ -167,9 +191,10 @@
             }
             else
             {
-                <p style="color: #7f8c8d; font-style: italic; margin-top: 15px;">Det finns inga resurser uppladdade.</p>
+                <p class="project-details-no-resources">Det finns inga resurser uppladdade.</p>
             }
         </div>
+
     </section>
 </div>
 
@@ -177,11 +202,11 @@
 <div class="modal fade" id="joinRoleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #002d5a; color: white;">
+            <div class="modal-header project-details-modal-header">
                 <h5 class="modal-title">Ange din roll</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            @* Vi postar till 'JoinProject' eftersom det är den metod som skickar oss tillbaka till denna sida *@
+
             <form asp-action="JoinProject" asp-controller="Project" method="post">
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
@@ -193,6 +218,7 @@
                         <input type="text" name="role" class="form-control" placeholder="t.ex. Frontend-utvecklare, Tester..." required />
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
                     <button type="submit" class="btn btn-success">Gå med</button>
@@ -202,39 +228,18 @@
     </div>
 </div>
 
-
 @* --- POPUP VID LYCKAD ANMÄLAN --- *@
 @if (TempData["SuccessMessage"] != null)
 {
-    @* data-redirect-url används av site.js för att veta vart man ska efter 3 sek *@
-    <div id="saveSuccessPopup" class="success-popup-overlay"
+    <div id="saveSuccessPopup"
+         class="success-popup-overlay"
          data-redirect-url="@Url.Action("ProjectDetails", new { id = Model.Id })">
         <div class="success-popup-content animated-popup">
-            <i class="fas fa-check-circle success-icon" style="color: #28a745; font-size: 3rem;"></i>
-            <h3 style="color: #002d5a; font-weight: bold;">Välkommen till projektet!</h3>
+            <i class="fas fa-check-circle success-icon project-details-success-icon"></i>
+            <h3 class="project-details-success-title">Välkommen till projektet!</h3>
             <p class="text-muted">@TempData["SuccessMessage"]</p>
             <p class="small">Sidan uppdateras om ett ögonblick...</p>
             <div class="spinner-border spinner-border-sm text-primary mt-2" role="status"></div>
         </div>
     </div>
 }
-
-<script>
-    function showJoinPopup(projectId, projectName) {
-        document.getElementById('modalProjectId').value = projectId;
-        document.getElementById('modalProjectText').innerText = "Gå med i: " + projectName;
-
-        var myModal = new bootstrap.Modal(document.getElementById('joinRoleModal'));
-        myModal.show();
-    }
-</script>
-
-<script>
-    function enableEdit(sectionId) {
-        const section = document.getElementById('section-' + sectionId);
-        section.querySelector('.display-mode').style.display = 'none';
-        section.querySelector('.edit-mode').style.display = 'block';
-        section.querySelector('.edit-btn').style.display = 'none';
-        section.querySelector('.save-btn').style.display = 'inline-block';
-    }
-</script>
