@@ -11,6 +11,13 @@
                 </div>
 
                 <div class="modal-body">
+                    @if (!(User?.Identity?.IsAuthenticated ?? false))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Ditt namn</label>
+                            <input class="form-control" type="text" name="SenderName" required />
+                        </div>
+                    }
                     <div class="mb-3">
                         <label class="form-label">Sök mottagare (förnamn / efternamn)</label>
 
