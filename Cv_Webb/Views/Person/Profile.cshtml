@@ -251,8 +251,8 @@
 					}
 
 					@* Genom att lägga till 'margin-left: auto' tvingar vi denna knapp 
-       att tryckas så långt till höger som möjligt i raden. 
-    *@
+						att tryckas så långt till höger som möjligt i raden. 
+					*@
 					@if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || !string.IsNullOrEmpty(ViewBag.CurrentSort))
 					{
 						<a asp-action="Profile" asp-route-id="@Model.Id" asp-fragment="projects-section"

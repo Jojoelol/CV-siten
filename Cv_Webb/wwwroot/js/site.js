@@ -318,3 +318,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+
+// Öppnar modalen för att gå med i ett projekt och fyller i ID/Namn
+function showJoinPopup(projectId, projectName) {
+    const idField = document.getElementById('modalProjectId');
+    const textField = document.getElementById('modalProjectText');
+    const modalElement = document.getElementById('joinRoleModal');
+
+    if (idField && textField && modalElement) {
+        idField.value = projectId;
+        textField.innerText = "Gå med i: " + projectName;
+
+        // Skapar och visar modalen med Bootstrap 5-logik
+        const myModal = new bootstrap.Modal(modalElement);
+        myModal.show();
+    }
+}
