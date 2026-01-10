@@ -1,65 +1,102 @@
-﻿// --- ALLMÄNNA FUNKTIONER ---
+﻿// ==============================
+// --- ALLMÄNNA FUNKTIONER ---
+// ==============================
 
-// Växlar mellan visning och redigering på profilsidan
+// Växlar mellan visning och redigering på profilsidan / projectdetails.
+// Klarar både inline style="display:none" och class .u-hidden
 function enableEdit(sectionName) {
     const container = document.getElementById('section-' + sectionName);
-    if (container) {
-        const displayMode = container.querySelector('.display-mode');
-        const editMode = container.querySelector('.edit-mode');
-        const editBtn = container.querySelector('.edit-btn');
-        const saveBtn = container.querySelector('.save-btn');
+    if (!container) return;
 
-        if (displayMode && editMode) {
-            displayMode.style.display = 'none';
-            editMode.style.display = 'block';
-            editMode.focus();
-        }
-        if (editBtn && saveBtn) {
-            editBtn.style.display = 'none';
-            saveBtn.style.display = 'inline-flex';
-        }
+    const displayMode = container.querySelector('.display-mode');
+    const editMode = container.querySelector('.edit-mode');
+    const editBtn = container.querySelector('.edit-btn');
+    const saveBtn = container.querySelector('.save-btn');
+
+    if (displayMode) {
+        displayMode.style.display = 'none';
+        displayMode.classList?.add('u-hidden');
+    }
+
+    if (editMode) {
+        editMode.style.display = 'block';
+        editMode.classList?.remove('u-hidden');
+        if (typeof editMode.focus === 'function') editMode.focus();
+    }
+
+    if (editBtn) {
+        editBtn.style.display = 'none';
+        editBtn.classList?.add('u-hidden');
+    }
+
+    if (saveBtn) {
+        // vissa av dina vyer vill ha inline-flex, andra bara "block"
+        saveBtn.style.display = 'inline-flex';
+        saveBtn.classList?.remove('u-hidden');
     }
 }
 
-// --- HÄNDELSER VID SIDLADDNING ---
 
-document.addEventListener("DOMContentLoaded", function () {
+// Öppnar modalen för att gå med i ett projekt och fyller i ID/Namn (stöd för inline onclick)
+function showJoinPopup(projectId, projectName) {
+    openJoinRoleModal(projectId, projectName);
+}
 
-    // 1. Logik för Pop-up vid sparat projekt
+function openJoinRoleModal(projectId, projectName) {
+    const idField = document.getElementById('modalProjectId');
+    const textField = document.getElementById('modalProjectText');
+    const modalElement = document.getElementById('joinRoleModal');
+
+    if (!idField || !textField || !modalElement || !window.bootstrap) return;
+
+    idField.value = projectId ?? "";
+    textField.innerText = projectName ? ("Gå med i: " + projectName) : "Gå med i projekt";
+
+    const myModal = window.bootstrap.Modal.getOrCreateInstance(modalElement);
+    myModal.show();
+}
+
+
+// ==============================
+// --- INIT-FUNKTIONER ---
+// ==============================
+
+function initAddProjectSuccessPopup() {
     const popupData = document.getElementById('popup-data');
-    if (popupData && popupData.dataset.show === "true") {
-        const popup = document.getElementById('successPopup');
-        const redirectUrl = popupData.dataset.url;
+    if (!popupData) return;
 
-        if (popup) {
-            popup.style.display = 'flex';
-            setTimeout(function () {
-                window.location.replace(redirectUrl);
-            }, 2000);
-        }
-    }
+    const shouldShow = popupData.dataset.show === "true" || popupData.getAttribute("data-show") === "true";
+    if (!shouldShow) return;
 
-    // 2. Hantera scroll-position vid sökning
+    const popup = document.getElementById('successPopup');
+    const redirectUrl = popupData.dataset.url || popupData.getAttribute("data-url");
+
+    if (!popup || !redirectUrl) return;
+
+    // Visa popup (klarar både style och u-hidden)
+    popup.style.display = 'flex';
+    popup.classList?.remove('u-hidden');
+
+    setTimeout(() => {
+        window.location.replace(redirectUrl);
+    }, 2000);
+}
+
+function initScrollRestoreOnSearch() {
     const searchForm = document.querySelector(".content-toolbar");
-    if (searchForm) {
-        searchForm.addEventListener("submit", function () {
-            sessionStorage.setItem("scrollPos", window.scrollY);
-        });
-    }
+    if (!searchForm) return;
 
-    // Återställ scroll-position om den finns sparad
+    searchForm.addEventListener("submit", () => {
+        sessionStorage.setItem("scrollPos", window.scrollY);
+    });
+
     const scrollPos = sessionStorage.getItem("scrollPos");
     if (scrollPos) {
-        window.scrollTo(0, scrollPos);
+        window.scrollTo(0, Number(scrollPos));
         sessionStorage.removeItem("scrollPos");
     }
+}
 
-    initReceiverSearch();
-    initMessagesPage();
-    initModalCleanup();
-
-});
-// --- MESSAGES PAGE ---
 function initReceiverSearch() {
     const searchInput = document.getElementById('receiverSearch');
     const resultsEl = document.getElementById('receiverResults');
@@ -133,69 +170,84 @@ function initReceiverSearch() {
 }
 
 function initMessagesPage() {
+    const readModalEl = document.getElementById("readMessageModal");
+    const deleteModalEl = document.getElementById("deleteMessageModal");
+    const sendModalEl = document.getElementById("sendMessageModal");
+
+    // Om sidan inte har message-modal-systemet, gör inget
+    if (!readModalEl && !deleteModalEl && !sendModalEl) return;
+
     const readFromEl = document.getElementById('readMessageFrom');
     const readContentEl = document.getElementById('readMessageContent');
     const deleteIdEl = document.getElementById('deleteMessageId');
+    const deleteInfoEl = document.getElementById("deleteMessageInfo");
     const replyBtn = document.getElementById('replyBtn');
 
-    // Om sidan inte ens har message-table/modaler, gör inget
-    if (!readFromEl && !deleteIdEl && !replyBtn) return;
+    // Håller info om senaste öppnade meddelande
+    let lastOpenedMessage = { from: "", senderId: "", subject: "" };
 
-    let lastOpenedMessage = null;
+    // READ modal fylls när den öppnas
+    if (readModalEl) {
+        readModalEl.addEventListener("show.bs.modal", (event) => {
+            const triggerRow = event.relatedTarget;
+            if (!triggerRow) return;
 
-    document.addEventListener('click', function (e) {
-
-        // DELETE-knapp (bara fyll hidden input)
-        const deleteBtn = e.target.closest('.btn-delete-message');
-        if (deleteBtn) {
-            e.stopPropagation();
-            if (deleteIdEl) deleteIdEl.value = deleteBtn.getAttribute('data-id') || '';
-            return;
-        }
-
-        // Klick på en rad -> fyll READ-modalen
-        const row = e.target.closest('.message-row');
-        if (row) {
-            const from = row.getAttribute('data-from') || '';
-            const senderId = row.getAttribute('data-sender-id') || '';
-            const subject = row.getAttribute('data-subject') || '';
-            const content = row.querySelector('.message-content')?.textContent?.trim() || '';
+            const from = triggerRow.getAttribute('data-from') || '';
+            const senderId = triggerRow.getAttribute('data-sender-id') || '';
+            const subject = triggerRow.getAttribute('data-subject') || '';
+            const content = triggerRow.querySelector('.message-content')?.textContent?.trim() || '';
 
             if (readFromEl) readFromEl.textContent = "Från: " + from;
             if (readContentEl) readContentEl.textContent = content;
 
             lastOpenedMessage = { from, senderId, subject };
-            return;
-        }
-    });
+        });
+    }
+
+    // DELETE modal fylls när den öppnas
+    if (deleteModalEl) {
+        deleteModalEl.addEventListener("show.bs.modal", (event) => {
+            const triggerBtn = event.relatedTarget;
+            if (!triggerBtn) return;
+
+            const id = triggerBtn.getAttribute("data-id") || "";
+            const from = triggerBtn.getAttribute("data-from") || "";
+            const subject = triggerBtn.getAttribute("data-subject") || "";
+
+            if (deleteIdEl) deleteIdEl.value = id;
+            if (deleteInfoEl) deleteInfoEl.textContent = `${from} – ${subject}`.trim();
+        });
+    }
 
     // Reply-knapp: fyll send-modal och växla modaler
-    replyBtn?.addEventListener('click', function () {
-        if (!lastOpenedMessage) return;
+    if (replyBtn) {
+        replyBtn.addEventListener('click', function () {
+            if (!lastOpenedMessage || !lastOpenedMessage.senderId) return;
 
-        const receiverSearch = document.getElementById('receiverSearch');
-        const receiverId = document.getElementById('receiverId');
-        const subjectInput = document.getElementById('sendSubject');
-        const receiverResults = document.getElementById('receiverResults');
+            const receiverSearch = document.getElementById('receiverSearch');
+            const receiverId = document.getElementById('receiverId');
+            const subjectInput = document.getElementById('sendSubject');
+            const receiverResults = document.getElementById('receiverResults');
 
-        if (receiverSearch) receiverSearch.value = lastOpenedMessage.from || '';
-        if (receiverId) receiverId.value = lastOpenedMessage.senderId || '';
-        if (subjectInput) {
-            const s = (lastOpenedMessage.subject || '').trim();
-            subjectInput.value = s.toLowerCase().startsWith('re:') ? s : ('Re: ' + s);
-        }
-        if (receiverResults) receiverResults.innerHTML = "";
+            if (receiverSearch) receiverSearch.value = lastOpenedMessage.from || '';
+            if (receiverId) receiverId.value = lastOpenedMessage.senderId || '';
+            if (subjectInput) {
+                const s = (lastOpenedMessage.subject || '').trim();
+                subjectInput.value = s.toLowerCase().startsWith('re:') ? s : ('Re: ' + s);
+            }
+            if (receiverResults) receiverResults.innerHTML = "";
 
-        const readEl = document.getElementById('readMessageModal');
-        const sendEl = document.getElementById('sendMessageModal');
-
-        if (readEl && window.bootstrap) {
-            (bootstrap.Modal.getInstance(readEl) || new bootstrap.Modal(readEl)).hide();
-        }
-        if (sendEl && window.bootstrap) {
-            (bootstrap.Modal.getInstance(sendEl) || new bootstrap.Modal(sendEl)).show();
-        }
-    });
+            // Stäng read modal och öppna send modal
+            if (readModalEl && window.bootstrap) {
+                const readInstance = window.bootstrap.Modal.getInstance(readModalEl);
+                if (readInstance) readInstance.hide();
+            }
+            if (sendModalEl && window.bootstrap) {
+                const sendInstance = window.bootstrap.Modal.getOrCreateInstance(sendModalEl);
+                sendInstance.show();
+            }
+        });
+    }
 }
 
 function initModalCleanup() {
@@ -211,364 +263,109 @@ function initModalCleanup() {
         el.addEventListener('hidden.bs.modal', cleanup);
     });
 }
-    document.addEventListener('click', function (e) {
-    const btn = e.target.closest('[data-bs-target="#sendMessageModal"][data-receiver-id]');
-    if (!btn) return;
 
-    const receiverId = btn.getAttribute('data-receiver-id');
-    const receiverName = btn.getAttribute('data-receiver-name') || '';
+function initSendMessageModalPrefill() {
+    const sendEl = document.getElementById('sendMessageModal');
+    if (!sendEl || !window.bootstrap) return;
 
-    const receiverIdEl = document.getElementById('receiverId');
-    const receiverSearchEl = document.getElementById('receiverSearch');
-    const subjectEl = document.getElementById('sendSubject');
-    const resultsEl = document.getElementById('receiverResults');
+    // Prefill när modalen öppnas via en trigger med data-receiver-id / data-receiver-name
+    sendEl.addEventListener('show.bs.modal', (event) => {
+        const trigger = event.relatedTarget;
+        if (!trigger) return;
 
-    if (receiverIdEl) receiverIdEl.value = receiverId;
-    if (receiverSearchEl) receiverSearchEl.value = receiverName;
+        const receiverId = trigger.getAttribute('data-receiver-id');
+        const receiverName = trigger.getAttribute('data-receiver-name') || '';
 
-    if (subjectEl) subjectEl.value = '';
+        const receiverIdEl = document.getElementById('receiverId');
+        const receiverSearchEl = document.getElementById('receiverSearch');
+        const subjectEl = document.getElementById('sendSubject');
+        const resultsEl = document.getElementById('receiverResults');
 
-    if (resultsEl) resultsEl.innerHTML = '';
-});
+        if (receiverIdEl && receiverId) receiverIdEl.value = receiverId;
+        if (receiverSearchEl && receiverName) receiverSearchEl.value = receiverName;
 
-//VISA PROFILBILD LIVE
-document.addEventListener("DOMContentLoaded", function () {
+        if (subjectEl) subjectEl.value = '';
+        if (resultsEl) resultsEl.innerHTML = '';
+    });
+}
 
-    // --- 1. Förhandsvisning av profilbild ---
+function initProfileImagePreview() {
     const imageInput = document.getElementById('imageInput');
     const previewContainer = document.getElementById('profile-image-preview');
+    if (!imageInput || !previewContainer) return;
 
-    if (imageInput && previewContainer) {
-        imageInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    previewContainer.innerHTML = `
-                        <img src="${e.target.result}" 
-                             class="img-thumbnail mb-2" 
-                             style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid #002d5a;" />
-                    `;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
+    imageInput.addEventListener('change', function (event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
 
-    // --- 2. Automatisk omdirigering efter sparande ---
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            previewContainer.innerHTML = `
+                <img src="${e.target.result}"
+                     class="img-thumbnail mb-2"
+                     style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid #002d5a;" />
+            `;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function initSaveSuccessRedirect() {
     const successPopup = document.getElementById('saveSuccessPopup');
-    if (successPopup) {
-        // Hämta URL:en från data-attributet vi skapade i HTML
-        const redirectUrl = successPopup.getAttribute('data-redirect-url');
+    if (!successPopup) return;
 
-        if (redirectUrl) {
-            setTimeout(function () {
-                window.location.replace(redirectUrl);
-            }, 3000);
-        }
-    }
-});
+    const redirectUrl = successPopup.getAttribute('data-redirect-url');
+    if (!redirectUrl) return;
 
-//GÖRA SLUTDATUM EFTER STARTDATUM GRÅA OSV
-document.addEventListener("DOMContentLoaded", function () {
+    setTimeout(() => {
+        window.location.replace(redirectUrl);
+    }, 3000);
+}
+
+function initDateRangeValidation() {
     const startDateInput = document.querySelector('input[name="StartDate"]');
     const endDateInput = document.querySelector('input[name="EndDate"]');
+    if (!startDateInput || !endDateInput) return;
 
     startDateInput.addEventListener("change", function () {
-        // Sätt 'min'-attributet på slutdatum till det valda startdatumet
         if (startDateInput.value) {
             endDateInput.min = startDateInput.value;
         }
 
-        // Om användaren redan valt ett slutdatum som nu är ogiltigt, rensa det
-        if (endDateInput.value && endDateInput.value < startDateInput.value) {
+        if (endDateInput.value && startDateInput.value && endDateInput.value < startDateInput.value) {
             endDateInput.value = "";
             alert("Slutdatumet har rensats eftersom det var före det nya startdatumet.");
         }
     });
-});
+}
 
-//TILLBAKA KNAPP I PROJECTDETAILS, VETA VAR MAN KOM IFRÅN (PROFILE/ALLPROJECTS)
-document.addEventListener("DOMContentLoaded", function () {
-    // Kontrollera om vi är på en projektdetaljsida
+function initSmartBackButton() {
+    // Spara referrer om vi är på ProjectDetails
     if (window.location.pathname.includes("/Project/ProjectDetails")) {
-        const currentUrl = window.location.href;
         const referrer = document.referrer;
 
-        // Om vi kommer från en annan sida (inte oss själva), spara den som vår "hembas"
         if (referrer && !referrer.includes(window.location.pathname)) {
             sessionStorage.setItem("originalProjectSource", referrer);
         }
     }
 
-    // Fix för tillbaka-knappen
     const smartBackBtn = document.getElementById("smartBackBtn");
-    if (smartBackBtn) {
-        smartBackBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            const source = sessionStorage.getItem("originalProjectSource");
+    if (!smartBackBtn) return;
 
-            if (source) {
-                window.location.href = source;
-            } else {
-                // Om ingen källa finns sparad (t.ex. man skrev in URL direkt), 
-                // gå till AllProjects som standard
-                window.location.href = "/Project/AllProjects";
-            }
-        });
-    }
-});
+    smartBackBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        const source = sessionStorage.getItem("originalProjectSource");
 
-
-// Öppnar modalen för att gå med i ett projekt och fyller i ID/Namn
-function showJoinPopup(projectId, projectName) {
-    const idField = document.getElementById('modalProjectId');
-    const textField = document.getElementById('modalProjectText');
-    const modalElement = document.getElementById('joinRoleModal');
-
-    if (idField && textField && modalElement) {
-        idField.value = projectId;
-        textField.innerText = "Gå med i: " + projectName;
-
-        // Skapar och visar modalen med Bootstrap 5-logik
-        const myModal = new bootstrap.Modal(modalElement);
-        myModal.show();
-    }
+        if (source) {
+            window.location.href = source;
+        } else {
+            window.location.href = "/Project/AllProjects";
+        }
+    });
 }
 
-
-
-//PROFILE, KANSKE INTE BEHÖVS
-
-
-function enableEdit(fieldName) {
-    const section = document.getElementById(`section-${fieldName}`);
-    if (!section) return;
-
-    const display = section.querySelector(".display-mode");
-    const edit = section.querySelector(".edit-mode");
-    const editBtn = section.querySelector(".edit-btn");
-    const saveBtn = section.querySelector(".save-btn");
-
-    if (display) display.classList.add("u-hidden");
-    if (edit) edit.classList.remove("u-hidden");
-    if (editBtn) editBtn.classList.add("u-hidden");
-    if (saveBtn) saveBtn.classList.remove("u-hidden");
-
-    // Sätt fokus i textarea om den finns
-    if (edit && typeof edit.focus === "function") edit.focus();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    // 1) Koppla "Redigera"-knappar utan inline onclick
-    document.querySelectorAll("[data-edit-field]").forEach((btn) => {
-        btn.addEventListener("click", () => enableEdit(btn.dataset.editField));
-    });
-
-    // 2) CV-upload utan inline onclick/onchange
-    const uploadBtn = document.querySelector('[data-action="cv-upload"]');
-    const fileInput = document.getElementById("cvFileInput");
-    const uploadForm = document.getElementById("cvUploadForm");
-
-    if (uploadBtn && fileInput) {
-        uploadBtn.addEventListener("click", () => fileInput.click());
-
-        fileInput.addEventListener("change", () => {
-            if (uploadForm) uploadForm.submit();
-        });
-    }
-
-    // 3) Confirm dialogs utan inline onsubmit
-    document.querySelectorAll("form[data-confirm]").forEach((form) => {
-        form.addEventListener("submit", (e) => {
-            const msg = form.getAttribute("data-confirm") || "Är du säker?";
-            if (!window.confirm(msg)) e.preventDefault();
-        });
-    });
-
-    // 4) (Valfritt) Bootstrap modal: om din SendMessageModal har inputs för receiver.
-    // Den här delen är "safe" – den gör inget om fälten inte finns.
-    const modalEl = document.getElementById("sendMessageModal");
-    if (modalEl && window.bootstrap) {
-        modalEl.addEventListener("show.bs.modal", (event) => {
-            const trigger = event.relatedTarget;
-            if (!trigger) return;
-
-            const receiverId = trigger.getAttribute("data-receiver-id");
-            const receiverName = trigger.getAttribute("data-receiver-name");
-
-            // Försök hitta vanliga fältnamn i modalens form
-            const idInput =
-                modalEl.querySelector('input[name="ReceiverId"]') ||
-                modalEl.querySelector("#ReceiverId");
-
-            const nameEl =
-                modalEl.querySelector('[data-role="receiver-name"]') ||
-                modalEl.querySelector("#ReceiverName");
-
-            if (idInput && receiverId) idInput.value = receiverId;
-            if (nameEl && receiverName) nameEl.textContent = receiverName;
-        });
-    }
-});
-
-
-// ====== Messages: modal-logik (Read / Reply / Delete) ====== KANSKE ÖVERFLÖDIG
-document.addEventListener("DOMContentLoaded", () => {
-    // --- Läs meddelande modal ---
-    const readModalEl = document.getElementById("readMessageModal");
-    const readTitleEl = document.getElementById("readMessageFrom");
-    const readContentEl = document.getElementById("readMessageContent");
-    const replyBtn = document.getElementById("replyBtn");
-
-    // Fält i "Skicka meddelande"-modalen (för reply)
-    const sendModalEl = document.getElementById("sendMessageModal");
-    const receiverIdInput = document.getElementById("receiverId");
-    const receiverSelectedEl = document.getElementById("receiverSelected");
-    const sendSubjectInput = document.getElementById("sendSubject");
-
-    // Håll info om senaste öppnade meddelande så "Svara" vet vem/ämne
-    let lastMessage = { senderId: "", from: "", subject: "" };
-
-    if (readModalEl) {
-        readModalEl.addEventListener("show.bs.modal", (event) => {
-            const triggerRow = event.relatedTarget; // <tr>
-            if (!triggerRow) return;
-
-            const from = triggerRow.getAttribute("data-from") || "";
-            const subject = triggerRow.getAttribute("data-subject") || "";
-            const senderId = triggerRow.getAttribute("data-sender-id") || "";
-
-            const contentCell = triggerRow.querySelector(".message-content");
-            const content = contentCell ? contentCell.textContent.trim() : "";
-
-            lastMessage = { senderId, from, subject };
-
-            if (readTitleEl) {
-                // Visas som: "Namn – Ämne"
-                const title = subject ? `${from} – ${subject}` : from;
-                readTitleEl.textContent = title;
-            }
-
-            if (readContentEl) {
-                readContentEl.textContent = content;
-            }
-        });
-    }
-
-    // --- Svara-knapp: fyller "Skicka meddelande"-modalen ---
-    if (replyBtn && sendModalEl && window.bootstrap) {
-        replyBtn.addEventListener("click", () => {
-            // Stäng read-modal
-            const readInstance = window.bootstrap.Modal.getInstance(readModalEl);
-            if (readInstance) readInstance.hide();
-
-            // Förifyll mottagare + ämne
-            if (receiverIdInput && lastMessage.senderId) receiverIdInput.value = lastMessage.senderId;
-            if (receiverSelectedEl) receiverSelectedEl.textContent = lastMessage.from ? `Till: ${lastMessage.from}` : "";
-
-            if (sendSubjectInput) {
-                const s = lastMessage.subject || "";
-                sendSubjectInput.value = s.toLowerCase().startsWith("re:") ? s : `Re: ${s}`.trim();
-            }
-
-            // Öppna send-modal
-            const sendInstance = window.bootstrap.Modal.getOrCreateInstance(sendModalEl);
-            sendInstance.show();
-        });
-    }
-
-    // --- Ta bort modal: fyller id + info ---
-    const deleteModalEl = document.getElementById("deleteMessageModal");
-    const deleteInfoEl = document.getElementById("deleteMessageInfo");
-    const deleteIdInput = document.getElementById("deleteMessageId");
-
-    if (deleteModalEl) {
-        deleteModalEl.addEventListener("show.bs.modal", (event) => {
-            const triggerBtn = event.relatedTarget; // delete-knappen
-            if (!triggerBtn) return;
-
-            const id = triggerBtn.getAttribute("data-id") || "";
-            const from = triggerBtn.getAttribute("data-from") || "";
-            const subject = triggerBtn.getAttribute("data-subject") || "";
-
-            if (deleteIdInput) deleteIdInput.value = id;
-            if (deleteInfoEl) deleteInfoEl.textContent = `${from} – ${subject}`.trim();
-        });
-    }
-});
-
-
-// ====== EditAccount: redirect efter lyckad sparning (3s) ======
-document.addEventListener("DOMContentLoaded", () => {
-    const popup = document.getElementById("saveSuccessPopup");
-    if (!popup) return;
-
-    const redirectUrl = popup.getAttribute("data-redirect-url");
-    if (!redirectUrl) return;
-
-    setTimeout(() => {
-        window.location.href = redirectUrl;
-    }, 3000);
-});
-
-
-// ====== AddProject: success popup + redirect ======
-document.addEventListener("DOMContentLoaded", () => {
-    const popupData = document.getElementById("popup-data");
-    const popup = document.getElementById("successPopup");
-
-    if (!popupData || !popup) return;
-
-    const shouldShow = popupData.getAttribute("data-show") === "true";
-    const redirectUrl = popupData.getAttribute("data-url");
-
-    if (!shouldShow || !redirectUrl) return;
-
-    // Visa popup
-    popup.classList.remove("u-hidden");
-
-    // Redirect efter 3 sekunder (känns rimligt och matchar din andra vy-stil)
-    setTimeout(() => {
-        window.location.href = redirectUrl;
-    }, 3000);
-});
-
-
-// ====== AllProjects: "Gå med" -> öppna modal och fyll projektinfo ======
-document.addEventListener("DOMContentLoaded", () => {
-    const modalEl = document.getElementById("joinRoleModal");
-    const projectTextEl = document.getElementById("modalProjectText");
-    const projectIdInput = document.getElementById("modalProjectId");
-
-    if (!modalEl || !window.bootstrap) return;
-
-    document.querySelectorAll("[data-join-project-id]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const projectId = btn.getAttribute("data-join-project-id");
-            const projectName = btn.getAttribute("data-join-project-name") || "";
-
-            if (projectTextEl) projectTextEl.textContent = projectName ? `Projekt: ${projectName}` : "";
-            if (projectIdInput) projectIdInput.value = projectId || "";
-
-            const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
-        });
-    });
-});
-
-
-// ====== Join/All Projects: öppna "joinRoleModal" och fyll projektinfo ======
-document.addEventListener("DOMContentLoaded", () => {
-    if (window.__joinProjectModalHandlerAdded) return;
-    window.__joinProjectModalHandlerAdded = true;
-
-    const modalEl = document.getElementById("joinRoleModal");
-    const projectTextEl = document.getElementById("modalProjectText");
-    const projectIdInput = document.getElementById("modalProjectId");
-
-    if (!modalEl || !window.bootstrap) return;
-
+function initJoinProjectDelegation() {
+    // Klick på knappar med data-join-project-id (utan dubbla handlers)
     document.addEventListener("click", (e) => {
         const btn = e.target.closest("[data-join-project-id]");
         if (!btn) return;
@@ -576,42 +373,71 @@ document.addEventListener("DOMContentLoaded", () => {
         const projectId = btn.getAttribute("data-join-project-id") || "";
         const projectName = btn.getAttribute("data-join-project-name") || "";
 
-        if (projectIdInput) projectIdInput.value = projectId;
-        if (projectTextEl) projectTextEl.textContent = projectName ? `Gå med i: ${projectName}` : "Gå med i projekt";
-
-        const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
-        modal.show();
+        openJoinRoleModal(projectId, projectName);
     });
-});
+}
 
-
-// ====== ProjectDetails/Profile: enableEdit utan inline script ======
-document.addEventListener("DOMContentLoaded", () => {
-    if (window.__enableEditHandlerAdded) return;
-    window.__enableEditHandlerAdded = true;
-
-    function enableEdit(sectionId) {
-        const section = document.getElementById("section-" + sectionId);
-        if (!section) return;
-
-        const display = section.querySelector(".display-mode");
-        const edit = section.querySelector(".edit-mode");
-        const editBtn = section.querySelector(".edit-btn");
-        const saveBtn = section.querySelector(".save-btn");
-
-        if (display) display.classList.add("u-hidden");
-        if (edit) edit.classList.remove("u-hidden");
-        if (editBtn) editBtn.classList.add("u-hidden");
-        if (saveBtn) saveBtn.classList.remove("u-hidden");
-    }
-
+function initEditButtonsDelegation() {
+    // Stöd för både data-edit-field och data-enable-edit
     document.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-enable-edit]");
+        const btn =
+            e.target.closest("[data-edit-field]") ||
+            e.target.closest("[data-enable-edit]");
+
         if (!btn) return;
 
-        const sectionId = btn.getAttribute("data-enable-edit");
-        if (!sectionId) return;
+        const field = btn.getAttribute("data-edit-field") || btn.getAttribute("data-enable-edit");
+        if (!field) return;
 
-        enableEdit(sectionId);
+        enableEdit(field);
     });
+}
+
+function initCvUpload() {
+    const uploadBtn = document.querySelector('[data-action="cv-upload"]');
+    const fileInput = document.getElementById("cvFileInput");
+    const uploadForm = document.getElementById("cvUploadForm");
+    if (!uploadBtn || !fileInput) return;
+
+    uploadBtn.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", () => {
+        if (uploadForm) uploadForm.submit();
+    });
+}
+
+function initConfirmForms() {
+    document.querySelectorAll("form[data-confirm]").forEach((form) => {
+        form.addEventListener("submit", (e) => {
+            const msg = form.getAttribute("data-confirm") || "Är du säker?";
+            if (!window.confirm(msg)) e.preventDefault();
+        });
+    });
+}
+
+
+// ==============================
+// --- DOMContentLoaded (EN gång) ---
+// ==============================
+
+document.addEventListener("DOMContentLoaded", function () {
+    initAddProjectSuccessPopup();
+    initScrollRestoreOnSearch();
+
+    initReceiverSearch();
+    initMessagesPage();
+    initModalCleanup();
+
+    initSendMessageModalPrefill();
+
+    initProfileImagePreview();
+    initSaveSuccessRedirect();
+
+    initDateRangeValidation();
+    initSmartBackButton();
+
+    initJoinProjectDelegation();
+    initEditButtonsDelegation();
+    initCvUpload();
+    initConfirmForms();
 });

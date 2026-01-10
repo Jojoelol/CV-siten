@@ -37,7 +37,7 @@ body {
     border-radius: 8px;
     width: 95%;
     max-width: none;
-    /* Lagt till en lätt skugga för "VG-nivå" på design [cite: 116] */
+    /* Lagt till en lätt skugga för "VG-nivå" på design */
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
@@ -78,10 +78,10 @@ body {
     height: 200px;
     background: #ffffff;
     border: 2px solid #2c3e50; /* Ramen matchar sidans huvudfärg */
-   /* display: flex;*/
+    /* display: flex; */
     align-items: center;
     justify-content: center;
-    border-radius: 50%; /* Rund profilbild ger ett modernare intryck [cite: 76] */
+    border-radius: 50%; /* Rund profilbild ger ett modernare intryck */
     overflow: hidden;
 }
 
@@ -93,7 +93,7 @@ body {
     border-radius: 10px;
 }
 
-/* Projekt-listan [cite: 84] */
+/* Projekt-listan */
 .projects-list {
     display: flex;
     flex-direction: row;
@@ -101,6 +101,7 @@ body {
     gap: 15px;
 }
 
+/* Basen för project-pill + senare förbättringar sammanslaget */
 .project-pill {
     border-radius: 12px;
     width: 180px;
@@ -113,32 +114,31 @@ body {
     border: none;
     color: white;
     font-weight: 500;
-    transition: transform 0.2s; /* Liten interaktionseffekt */
+
+    /* (från senare dublett) */
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-    .project-pill:hover {
-        transform: translateY(-5px); /* Lyfter vid hover för bättre UX */
-        background: #2980b9;
-    }
+.project-pill:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    border-color: #3498db !important;
+    background-color: #ffffff !important;
+}
 
+/* Säkerställer att ikonerna i pillerna också är centrerade */
+.project-pill i {
+    display: inline-block;
+}
 
-
-/* MIN PROFIL*/
+/* MIN PROFIL */
 
 /* Container för hela profilsidan */
-/* Lägg till i site.css om de inte redan är där */
 .profile-page-wrapper {
     display: flex;
     height: calc(100vh - 80px); /* Justera efter din headers höjd */
     overflow: hidden;
-}
-
-.profile-sidebar {
-    flex: 0 0 350px;
-    background-color: #2c3e50;
-    color: white;
-    padding: 30px;
-    overflow-y: auto;
 }
 
 .profile-main-content {
@@ -148,11 +148,29 @@ body {
     background-color: #f4f7f6;
 }
 
+/* (sammanslagen dublett) profile-sidebar */
+.profile-sidebar {
+    flex: 0 0 350px;
+    background-color: #2c3e50;
+    color: white;
+
+    /* sista padding vann i din fil */
+    padding: 40px 25px;
+
+    /* från första varianten */
+    overflow-y: auto;
+
+    height: calc(100vh - 70px);
+    box-sizing: border-box;
+}
+
+/* (sammanslagen dublett) sidebar-card */
 .sidebar-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    width: 100%;
 }
 
 .profile-name {
@@ -166,24 +184,9 @@ body {
     margin-bottom: 20px;
 }
 
-/* Höger del: Scrollbar */
-/*.profile-main-content {
-    flex: 1;
-    padding: 40px;
-    overflow-y: scroll;*/ /* Gör denna del scrollbar */
-/*background-color: #f4f7f6;*/
-/*}*/
-
 /* Verktygsfältet */
-/* Justering för hela verktygsfältet */
-.content-toolbar {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    width: 100%;
-}
-
-.form-control-custom, .form-select-custom {
+.form-control-custom,
+.form-select-custom {
     padding: 8px 15px;
     border: 1px solid #dee2e6;
     border-radius: 4px;
@@ -206,10 +209,9 @@ body {
     width: 100%;
 }
 
-/* Knappar */
+/* (sammanslagen dublett) btn-action */
 .btn-action {
-    padding: 10px 20px;
-    border-radius: 4px;
+    /* från tidiga regeln */
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -217,6 +219,17 @@ body {
     transition: 0.3s;
     font-size: 0.9rem;
     text-align: center;
+
+    /* från senare regeln */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 15px;
+    min-height: 45px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
 }
 
 .btn-primary {
@@ -224,25 +237,23 @@ body {
     color: white !important;
 }
 
-    .btn-primary:hover {
-        background-color: #2980b9;
-    }
+.btn-primary:hover {
+    background-color: #2980b9;
+}
 
 .btn-outline {
     background-color: transparent;
     color: #3498db !important;
 }
 
-    .btn-outline:hover {
-        background-color: #3498db;
-        color: white !important;
-    }
+.btn-outline:hover {
+    background-color: #3498db;
+    color: white !important;
+}
 
 .section-title {
     color: #2c3e50;
-/*    margin-bottom: 20px;
-*/    border-bottom: 2px solid #3498db;
-    /*display: inline-block;*/
+    border-bottom: 2px solid #3498db;
 }
 
 /* Unik huvudcontainer för att undvika krockar */
@@ -265,39 +276,24 @@ body {
     text-decoration: none;
     color: #333;
 }
-    .sr-profile-card:hover {
-        transform: scale(1.02);
-        text-decoration: none;
-        color: #333;
-    }
 
+/* (rensad dublett) sr-profile-card:hover */
+.sr-profile-card:hover {
+    transform: scale(1.02);
+    text-decoration: none;
+    color: #333;
+}
 
-    .sr-results-list {
-        display: flex; /* Aktiverar flexbox */
-        flex-direction: row; /* Lägger elementen horisontellt (standard) */
-        flex-wrap: wrap; /* Gör att de hoppar ner på ny rad om de inte får plats */
-        justify-content: center; /* Centrerar hela raden av knappar på sidan */
-        gap: 20px; /* Skapar mellanrum mellan knapparna */
-        padding: 20px;
-        width: 100%;
-    }
-
-    .sr-profile-card:hover {
-        transform: scale(1.02);
-        text-decoration: none;
-        color: #333;
-    }
-
+/* (rensad dublett) sr-results-list */
 .sr-results-list {
-    display: flex; /* Aktiverar flexbox */
-    flex-direction: row; /* Lägger elementen horisontellt (standard) */
-    flex-wrap: wrap; /* Gör att de hoppar ner på ny rad om de inte får plats */
-    justify-content: center; /* Centrerar hela raden av knappar på sidan */
-    gap: 20px; /* Skapar mellanrum mellan knapparna */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
     padding: 20px;
     width: 100%;
 }
-
 
 /* Unik bildbox */
 .sr-img-wrapper {
@@ -347,20 +343,22 @@ body {
 
 .sr-bio-text {
     margin: 0;
-    line-height: 1.6; /* Förbättrar läsbarhet [cite: 58] */
+    line-height: 1.6; /* Förbättrar läsbarhet */
     text-align: left;
 }
 
-.sr-matchPerson{
-    position:absolute;
+/* (sammanslagen dublett) sr-matchPerson */
+.sr-matchPerson {
+    position: absolute;
+    color: white;
 }
 
+/* (rensad dublett) sr-main */
 .sr-main {
     background-color: #2c3e50;
     margin: 0;
     padding: 40px 0;
     width: 100%;
-    /* Säkerställer att bakgrunden täcker hela skärmen även om listan är kort */
     min-height: calc(100vh - 60px);
 }
 
@@ -369,32 +367,13 @@ body {
     font-size: 1.2rem;
     text-align: center;
     width: 100%;
-    margin-top: 50px; /* Ger lite avstånd från rubriken */
-
+    margin-top: 50px;
 }
 
-
-.profile-sidebar {
-    flex: 0 0 350px;
-    background-color: #2c3e50;
-    color: white;
-    padding: 40px 25px; /*/ Ökad padding för mer luft /*/
-    height: calc(100vh-70px);
-    box-sizing: border-box;
-}
-
-
-.sidebar-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-
+/* (sammanslagen dublett) profile-info-text */
 .profile-info-text {
     text-align: center;
-    margin-bottom: 25px;/* / Skapar avstånd ner till knapparna /*/
+    margin-bottom: 25px;
     width: 100%;
 }
 
@@ -403,17 +382,15 @@ body {
     font-size: 0.95rem;
     line-height: 1.5;
     color: #ecf0f1;
-    word-wrap: break-word; /*/ Förhindrar att lång text skjuter ut /*/
+    word-wrap: break-word;
 }
-
 
 .sidebar-actions-container {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 15px; /*/ EXAKT avstånd mellan varje knapprad /*/
+    gap: 15px;
 }
-
 
 .cv-button-row {
     display: flex;
@@ -425,26 +402,9 @@ body {
     flex: 1;
 }
 
-.btn-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 12px 15px;
-    min-height: 45px; /*/ Säkerställer att knapparna har en bra storlek*/
-border-radius: 6px;
-font-weight: 600;
-text-decoration: none !important;
-transition: all 0.2s ease;
-cursor: pointer;
-}
-
-/* Ta bort eller kommentera ut width: 100% från din generella .btn-action 
-   om du inte vill att ALLA knappar på hela siten ska vara fullbredd. */
-
 .toolbar-buttons {
     display: flex;
-    justify-content: space-between; /* Viktigt: Skapar mellanrummet  */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     margin-top: 15px;
@@ -453,15 +413,15 @@ cursor: pointer;
 
 .right-buttons {
     display: flex;
-    gap: 10px; /* Mellanrum mellan 'Lägg till' och 'Gå med' */
+    gap: 10px;
 }
 
 /* Denna klass overridar din 100% bredd och gör knapparna mindre */
 .btn-small {
-    width: auto !important; /* Tvingar knappen att bara vara så bred som texten */
-    min-width: 110px; /* Ger en snygg minimibredd så de ser enhetliga ut */
+    width: auto !important;
+    min-width: 110px;
     padding: 6px 15px !important;
-    height: 38px !important; /* Gör dem lite lägre än standardknappar */
+    height: 38px !important;
     font-size: 0.85rem !important;
     white-space: nowrap;
     display: inline-flex;
@@ -469,11 +429,13 @@ cursor: pointer;
     justify-content: center;
 }
 
-/* Säkerställ att föräldern inte tvingar ner knapparna på ny rad */
+/* (sammanslagen dublett) content-toolbar:
+   OBS! flex-direction: column kom från en tidigare regel och behövdes för att behålla nuvarande layout. */
 .content-toolbar {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: column; /* viktigt att behålla */
+    justify-content: space-between;
+    gap: 20px;
     width: 100%;
 }
 
@@ -481,45 +443,41 @@ cursor: pointer;
     background: white;
     padding: 20px;
     border-radius: 8px;
-    border-left: 4px solid #3498db; /* Blå kant för att matcha din design */
+    border-left: 4px solid #3498db;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     color: #2c3e50;
     line-height: 1.6;
 }
 
 .section-divider {
-    margin: 0; /* Tar bort de 40px som fanns tidigare */
-    margin-bottom: 20px; /* Matchar exakt din .cv-section margin-bottom */
+    margin: 0;
+    margin-bottom: 20px;
     border: 0;
     border-top: 0px solid #ffffff;
-}
-.hr{
-
 }
 
 .projects-block {
     background: #fff;
-    padding: 15px 20px 20px 20px; /* Minskad padding i toppen från 20px till 15px */
+    padding: 15px 20px 20px 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-top: 0; /* Tar bort margin-top som krockar med dividern */
+    margin-top: 0;
 }
 
 /* Behållare för rubrik och redigera-knapp */
 .cv-header-row {
     display: flex;
-    justify-content: space-between; /* Skjuter knappen till höger */
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    border-bottom: 2px solid #3498db; /* Flyttar linjen till hela raden */
+    border-bottom: 2px solid #3498db;
     padding-bottom: 5px;
 }
 
-    /* Justering för rubriken så den inte har en egen linje som krockar */
-    .cv-header-row .section-title {
-        margin-bottom: 0;
-        border-bottom: none;
-    }
+.cv-header-row .section-title {
+    margin-bottom: 0;
+    border-bottom: none;
+}
 
 /* Specifik styling för de små redigeringsknapparna */
 .btn-edit-small {
@@ -539,7 +497,7 @@ cursor: pointer;
 /* Ny styling för kontaktuppgifter i sidebaren */
 .profile-contact-details {
     text-align: left;
-    background: rgba(255, 255, 255, 0.05); /* En mycket lätt ljusare bakgrund */
+    background: rgba(255, 255, 255, 0.05);
     padding: 15px;
     border-radius: 8px;
     margin: 20px 0;
@@ -554,14 +512,9 @@ cursor: pointer;
     line-height: 1.4;
 }
 
-    .contact-item strong {
-        color: #3498db; /* Blå färg för labels */
-        font-weight: 600;
-    }
-
-/* Säkerställ att sidebaren har tillräckligt med utrymme */
-.profile-info-text {
-    width: 100%;
+.contact-item strong {
+    color: #3498db;
+    font-weight: 600;
 }
 
 .cv-section textarea.edit-mode {
@@ -575,100 +528,99 @@ cursor: pointer;
 }
 
 .save-btn {
-    background-color: #27ae60 !important; /* Grön färg för Spara */
+    background-color: #27ae60 !important;
     border-color: #27ae60 !important;
 }
 
-.p-projects-container{
+.p-projects-container {
     padding-top: 40px;
 }
 
+/* (sammanslagen dublett) success-popup-overlay */
 .success-popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 45, 90, 0.9);
+    background: rgba(0, 45, 90, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10000;
+    z-index: 9999;
 }
 
+/* (sammanslagen dublett) success-popup-content */
 .success-popup-content {
     background: white;
-    padding: 30px;
-    border-radius: 12px;
+    padding: 40px;
+    border-radius: 15px;
     text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 400px;
+    width: 90%;
 }
 
+/* Animation för att "poppa upp" */
+.animated-popup {
+    animation: popupScale 0.4s ease-out forwards;
+}
+
+/* (rensad dublett) keyframes */
+@keyframes popupScale {
+    0% {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* (rensad dublett) success-icon */
 .success-icon {
     font-size: 4rem;
     color: #28a745;
     margin-bottom: 15px;
 }
 
-@keyframes popupScale {
-    from {
-        transform: scale(0.7);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
 /* Behållaren för sök-input, select och knappen */
 .toolbar-inputs {
     display: flex;
     gap: 10px;
-    flex: 1; /* Gör att hela gruppen tar upp tillgänglig plats till vänster */
+    flex: 1;
     align-items: center;
 }
 
-    /* Gör sökfältet till 3 delar (75%) */
-    .toolbar-inputs .form-control-custom {
-        flex: 3;
-        min-width: 0;
-        height: 38px;
-    }
-
-    /* Gör rullistan till 1 del (25%) */
-    .toolbar-inputs .form-select-custom {
-        flex: 1;
-        min-width: 0;
-        height: 38px;
-    }
-
-    /* Sökknappen behåller sin fasta storlek */
-    .toolbar-inputs .btn-small {
-        flex: none;
-        padding: 0 20px;
-        height: 38px;
-    }
-
-/* Justering för hela verktygsfältet */
-.content-toolbar {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    width: 100%;
+.toolbar-inputs .form-control-custom {
+    flex: 3;
+    min-width: 0;
+    height: 38px;
 }
 
-/*PROJECTDETAILS*/
-/* Specifikt för resurs-korten i projektvyn */
+.toolbar-inputs .form-select-custom {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+}
+
+.toolbar-inputs .btn-small {
+    flex: none;
+    padding: 0 20px;
+    height: 38px;
+}
+
+/* PROJECTDETAILS */
 .file-card {
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
-    .file-card:hover {
-        background-color: rgba(52, 152, 219, 0.05);
-        border-style: solid;
-    }
+.file-card:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+    border-style: solid;
+}
 
 /* Anpassa projekt-piller för deltagare så de ser ut som profil-länkar */
 .projects-list .project-pill i {
@@ -684,46 +636,29 @@ cursor: pointer;
 
 /* Ny styling för projektbilden i sidebaren */
 .project-image-container {
-    width: 100%; /* Fyller hela kortets bredd minus padding */
-    height: 200px; /* Eller den höjd du föredrar */
-    border-radius: 8px; /* Samma rundning som profile-contact-details */
-    overflow: hidden; /* Klipper bilden snyggt vid hörnen */
-    background: rgba(255, 255, 255, 0.05); /* Samma bakgrund som kontakt-rutan */
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
 }
 
-    .project-image-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Ser till att bilden fyller rutan utan att bli utdragen */
-    }
-
-    .project-image-container i {
-        font-size: 4rem;
-        color: #3498db;
-    }
-
-.project-pill {
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+.project-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-    .project-pill:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        border-color: #3498db !important;
-        background-color: #ffffff !important;
-    }
+.project-image-container i {
+    font-size: 4rem;
+    color: #3498db;
+}
 
-    /* Säkerställer att ikonerna i pillerna också är centrerade */
-    .project-pill i {
-        display: inline-block;
-    }
-
-/*css för inaktivera och aktivera profil*/
+/* css för inaktivera och aktivera profil */
 .btn-danger-outline {
     border: 2px solid #e74c3c;
     color: #e74c3c;
@@ -734,13 +669,13 @@ cursor: pointer;
     transition: 0.2s ease-in-out;
 }
 
-    .btn-danger-outline:hover {
-        background-color: #e74c3c;
-        color: white;
-    }
+.btn-danger-outline:hover {
+    background-color: #e74c3c;
+    color: white;
+}
 
 .btn-success-outline {
-    border: 2px solid #27ae60; /* Grön */
+    border: 2px solid #27ae60;
     color: #27ae60;
     background-color: transparent;
     padding: 8px 16px;
@@ -749,13 +684,13 @@ cursor: pointer;
     transition: 0.2s ease-in-out;
 }
 
-    .btn-success-outline:hover {
-        background-color: #27ae60;
-        color: white;
-    }
+.btn-success-outline:hover {
+    background-color: #27ae60;
+    color: white;
+}
 
 .message-card {
-    max-width: 1100px; 
+    max-width: 1100px;
     margin: 0 auto 40px auto;
 }
 
@@ -775,9 +710,9 @@ cursor: pointer;
     transition: background-color 0.15s ease;
 }
 
-    .message-row:hover {
-        background-color: rgba(52, 152, 219, 0.06);
-    }
+.message-row:hover {
+    background-color: rgba(52, 152, 219, 0.06);
+}
 
 .message-badge-new {
     background-color: #3498db !important;
@@ -798,10 +733,10 @@ cursor: pointer;
     color: #e74c3c !important;
 }
 
-    .btn-delete-message:hover {
-        background-color: #e74c3c !important;
-        color: #fff !important;
-    }
+.btn-delete-message:hover {
+    background-color: #e74c3c !important;
+    color: #fff !important;
+}
 
 #sendMessageModal .modal-title,
 #readMessageModal .modal-title,
@@ -829,64 +764,14 @@ cursor: pointer;
     border: 2px solid #f4f7f6;
 }
 
-/* Popup-overlay som täcker hela skärmen */
-.success-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 45, 90, 0.85); /* Mörkblå transparent bakgrund */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-/* Själva rutan */
-.success-popup-content {
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-width: 400px;
-    width: 90%;
-}
-
-/* Animation för att "poppa upp" */
-.animated-popup {
-    animation: popupScale 0.4s ease-out forwards;
-}
-
-@keyframes popupScale {
-    0% {
-        transform: scale(0.7);
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.success-icon {
-    font-size: 4rem;
-    color: #28a745;
-    margin-bottom: 15px;
-}
-
 .project-card:hover {
-    transform: translateY(-5px); /* Lyfter vid hover för bättre UX */
-/*    background: #2980b9;*/
+    transform: translateY(-5px);
     transition: transform 0.2s;
 }
 
-/*PROFIL*/
-
 /* ====== Helper-klasser (flyttat från inline style="...") ====== */
 
+/* (rensad dublett) u-hidden */
 .u-hidden {
     display: none !important;
 }
@@ -951,15 +836,15 @@ cursor: pointer;
     border: 1px solid;
 }
 
-    .privacy-status.is-private {
-        background-color: #2c3e50;
-        border-color: #34495e;
-    }
+.privacy-status.is-private {
+    background-color: #2c3e50;
+    border-color: #34495e;
+}
 
-    .privacy-status.is-public {
-        background-color: #fff3cd;
-        border-color: #ffeeba;
-    }
+.privacy-status.is-public {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
 
 .privacy-status-text {
     font-size: 0.8em;
@@ -1177,13 +1062,13 @@ cursor: pointer;
     vertical-align: middle;
 }
 
-    .u-status-dot.is-active {
-        color: #48bb78;
-    }
+.u-status-dot.is-active {
+    color: #48bb78;
+}
 
-    .u-status-dot.is-inactive {
-        color: #a0aec0;
-    }
+.u-status-dot.is-inactive {
+    color: #a0aec0;
+}
 
 .u-project-participants-row {
     margin-top: auto;
@@ -1276,7 +1161,6 @@ cursor: pointer;
     border: none;
 }
 
-
 /* ====== ChangePassword (flyttat från inline styles) ====== */
 
 .change-password-card {
@@ -1306,7 +1190,6 @@ cursor: pointer;
 .change-password-cancel {
     padding: 10px 20px;
 }
-
 
 /* ====== CreateAccount (flyttat från inline styles) ====== */
 
@@ -1338,22 +1221,13 @@ cursor: pointer;
 
 /* ====== Messages (flyttat från inline styles) ====== */
 
-/* Om du redan har .u-hidden från tidigare så kan du skippa den här.
-   Annars: */
-.u-hidden {
-    display: none !important;
-}
-
-/* Inline-form (tidigare style="display:inline") */
 .u-inline-form {
     display: inline;
 }
 
-/* Pre-wrap (tidigare style="white-space: pre-wrap") */
 .u-prewrap {
     white-space: pre-wrap;
 }
-
 
 /* ====== Home/Startsida (flyttat från inline styles) ====== */
 
@@ -1532,16 +1406,7 @@ cursor: pointer;
 
 /* ====== Search Results (flyttat från inline styles) ====== */
 
-.sr-main {
-    background-color: #2c3e50;
-}
-
-/* Rubriker */
 .sr-title {
-    color: white;
-}
-
-.sr-matchPerson {
     color: white;
 }
 
@@ -1551,7 +1416,6 @@ cursor: pointer;
     height: 100%;
     object-fit: cover;
 }
-
 
 /* ====== EditAccount (flyttat från inline styles) ====== */
 
@@ -1566,7 +1430,6 @@ cursor: pointer;
     font-weight: bold;
 }
 
-/* Profilbild (när det finns en bild) */
 .edit-account-profile-img {
     width: 150px;
     height: 150px;
@@ -1575,7 +1438,6 @@ cursor: pointer;
     border: 3px solid #002d5a;
 }
 
-/* Placeholder (när ingen bild finns) */
 .edit-account-image-placeholder {
     width: 150px;
     height: 150px;
@@ -1587,11 +1449,9 @@ cursor: pointer;
     border: 2px dashed #ccc;
 }
 
-/* Spara-knapp */
 .edit-account-save-btn {
     background-color: #002d5a;
 }
-
 
 /* ====== AddProject (flyttat från inline styles) ====== */
 
@@ -1601,7 +1461,6 @@ cursor: pointer;
     background-color: #2c3e50;
 }
 
-/* Header box */
 .add-project-header {
     background-color: white;
     border-radius: 12px;
@@ -1621,7 +1480,6 @@ cursor: pointer;
     margin-bottom: 0;
 }
 
-/* Left card */
 .add-project-card-left {
     background-color: white;
     padding: 30px;
@@ -1629,17 +1487,14 @@ cursor: pointer;
     box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
-/* Labels */
 .add-project-label {
     color: #002d5a;
 }
 
-/* Inputs and select/textarea border radius */
 .add-project-input {
     border-radius: 8px;
 }
 
-/* Buttons */
 .add-project-save-btn {
     background-color: #28a745;
     border: none;
@@ -1653,7 +1508,6 @@ cursor: pointer;
     border-radius: 8px;
 }
 
-/* Right card (upload area) */
 .add-project-card-right {
     background-color: rgba(255,255,255,0.95);
     padding: 40px;
@@ -1694,7 +1548,6 @@ cursor: pointer;
     font-size: 3rem;
 }
 
-
 /* ====== AllProjects (flyttat från inline styles) ====== */
 
 .all-projects-page {
@@ -1715,7 +1568,6 @@ cursor: pointer;
     display: inline-block;
 }
 
-/* Toolbar */
 .all-projects-toolbar {
     margin-bottom: 30px;
 }
@@ -1750,7 +1602,6 @@ cursor: pointer;
     height: 40px;
 }
 
-/* Buttons column */
 .all-projects-buttons-col {
     display: flex;
     flex-direction: column;
@@ -1798,7 +1649,6 @@ cursor: pointer;
     width: 100%;
 }
 
-/* Empty state */
 .all-projects-empty {
     text-align: center;
     padding: 60px 20px;
@@ -1826,14 +1676,12 @@ cursor: pointer;
     padding: 10px 20px;
 }
 
-/* Grid */
 .all-projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
 
-/* Card */
 .all-projects-card {
     position: relative;
     background: white;
@@ -1891,7 +1739,6 @@ cursor: pointer;
     font-size: 0.8rem;
 }
 
-/* Body details */
 .all-projects-card-body {
     padding: 5px 20px 20px 20px;
     flex-grow: 1;
@@ -1912,15 +1759,14 @@ cursor: pointer;
     font-size: 0.6rem;
 }
 
-    .all-projects-status-dot.is-active {
-        color: #48bb78;
-    }
+.all-projects-status-dot.is-active {
+    color: #48bb78;
+}
 
-    .all-projects-status-dot.is-inactive {
-        color: #a0aec0;
-    }
+.all-projects-status-dot.is-inactive {
+    color: #a0aec0;
+}
 
-/* Footer */
 .all-projects-card-footer {
     margin-top: auto;
     padding-top: 15px;
@@ -1952,13 +1798,10 @@ cursor: pointer;
     border-radius: 6px;
 }
 
-/* Modal header */
 .all-projects-modal-header {
     background-color: #002d5a;
     color: white;
 }
-
-
 
 /* ====== EditProject (flyttat från inline styles) ====== */
 
@@ -1968,7 +1811,6 @@ cursor: pointer;
     padding: 30px;
 }
 
-/* Projektbild (när den finns) */
 .edit-project-image {
     width: 250px;
     height: 150px;
@@ -1977,7 +1819,6 @@ cursor: pointer;
     border: 2px solid #002d5a;
 }
 
-/* Placeholder (ingen bild vald) */
 .edit-project-image-placeholder {
     width: 250px;
     height: 150px;
@@ -1989,12 +1830,10 @@ cursor: pointer;
     border: 2px dashed #ccc;
 }
 
-/* Spara-knapp */
 .edit-project-save-btn {
     background-color: #002d5a;
     padding: 12px;
 }
-
 
 /* ====== Join Projects (flyttat från inline styles) ====== */
 
@@ -2008,14 +1847,12 @@ cursor: pointer;
     color: #002d5a;
 }
 
-/* Grid */
 .join-projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
 
-/* Card */
 .join-projects-project-card {
     background: white;
     border-radius: 12px;
@@ -2027,7 +1864,6 @@ cursor: pointer;
     border: 1px solid #eee;
 }
 
-/* Image area */
 .join-projects-image-wrap {
     width: 100%;
     height: 160px;
@@ -2048,7 +1884,6 @@ cursor: pointer;
     color: #cbd5e0;
 }
 
-/* Body */
 .join-projects-body {
     padding: 20px;
     flex-grow: 1;
@@ -2076,7 +1911,6 @@ cursor: pointer;
     text-transform: uppercase;
 }
 
-/* Details grid */
 .join-projects-details {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2090,15 +1924,14 @@ cursor: pointer;
     font-size: 0.6rem;
 }
 
-    .join-projects-status-dot.is-active {
-        color: #48bb78;
-    }
+.join-projects-status-dot.is-active {
+    color: #48bb78;
+}
 
-    .join-projects-status-dot.is-inactive {
-        color: #a0aec0;
-    }
+.join-projects-status-dot.is-inactive {
+    color: #a0aec0;
+}
 
-/* Footer */
 .join-projects-footer {
     margin-top: auto;
     padding-top: 15px;
@@ -2121,7 +1954,6 @@ cursor: pointer;
     width: auto;
     padding: 5px 15px;
 }
-
 
 /* ====== ProjectDetails (flyttat från inline styles) ====== */
 
@@ -2159,18 +1991,15 @@ cursor: pointer;
     width: 100%;
 }
 
-/* pre-line för beskrivning */
 .project-details-preline {
     white-space: pre-line;
 }
 
-/* textarea: tidigare inline width/min-height + display none */
 .project-details-desc-textarea {
     width: 100%;
     min-height: 150px;
 }
 
-/* deltagarlista */
 .project-details-participants-list {
     margin-top: 15px;
     display: flex;
@@ -2178,7 +2007,6 @@ cursor: pointer;
     gap: 15px;
 }
 
-/* deltagar-pill */
 .project-details-pill {
     background-color: #ebf5ff;
     color: #2c3e50;
@@ -2197,9 +2025,9 @@ cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-    .project-details-pill.is-owner {
-        border: 2px solid #3498db;
-    }
+.project-details-pill.is-owner {
+    border: 2px solid #3498db;
+}
 
 .project-details-owner-badge {
     position: absolute;
@@ -2232,7 +2060,6 @@ cursor: pointer;
     margin-top: 15px;
 }
 
-/* resurser */
 .project-details-resources {
     margin-top: 30px;
 }
@@ -2277,13 +2104,11 @@ cursor: pointer;
     margin-top: 15px;
 }
 
-/* modal header */
 .project-details-modal-header {
     background-color: #002d5a;
     color: white;
 }
 
-/* popup */
 .project-details-success-icon {
     color: #28a745;
     font-size: 3rem;
@@ -2292,9 +2117,4 @@ cursor: pointer;
 .project-details-success-title {
     color: #002d5a;
     font-weight: bold;
-}
-
-/* Om du inte redan har dessa utility-klasser någonstans: */
-.u-hidden {
-    display: none !important;
 }
