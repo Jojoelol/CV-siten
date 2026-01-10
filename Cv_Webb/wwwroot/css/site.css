@@ -1591,3 +1591,105 @@ cursor: pointer;
 .edit-account-save-btn {
     background-color: #002d5a;
 }
+
+
+/* ====== AddProject (flyttat från inline styles) ====== */
+
+.add-project-page {
+    padding: 20px;
+    min-height: 100vh;
+    background-color: #2c3e50;
+}
+
+/* Header box */
+.add-project-header {
+    background-color: white;
+    border-radius: 12px;
+    padding: 25px;
+    border-left: 8px solid #002d5a;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.add-project-title {
+    color: #002d5a;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.add-project-subtitle {
+    color: #666;
+    margin-bottom: 0;
+}
+
+/* Left card */
+.add-project-card-left {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Labels */
+.add-project-label {
+    color: #002d5a;
+}
+
+/* Inputs and select/textarea border radius */
+.add-project-input {
+    border-radius: 8px;
+}
+
+/* Buttons */
+.add-project-save-btn {
+    background-color: #28a745;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.add-project-cancel-btn {
+    padding: 12px;
+    border-radius: 8px;
+}
+
+/* Right card (upload area) */
+.add-project-card-right {
+    background-color: rgba(255,255,255,0.95);
+    padding: 40px;
+    border-radius: 15px;
+    border: 2px dashed #0056b3;
+    height: 100%;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.add-project-image-icon {
+    font-size: 3rem;
+    color: #0056b3;
+}
+
+.add-project-image-title {
+    color: #002d5a;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.add-project-zip-icon {
+    font-size: 2rem;
+    color: #6c757d;
+}
+
+/* Success popup (flyttat från inline display:none) */
+.add-project-success-popup.u-hidden {
+    display: none !important;
+}
+
+.add-project-success-icon {
+    color: #28a745;
+    font-size: 3rem;
+}

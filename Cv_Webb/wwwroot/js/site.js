@@ -512,3 +512,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
 });
 
+
+// ====== AddProject: success popup + redirect ======
+document.addEventListener("DOMContentLoaded", () => {
+    const popupData = document.getElementById("popup-data");
+    const popup = document.getElementById("successPopup");
+
+    if (!popupData || !popup) return;
+
+    const shouldShow = popupData.getAttribute("data-show") === "true";
+    const redirectUrl = popupData.getAttribute("data-url");
+
+    if (!shouldShow || !redirectUrl) return;
+
+    // Visa popup
+    popup.classList.remove("u-hidden");
+
+    // Redirect efter 3 sekunder (känns rimligt och matchar din andra vy-stil)
+    setTimeout(() => {
+        window.location.href = redirectUrl;
+    }, 3000);
+});
