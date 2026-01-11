@@ -315,11 +315,14 @@ namespace CV_siten.Controllers
 
             // Istället för RedirectToAction, returnera vyn direkt:
             // Detta gör att vi stannar på samma historik-post.
-            var project = await _context.Projects
-                .Include(p => p.PersonProjects).ThenInclude(pp => pp.Person)
-                .FirstOrDefaultAsync(p => p.Id == projectId);
 
-            return View("ProjectDetails", project);
+            //var project = await _context.Projects
+            //    .Include(p => p.PersonProjects).ThenInclude(pp => pp.Person)
+            //    .FirstOrDefaultAsync(p => p.Id == projectId);
+
+            //return View("ProjectDetails", project);
+
+            return RedirectToAction("ProjectDetails", new { id = projectId });
         }
 
         // --- LÄMNA PROJEKT ---

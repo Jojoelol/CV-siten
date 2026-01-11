@@ -2118,3 +2118,46 @@ body {
     color: #002d5a;
     font-weight: bold;
 }
+
+/* ===== Layout / Header ===== */
+.main-header .layout-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+/* motsvarar: style="flex-shrink:0" */
+.main-header .logo {
+    flex-shrink: 0;
+}
+
+/* motsvarar: style="height:45px; width:auto" */
+.main-header .layout-logo-img {
+    height: 45px;
+    width: auto;
+    max-height: 45px;
+    display: block; /* tar bort inline-img “baseline”-strul */
+}
+
+/* motsvarar gamla: display:flex; gap:10px; margin-right:auto */
+.main-header .layout-searchbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+}
+
+    /* säkrare än bara width (om form-control skulle vinna) */
+    .main-header .layout-searchbar .layout-search-input {
+        flex: 0 0 200px;
+        width: 200px;
+        max-width: 200px;
+    }
+
+/* motsvarar gamla: display:flex; align-items:center; gap:15px */
+.main-header .layout-logged-in-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}

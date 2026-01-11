@@ -105,7 +105,7 @@ main {
 }
 
 
-/* ====== Layout (flyttat från inline styles) ====== */
+ /*====== Layout (flyttat från inline styles) ====== */
 
 .layout-header-content {
     display: flex;
@@ -114,17 +114,11 @@ main {
     gap: 20px;
 }
 
-/* Logo */
-.layout-logo {
-    flex-shrink: 0;
-}
-
 .layout-logo-img {
     height: 45px;
     width: auto;
 }
 
-/* Searchbar (pushar resten åt höger via margin-right:auto) */
 .layout-searchbar {
     display: flex;
     gap: 10px;
@@ -135,7 +129,6 @@ main {
     width: 200px;
 }
 
-/* Right-side auth area */
 .layout-logged-in-info {
     display: flex;
     align-items: center;

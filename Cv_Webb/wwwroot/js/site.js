@@ -416,6 +416,40 @@ function initConfirmForms() {
 }
 
 
+document.addEventListener("DOMContentLoaded", function () {
+    // Fånga upp alla knappar med klassen 'all-projects-join-btn'
+    const joinButtons = document.querySelectorAll('.all-projects-join-btn');
+
+    joinButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            // Hämta data från knappen
+            const projectId = this.getAttribute('data-project-id');
+            const projectName = this.getAttribute('data-project-name');
+
+            // Fyll i modalens fält
+            const idInput = document.getElementById('modalProjectId');
+            const textDisplay = document.getElementById('modalProjectText');
+
+            if (idInput && textDisplay) {
+                idInput.value = projectId;
+                textDisplay.innerText = "Gå med i: " + projectName;
+
+                // Visa modalen (Bootstrap 5 syntax)
+                const joinModal = new bootstrap.Modal(document.getElementById('joinRoleModal'));
+                joinModal.show();
+            }
+        });
+    });
+
+    // Logik för att stänga success-popupen i ProjectDetails om den finns
+    const successPopup = document.getElementById('saveSuccessPopup');
+    if (successPopup) {
+        setTimeout(() => {
+            successPopup.style.display = 'none';
+        }, 3000);
+    }
+});
+
 // ==============================
 // --- DOMContentLoaded (EN gång) ---
 // ==============================
