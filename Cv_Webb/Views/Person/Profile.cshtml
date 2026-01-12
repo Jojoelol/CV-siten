@@ -61,7 +61,6 @@
 			<div class="sidebar-actions-container">
 				@if (ViewBag.IsOwner == true)
 				{
-					@* Bekräftelsemeddelande vid statusändring *@
 					@if (TempData["StatusMessage"] != null)
 					{
 						<div class="alert alert-info py-1 text-center u-status-alert">
@@ -69,6 +68,7 @@
 						</div>
 					}
 
+<<<<<<< HEAD
 					@if (TempData["ErrorMessage"] != null)
 					{
 						<div class="alert alert-danger py-1 text-center u-error-alert">
@@ -79,6 +79,8 @@
 					@* Dina befintliga CV-knappar här under... *@
 
 					@* --- HUVUDHANDLINGAR (Blå & Röd) --- *@
+=======
+>>>>>>> main
 					@if (string.IsNullOrEmpty(Model.CvUrl))
 					{
 						<form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
@@ -111,10 +113,7 @@
 						<i class="fas fa-file-export u-export-xml-icon"></i> Exportera CV (XML)
 					</a>
 
-					@* --- KONTOINSTÄLLNINGAR (Längst ner) --- *@
 					<div class="u-account-settings">
-
-						@* Sekretess-switch *@
 						<div class="privacy-status @(Model.IsPrivate ? "is-private" : "is-public")">
 							<p class="privacy-status-text">
 								STATUS: @(Model.IsPrivate ? "PRIVAT" : "OFFENTLIG")
@@ -128,7 +127,6 @@
 							</form>
 						</div>
 
-						@* --- DYNAMISK INAKTIVERA/AKTIVERA KNAPP --- *@
 						@if (Model.IsActive)
 						{
 							<form asp-controller="Person" asp-action="Inactivate" method="post">
@@ -233,7 +231,6 @@
 			<form asp-action="Profile" asp-fragment="projects-section" method="get" class="content-toolbar">
 				<input type="hidden" name="id" value="@Model.Id" />
 
-				@* ÖVRE RADEN (Sök & Sortering) *@
 				<div class="toolbar-top-row u-toolbar-top-row">
 					<input type="text" name="searchString" value="@ViewBag.CurrentSearch"
 						   placeholder="Sök projekt eller roll..." class="form-control-custom u-toolbar-search">
@@ -262,16 +259,14 @@
 					<button type="submit" class="btn-action btn-primary btn-small u-toolbar-search-btn">Sök</button>
 				</div>
 
-				@* HÖGER SIDA: Admin-knappar och Rensa-knapp *@
 				<div class="right-buttons u-right-buttons">
-
 					@if (ViewBag.IsOwner == true)
 					{
 						<a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline btn-small u-nowrap-btn">Lägg till projekt</a>
 						<a asp-controller="Project" asp-action="AllProjects" class="btn-action btn-outline btn-small u-nowrap-btn">Gå med i projekt</a>
 					}
 
-					@if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || !string.IsNullOrEmpty(ViewBag.CurrentSort))
+					@if (!string.IsNullOrEmpty(ViewBag.CurrentSearch as string))
 					{
 						<a asp-action="Profile" asp-route-id="@Model.Id" asp-fragment="projects-section"
 						   class="btn-action btn-small u-clear-search-btn">
@@ -282,7 +277,7 @@
 			</form>
 
 			@* --- PROJEKTGRID --- *@
-			@if (Model.PersonProjects != null && Model.PersonProjects.Any())
+			@if (Model.PersonProjects != null && Model.PersonProjects.Count > 0)
 			{
 				<div class="projects-grid u-projects-grid">
 					@foreach (var pp in Model.PersonProjects)
@@ -294,12 +289,9 @@
 
 							@if (isProjectOwner)
 							{
-								<div class="u-project-owner-badge">
-									ÄGARE
-								</div>
+								<div class="u-project-owner-badge">ÄGARE</div>
 							}
 
-							@* 1. PROJEKTBILD *@
 							<div class="project-card-image u-project-card-image">
 								@if (!string.IsNullOrEmpty(pp.Project.ImageUrl))
 								{
@@ -313,14 +305,9 @@
 								}
 							</div>
 
-							@* 2. INNEHÅLL *@
 							<div class="u-project-card-body">
-
 								<div class="u-project-title-block">
-									<span class="u-project-name">
-										@pp.Project.ProjectName
-									</span>
-
+									<span class="u-project-name">@pp.Project.ProjectName</span>
 									<span class="u-project-role">
 										<i class="fas fa-user-tag u-user-tag-icon"></i>
 										@(string.IsNullOrEmpty(pp.Role) ? "Deltagare" : pp.Role)
@@ -328,24 +315,21 @@
 								</div>
 
 								<div class="u-project-details-grid">
-									<div title="Typ">
+									<div>
 										<i class="fas fa-layer-group u-detail-icon"></i>
 										<strong>Typ:</strong> @(pp.Project.Type ?? "Ej angiven")
 									</div>
-
-									<div title="Status">
+									<div>
 										<i class="fas fa-circle u-status-dot @(pp.Project.Status == "Aktivt" ? "is-active" : "is-inactive")"></i>
 										<strong>Status:</strong> @(pp.Project.Status ?? "Aktivt")
 									</div>
-
-									<div title="Startdatum">
+									<div>
 										<i class="fas fa-calendar-alt u-detail-icon"></i>
 										<strong>Start:</strong> @pp.Project.StartDate.ToString("yyyy-MM-dd")
 									</div>
-
-									<div title="Slutdatum">
+									<div>
 										<i class="fas fa-calendar-check u-detail-icon"></i>
-										<strong>Slut:</strong> @pp.Project.EndDate?.ToString("yyyy-MM-dd")
+										<strong>Slut:</strong> @(pp.Project.EndDate?.ToString("yyyy-MM-dd") ?? "Pågående")
 									</div>
 								</div>
 
@@ -362,6 +346,7 @@
 			}
 		</div>
 
+<<<<<<< HEAD
 		@* --- HUVUDHANDLINGAR (Blå & Röd) --- *@
 		@if (string.IsNullOrEmpty(Model.CvUrl))
 		{
@@ -386,10 +371,38 @@
 						<i class="fas fa-trash-alt"></i> <span>Ta bort CV</span>
 					</button>
 				</form>
+=======
+		@* --- LIKNANDE PERSONER --- *@
+		@if (ViewBag.SimilarPerson != null)
+		{
+			<div class="cv-section u-similar-section">
+				<div class="cv-header-row">
+					<h3 class="section-title"><i class="fas fa-user-friends"></i> Hitta liknande personer</h3>
+				</div>
+				<div class="similar-profile-card u-similar-card">
+					<div class="u-similar-avatar">
+						@if (!string.IsNullOrEmpty(ViewBag.SimilarPerson.ImageUrl))
+						{
+							<img src="~/images/ProfilePicture/@ViewBag.SimilarPerson.ImageUrl" alt="Profilbild" class="u-img-cover-full" />
+						}
+						else
+						{
+							<div class="u-similar-avatar-fallback"><i class="fas fa-user"></i></div>
+						}
+					</div>
+					<div class="u-similar-content">
+						<h5 class="u-similar-name">@ViewBag.SimilarPerson.FirstName @ViewBag.SimilarPerson.LastName</h5>
+						<p class="u-similar-title">@ViewBag.SimilarPerson.JobTitle</p>
+						<div class="match-badge mb-2 u-match-badge">
+							<i class="fas fa-bullseye"></i> @ViewBag.MatchScore% Matchning
+						</div>
+						<br />
+						<a asp-action="Profile" asp-route-id="@ViewBag.SimilarPerson.Id" class="btn btn-sm btn-primary u-similar-btn">Visa profil</a>
+					</div>
+				</div>
+>>>>>>> main
 			</div>
 		}
-
 	</section>
-
 	<partial name="SendMessageModal" />
 </div>

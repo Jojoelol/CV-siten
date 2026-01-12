@@ -69,17 +69,15 @@ namespace CV_siten.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        // Parametern 'string Role' är borttagen här:
-        public async Task<IActionResult> AddProject(Project model, IFormFile? imageFile, IFormFile? zipFile)
+        public async Task<IActionResult> AddProject(AddProjectViewModel model)
         {
-            // Kontrollera om slutdatum är före startdatum
+            // 1. Logisk validering: Slutdatum får inte vara före startdatum
             if (model.EndDate.HasValue && model.EndDate < model.StartDate)
             {
                 ModelState.AddModelError("EndDate", "Slutdatum kan inte vara före startdatum.");
             }
 
-            ModelState.Remove("OwnerId");
-
+            // Kontrollera om ViewModel-attributen ([Required], [MaxLength] etc) är uppfyllda
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
@@ -87,53 +85,74 @@ namespace CV_siten.Controllers
 
                 if (person == null) return RedirectToAction("Index", "Home");
 
-                // 2. Hantera Projektbild
-                if (imageFile != null && imageFile.Length > 0)
+                // 2. Mappa data från ViewModel till den faktiska databasmodellen (Project)
+                // Vi konverterar DateTime till DateTimeOffset här
+                var newProject = new Project
                 {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    ProjectName = model.ProjectName,
+                    Description = model.Description,
+                    StartDate = new DateTimeOffset(model.StartDate.Value),
+                    EndDate = model.EndDate.HasValue ? new DateTimeOffset(model.EndDate.Value) : null,
+                    Type = model.Type ?? "",
+                    Status = model.Status,
+                    OwnerId = person.Id
+                };
+
+                // 3. Hantera Projektbild (Hämtas från model.ImageFile)
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
                     string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/projects");
                     if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
                     using (var stream = new FileStream(Path.Combine(uploadPath, fileName), FileMode.Create))
                     {
-                        await imageFile.CopyToAsync(stream);
+                        await model.ImageFile.CopyToAsync(stream);
                     }
-                    model.ImageUrl = fileName;
+                    newProject.ImageUrl = fileName;
                 }
 
-                // 3. Hantera ZIP-fil
-                if (zipFile != null && zipFile.Length > 0)
+                // 4. Hantera ZIP-fil (Hämtas från model.ZipFile)
+                if (model.ZipFile != null && model.ZipFile.Length > 0)
                 {
-                    string zipFileName = Guid.NewGuid().ToString() + Path.GetExtension(zipFile.FileName);
+                    string zipFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ZipFile.FileName);
                     string zipUploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/projects");
                     if (!Directory.Exists(zipUploadPath)) Directory.CreateDirectory(zipUploadPath);
+
                     using (var stream = new FileStream(Path.Combine(zipUploadPath, zipFileName), FileMode.Create))
                     {
-                        await zipFile.CopyToAsync(stream);
+                        await model.ZipFile.CopyToAsync(stream);
                     }
-                    model.ZipUrl = zipFileName;
+                    newProject.ZipUrl = zipFileName;
                 }
 
-                // 4. Sätt ägare och spara projektet
-                model.OwnerId = person.Id;
-                _context.Projects.Add(model);
-                await _context.SaveChangesAsync();
-
-                // 5. Skapa kopplingen till personen
-                _context.PersonProjects.Add(new PersonProject
+                try
                 {
-                    PersonId = person.Id,
-                    ProjectId = model.Id,
-                    Role = model.Role ?? "Projektägare" // ÄNDRAT: Hämtar från model.Role
-                });
+                    // 5. Spara projektet
+                    _context.Projects.Add(newProject);
 
-                await _context.SaveChangesAsync();
+                    // 6. Skapa kopplingen i PersonProject
+                    _context.PersonProjects.Add(new PersonProject
+                    {
+                        PersonId = person.Id,
+                        Project = newProject, // Använder objektet direkt istället för Id för säkerhet
+                        Role = model.Role ?? "Projektägare"
+                    });
 
-                // 6. BEHÅLL DIN POPUP-LOGIK
-                ViewBag.ShowSuccessPopup = true;
+                    // Spara allt i en batch för att undvika transaktionsfel
+                    await _context.SaveChangesAsync();
 
-                return View(model);
+                    // Visa din popup-logik
+                    ViewBag.ShowSuccessPopup = true;
+                    return View(model);
+                }
+                catch (Exception)
+                {
+                    ModelState.AddModelError("", "Ett fel uppstod när projektet sparades i databasen.");
+                }
             }
 
+            // Om något är fel (ModelState), skicka tillbaka vyn med felmeddelandena
             return View(model);
         }
 

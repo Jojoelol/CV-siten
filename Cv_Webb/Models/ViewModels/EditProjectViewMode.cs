@@ -26,7 +26,7 @@ namespace CV_siten.Models.ViewModels // Kontrollera att detta matchar din mappst
         [Required(ErrorMessage = "Typ måste anges")]
         public string Type { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Stauts måste anges")]
+        [Required(ErrorMessage = "Status måste anges")]
         public string Status { get; set; } = string.Empty;
 
         // För att behålla befintliga filer
