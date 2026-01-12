@@ -450,6 +450,45 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    // Vi använder .cv-delete-form-wrap (som i din HTML)
+    // Vi använder querySelectorAll för att fånga både knappen i sidebaren och i main content
+    const deleteCvForms = document.querySelectorAll('.cv-delete-form-wrap');
+
+    deleteCvForms.forEach(form => {
+        form.addEventListener('submit', function (e) {
+            if (!confirm("Är du säker på att du vill ta bort ditt CV permanent?")) {
+                e.preventDefault(); // Avbryter inskickningen om användaren klickar "Avbryt"
+            }
+        });
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const cvInput = document.getElementById('cvFileInput');
+        const cvForm = document.getElementById('cvUploadForm');
+
+        if (cvInput && cvForm) {
+            cvInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const fileName = file.name;
+                    const extension = fileName.split('.').pop().toLowerCase();
+
+                    if (extension !== 'pdf') {
+                        // Visa en snabb varning
+                        alert("Felaktigt filformat! Du kan bara ladda upp PDF-filer.");
+                        // Rensa inputen så att den felaktiga filen försvinner
+                        this.value = "";
+                    } else {
+                        // Om det är en PDF, skicka formuläret som vanligt
+                        cvForm.submit();
+                    }
+                }
+            });
+        }
+    });
+
 // ==============================
 // --- DOMContentLoaded (EN gång) ---
 // ==============================
