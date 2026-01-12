@@ -6,7 +6,17 @@
 }
 
 <section class="sr-main">
-    <h2 class="text-center sr-title">Sökresultat för: @ViewBag.SearchQuery</h2>
+    <h2 class="text-center sr-title">
+        Sökresultat
+        @if (!string.IsNullOrEmpty(ViewBag.SearchQuery))
+        {
+            <span>för "@ViewBag.SearchQuery"</span>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.SkillQuery))
+        {
+            <span>med kompetens "@ViewBag.SkillQuery"</span>
+        }
+    </h2>
 
     <div class="sr-results-list">
         <h3 class="sr-matchPerson">Matchande Personer</h3>
