@@ -140,6 +140,7 @@ namespace CV_siten.Controllers
 
         public async Task<IActionResult> Search(string search, string skill)
         {
+            ViewBag.SearchQuery = search;
             var query = _context.Persons.Where(p => p.IsActive);
 
             if (User.Identity?.IsAuthenticated != true)
