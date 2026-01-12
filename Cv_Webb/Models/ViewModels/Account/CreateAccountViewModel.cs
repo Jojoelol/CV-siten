@@ -52,10 +52,6 @@ namespace CV_siten.Models.ViewModels.Account
         [Display(Name = "Yrkestitel")]
         public string JobTitle { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Du måste välja om profilen ska vara privat eller offentlig")]
-        [Display(Name = "Privat profil")]
-        public bool IsPrivate { get; set; }
-
         [Required(ErrorMessage = "Adress är obligatorisk")]
         [Display(Name = "Adress")]
         public string Address { get; set; } = string.Empty;
@@ -69,8 +65,7 @@ namespace CV_siten.Models.ViewModels.Account
         [Display(Name = "Ort")]
         public string City { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Du måste ladda upp en profilbild")]
         [Display(Name = "Profilbild")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 }
