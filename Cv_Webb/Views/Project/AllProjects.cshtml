@@ -10,14 +10,14 @@
 
                 @* 1. SÖKFÄLT *@
                 <div class="all-projects-search-col">
-                    <label class="small fw-bold text-muted all-projects-label">Sök projekt eller ägare:</label>
+                    <label class="all-projects-label text-muted fw-bold small">Sök projekt eller ägare:</label>
                     <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
                            placeholder="Skriv här..." class="form-control-custom all-projects-input">
                 </div>
 
                 @* 2. SORTERING *@
                 <div class="all-projects-sort-col">
-                    <label class="small fw-bold text-muted all-projects-label">Sortera efter:</label>
+                    <label class="all-projects-label text-muted fw-bold small">Sortera efter:</label>
                     <select name="sortBy" class="form-select-custom all-projects-input" onchange="this.form.submit()">
                         <option value="">Standard (A-Ö)</option>
                         <optgroup label="Namn">
@@ -35,14 +35,11 @@
                     </select>
                 </div>
 
-                @* 3. KNAPP-KOLUMN (Fixerad höjd för att förhindra "hopp") *@
+                @* 3. KNAPP-KOLUMN (Bytt plats på Rensa och Sök) *@
                 <div class="all-projects-buttons-col">
 
-                    <button type="submit" class="btn-action btn-primary all-projects-search-btn">
-                        <i class="fas fa-search all-projects-btn-icon"></i> Sök
-                    </button>
-
-                    @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch) || !string.IsNullOrEmpty(ViewBag.CurrentSort))
+                    @* Rensa kommer nu FÖRE sök och visas bara om det finns en söksträng *@
+                    @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
                     {
                         <a asp-action="AllProjects" class="btn-action all-projects-clear-btn">
                             <i class="fas fa-times all-projects-btn-icon"></i> Rensa
@@ -52,6 +49,10 @@
                     {
                         <div class="all-projects-clear-spacer"></div>
                     }
+
+                    <button type="submit" class="btn-action btn-primary all-projects-search-btn">
+                        <i class="fas fa-search all-projects-btn-icon"></i> Sök
+                    </button>
                 </div>
 
             </div>
@@ -85,13 +86,12 @@
                     project.PersonProjects.Any(pp => pp.PersonId == (int)ViewBag.CurrentPersonId);
 
                     <div class="project-card all-projects-card">
-
                         <a asp-action="ProjectDetails" asp-route-id="@project.Id" class="all-projects-card-link">
                             <div class="project-card-image all-projects-card-image">
                                 <img class="all-projects-card-img"
                                      src="@Url.Content(string.IsNullOrEmpty(project.ImageUrl)
-                                                                               ? "~/images/projects/defaultbildProjekt.jpg"
-                                                                               : "~/images/projects/" + project.ImageUrl)"
+                                                                                    ? "~/images/projects/defaultbildProjekt.jpg"
+                                                                                    : "~/images/projects/" + project.ImageUrl)"
                              alt="@project.ProjectName" />
                     </div>
 
@@ -107,12 +107,10 @@
                         <div class="all-projects-card-body">
                             <div class="all-projects-details-grid">
                                 <div><i class="fas fa-layer-group"></i> <strong>Typ:</strong> @(project.Type ?? "Webb")</div>
-
                                 <div>
                                     <i class="fas fa-circle all-projects-status-dot @(project.Status == "Aktivt" ? "is-active" : "is-inactive")"></i>
                                     <strong>Status:</strong> @(project.Status ?? "Aktivt")
                                 </div>
-
                                 <div><i class="fas fa-calendar-alt"></i> <strong>Start:</strong> @project.StartDate.ToString("yyyy-MM-dd")</div>
                                 <div><i class="fas fa-calendar-check"></i> <strong>Slut:</strong> @(project.EndDate.HasValue? project.EndDate.Value.ToString("yyyy-MM-dd") : "Pågående")</div>
                             </div>
@@ -142,7 +140,6 @@
                                 }
                             </div>
                         </div>
-
                     </div>
                 }
             </div>
@@ -150,7 +147,7 @@
     </div>
 </div>
 
-@* --- MODAL FÖR ATT ANGE ROLL --- *@
+@* Modal *@
 <div class="modal fade" id="joinRoleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -158,25 +155,21 @@
                 <h5 class="modal-title">Ange din roll</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
-            <form asp-action="JoinProject" asp-controller="Project" method="post">
+            <form asp-action="Join" asp-controller="Project" method="post">
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
                     <p id="modalProjectText" class="fw-bold"></p>
                     <input type="hidden" name="projectId" id="modalProjectId" />
-
                     <div class="mb-3">
                         <label class="form-label">Vad är din roll i detta projekt?</label>
-                        <input type="text" name="role" class="form-control" placeholder="t.ex. Frontend-utvecklare, Tester..." required />
+                        <input type="text" name="role" class="form-control" placeholder="t.ex. Frontend-utvecklare..." required />
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
                     <button type="submit" class="btn btn-success">Gå med</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>

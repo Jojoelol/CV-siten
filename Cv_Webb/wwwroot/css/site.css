@@ -1585,7 +1585,17 @@ body {
 }
 
 .all-projects-sort-col {
-    width: 220px;
+    width: 300px;
+
+}
+
+.all-projects-search-btn,
+.all-projects-clear-btn,
+.all-projects-clear-spacer {
+    height: 46px; /* Måste matcha den nya höjden på input-fälten */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .all-projects-label {
@@ -1596,10 +1606,14 @@ body {
 .all-projects-input {
     width: 100%;
     margin: 0;
-    padding: 10px;
+    padding: 6px 12px; /* Minskat vertikalt padding för att ge texten plats */
     border-radius: 8px;
     border: 1px solid #ddd;
-    height: 40px;
+    height: 46px; /* Ökad höjd från 40px till 46px */
+    line-height: 1.6; /* Ökat radavstånd så att bokstäver som 'g' syns helt */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 }
 
 .all-projects-buttons-col {
