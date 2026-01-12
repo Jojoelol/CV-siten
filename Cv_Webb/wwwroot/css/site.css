@@ -2119,6 +2119,62 @@ body {
     font-weight: bold;
 }
 
+
+/* Behållaren som håller båda knapparna */
+.cv-button-row-container {
+    display: flex;
+    gap: 8px; /* Mellanrum mellan knapparna */
+    width: 100%;
+    margin-bottom: 10px;
+    align-items: stretch; /* Gör att alla barn (länken och formuläret) blir lika höga */
+}
+
+/* "Visa CV"-länken */
+.cv-btn-view {
+    flex: 2; /* Tar upp 2 delar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 !important;
+    height: 45px; /* Samma fasta höjd som dina andra knappar */
+    text-decoration: none;
+}
+
+/* Formuläret som ramar in radera-knappen */
+.cv-delete-form-wrap {
+    flex: 1; /* Tar upp 1 del */
+    display: flex;
+}
+
+.cv-btn-delete-text {
+    width: 100%;
+    height: 100%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px;
+    /* VIKTIGT: Nollställ padding helt för att garantera centrering i smala boxar */
+    padding: 0 !important;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    margin: 0 !important;
+    line-height: 1; /* Tar bort extra höjd runt texten */
+}
+
+    /* Säkerställ att ikonen inte har någon margin-right som skjuter texten åt sidan */
+    .cv-btn-delete-text i {
+        margin: 0 !important;
+    }
+
+.u-error-alert {
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+
+
+
 /* ===== Layout / Header ===== */
 .main-header .layout-header-content {
     display: flex;

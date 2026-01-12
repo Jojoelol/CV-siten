@@ -296,19 +296,66 @@ namespace CV_siten.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UploadCv(IFormFile cvFile)
+        public async Task<IActionResult> UploadCv(int personId, IFormFile cvFile)
         {
-            if (cvFile == null || Path.GetExtension(cvFile.FileName).ToLower() != ".pdf") return BadRequest();
+            // 1. Kontrollera om filen ens existerar
+            if (cvFile == null || cvFile.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Vänligen välj en fil att ladda upp.";
+                return RedirectToAction("Profile", new { id = personId });
+            }
+
+            // 2. Kontrollera filändelsen
+            var extension = Path.GetExtension(cvFile.FileName).ToLower();
+            if (extension != ".pdf")
+            {
+                TempData["ErrorMessage"] = "Kan enbart ta emot CV i PDF-format.";
+                return RedirectToAction("Profile", new { id = personId });
+            }
+
+            // 3. Säkerhet: Kontrollera att den inloggade användaren faktiskt äger profilen (IDOR-skydd)
             var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-            if (person != null)
+
+            if (person == null || person.Id != personId)
+            {
+                return Forbid(); // Användaren försöker ladda upp till någon annans profil
+            }
+
+            // 4. Spara filen
+            try
             {
                 string fileName = Guid.NewGuid().ToString() + ".pdf";
-                string path = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "cvs", fileName);
-                using (var stream = new FileStream(path, FileMode.Create)) { await cvFile.CopyToAsync(stream); }
-                person.CvUrl = "/uploads/cvs/" + fileName; await _context.SaveChangesAsync();
+                // Säkerställ att sökvägen till mappen finns
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "cvs");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                string fullPath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await cvFile.CopyToAsync(stream);
+                }
+
+                // 5. Uppdatera databasen
+                person.CvUrl = "/uploads/cvs/" + fileName;
+                await _context.SaveChangesAsync();
+
+                TempData["StatusMessage"] = "Ditt CV har laddats upp!";
             }
-            return RedirectToAction(nameof(Profile));
+            catch (Exception ex)
+            {
+                // Om något går fel tekniskt (t.ex. rättigheter på servern)
+                TempData["ErrorMessage"] = "Ett fel uppstod när filen skulle sparas på servern.";
+            }
+
+            return RedirectToAction("Profile", new { id = personId });
         }
 
 
@@ -322,6 +369,32 @@ namespace CV_siten.Controllers
 
             // Skickar vidare till Profile-metoden men med den inloggades ID
             return RedirectToAction("Profile", new { id = person.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCv()
+        {
+            // Hämta inloggad användare för att förhindra IDOR
+            var user = await _userManager.GetUserAsync(User);
+            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+            if (person != null && !string.IsNullOrEmpty(person.CvUrl))
+            {
+                // 1. (Valfritt) Ta bort den fysiska filen från wwwroot
+                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, person.CvUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                // 2. Nollställ URL:en i databasen
+                person.CvUrl = null;
+                await _context.SaveChangesAsync();
+                TempData["StatusMessage"] = "Ditt CV har tagits bort.";
+            }
+
+            return RedirectToAction(nameof(Profile));
         }
     }
 }
