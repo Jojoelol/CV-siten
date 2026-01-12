@@ -1,25 +1,24 @@
-﻿@model CV_siten.Data.Models.Project
+﻿@model CV_siten.Models.ViewModels.AddProjectViewModel
 
 @{
     ViewData["Title"] = "Lägg till projekt";
 }
 
 <div class="background add-project-page">
-
     <div class="mb-4 add-project-header">
         <h2 class="add-project-title">Skapa nytt projekt</h2>
         <p class="add-project-subtitle">Fyll i informationen nedan för att visa upp ditt arbete på din profil.</p>
     </div>
 
     <form asp-action="AddProject" method="post" enctype="multipart/form-data">
-        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        @* Sammanfattning av fel *@
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <div class="row">
             <div class="col-md-5">
                 <div class="add-project-card-left">
-
                     <div class="mb-3">
-                        <label class="form-label fw-bold add-project-label">Namn:</label>
+                        <label asp-for="ProjectName" class="form-label fw-bold add-project-label">Namn:</label>
                         <input asp-for="ProjectName" class="form-control add-project-input" placeholder="t.ex. Hattmakarna" />
                         <span asp-validation-for="ProjectName" class="text-danger"></span>
                     </div>
@@ -27,11 +26,9 @@
                     <div class="mb-3">
                         <label asp-for="Role" class="form-label fw-bold add-project-label">Roll i projektet:</label>
                         <input asp-for="Role" class="form-control add-project-input" placeholder="t.ex. Databasansvarig" />
-                        @* Detta gör att du ser exakt vad som är fel om det inte går att spara *@
                         <span asp-validation-for="Role" class="text-danger"></span>
                     </div>
 
-                    @* --- TYP OCH STATUS --- *@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="Type" class="form-label fw-bold add-project-label">Typ:</label>
@@ -42,6 +39,7 @@
                         <div class="col-md-6 mb-3">
                             <label asp-for="Status" class="form-label fw-bold add-project-label">Status:</label>
                             <select asp-for="Status" class="form-select add-project-input">
+                                <option value="" disabled selected>Välj status...</option>
                                 <option value="Aktivt">Aktivt</option>
                                 <option value="Avslutat">Avslutat</option>
                                 <option value="Pausat">Pausat</option>
@@ -53,35 +51,27 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold add-project-label">Startdatum:</label>
+                            <label asp-for="StartDate" class="form-label fw-bold add-project-label">Startdatum:</label>
                             <input asp-for="StartDate" type="date" class="form-control add-project-input" />
                             <span asp-validation-for="StartDate" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold add-project-label">Slutdatum:</label>
+                            <label asp-for="EndDate" class="form-label fw-bold add-project-label">Slutdatum:</label>
                             <input asp-for="EndDate" type="date" class="form-control add-project-input" />
                             <span asp-validation-for="EndDate" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold add-project-label">Beskrivning:</label>
-                        <textarea asp-for="Description"
-                                  class="form-control add-project-input"
-                                  rows="6"
-                                  placeholder="Berätta om projektet..."></textarea>
+                        <label asp-for="Description" class="form-label fw-bold add-project-label">Beskrivning:</label>
+                        <textarea asp-for="Description" class="form-control add-project-input" rows="6" placeholder="Berätta om projektet..."></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-success flex-grow-1 add-project-save-btn">
-                            Spara projekt
-                        </button>
-                        <a asp-controller="Person" asp-action="Profile" class="btn btn-outline-secondary add-project-cancel-btn">
-                            Avbryt
-                        </a>
+                        <button type="submit" class="btn btn-success flex-grow-1 add-project-save-btn">Spara projekt</button>
+                        <a asp-controller="Person" asp-action="Profile" class="btn btn-outline-secondary add-project-cancel-btn">Avbryt</a>
                     </div>
-
                 </div>
             </div>
 
@@ -89,32 +79,24 @@
                 <div class="add-project-card-right">
                     <i class="bi bi-images add-project-image-icon"></i>
                     <h4 class="add-project-image-title">Projektbild</h4>
-                    <p class="text-muted">Ladda upp en bild som representerar ditt projekt (t.ex. en skärmdump).</p>
+                    <p class="text-muted">Ladda upp en bild som representerar ditt projekt.</p>
 
                     <div class="mt-3 w-75">
-                        <input type="file" name="imageFile" class="form-control add-project-input" accept="image/*" />
+                        <input asp-for="ImageFile" type="file" class="form-control add-project-input" accept="image/*" />
+                        <span asp-validation-for="ImageFile" class="text-danger"></span>
                     </div>
 
                     <div class="mt-4 border-top pt-4 w-75">
                         <i class="bi bi-file-earmark-zip add-project-zip-icon"></i>
                         <h5 class="mt-2">Källkod (Valfritt)</h5>
-                        <input type="file" name="zipFile" class="form-control mt-2 add-project-input" accept=".zip,.rar,.7z" />
+                        <input asp-for="ZipFile" type="file" class="form-control mt-2 add-project-input" accept=".zip,.rar,.7z" />
+                        <span asp-validation-for="ZipFile" class="text-danger"></span>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-
 </div>
-
-@* dolt element som JS kan läsa av *@
-@if (ViewBag.ShowSuccessPopup == true)
-{
-    <div id="popup-data"
-         data-show="true"
-         data-url="@Url.Action("Profile", "Person")">
-    </div>
-}
 
 @* Popup HTML *@
 <div id="successPopup" class="success-popup-overlay add-project-success-popup u-hidden">
@@ -124,3 +106,9 @@
         <p>Du skickas nu tillbaka till din profil...</p>
     </div>
 </div>
+
+@if (ViewBag.ShowSuccessPopup == true)
+{
+    <div id="popup-data" data-show="true" data-url="@Url.Action("Profile", "Person")"></div>
+}
+}
