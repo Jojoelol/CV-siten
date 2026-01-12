@@ -186,22 +186,26 @@ function initMessagesPage() {
     let lastOpenedMessage = { from: "", senderId: "", subject: "" };
 
 
-    if (readModalEl) {
-        readModalEl.addEventListener("show.bs.modal", (event) => {
-            const triggerRow = event.relatedTarget;
-            if (!triggerRow) return;
+    readModalEl.addEventListener("show.bs.modal", (event) => {
+        const triggerEl = event.relatedTarget;
+        if (!triggerEl) return;
 
-            const from = triggerRow.getAttribute('data-from') || '';
-            const senderId = triggerRow.getAttribute('data-sender-id') || '';
-            const subject = triggerRow.getAttribute('data-subject') || '';
-            const content = triggerRow.querySelector('.message-content')?.textContent?.trim() || '';
+        const row = triggerEl.closest('tr.message-row');
+        if (!row) return;
 
-            if (readFromEl) readFromEl.textContent = "Från: " + from;
-            if (readContentEl) readContentEl.textContent = content;
+        const from = row.getAttribute('data-from') || '';
+        const senderId = row.getAttribute('data-sender-id') || '';
+        const subject = row.getAttribute('data-subject') || '';
 
-            lastOpenedMessage = { from, senderId, subject };
-        });
-    }
+        const contentCell = row.querySelector('td.message-content');
+        const content = contentCell ? contentCell.textContent.trim() : '';
+
+        if (readFromEl) readFromEl.textContent = "Från: " + from;
+        if (readContentEl) readContentEl.textContent = content;
+
+        lastOpenedMessage = { from, senderId, subject };
+    });
+
 
     if (deleteModalEl) {
         deleteModalEl.addEventListener("show.bs.modal", (event) => {
