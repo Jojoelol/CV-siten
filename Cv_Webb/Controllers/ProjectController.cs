@@ -34,6 +34,11 @@ namespace CV_siten.Controllers
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (project == null) return NotFound();
+            // Vi behåller endast de kopplingar där personen är aktiv
+            project.PersonProjects = project.PersonProjects
+                .Where(pp => pp.Person != null && pp.Person.IsActive)
+                .ToList();
+            // ----------------------------------------------------
 
             var user = await _userManager.GetUserAsync(User);
             bool isOwner = false;
@@ -46,6 +51,7 @@ namespace CV_siten.Controllers
                 if (person != null)
                 {
                     currentPersonId = person.Id;
+                    // Här kollar vi nu mot den filtrerade listan
                     isParticipant = project.PersonProjects.Any(pp => pp.PersonId == person.Id);
                     isOwner = project.OwnerId == person.Id;
                 }
