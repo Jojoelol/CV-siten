@@ -39,9 +39,10 @@
                                     foreach (var m in Model)
                                     {
                                         <tr class="@(m.IsRead ? "" : "table-light") message-row"
-                                            data-from="@(m.Sender != null ? (m.Sender.FirstName + " " + m.Sender.LastName) : (m.SenderName + " (extern)"))"
-                                            data-subject="@m.Subject"
-                                            data-sender-id="@m.SenderId">
+                                            data-from="@(m.Sender != null
+                                            ? (m.Sender.FirstName + " " + m.Sender.LastName)
+                                            : (m.SenderName ?? "Extern"))"
+                                            data-subject="@m.Subject">
 
                                             <td data-bs-toggle="modal" data-bs-target="#readMessageModal">
                                                 <strong>
@@ -122,7 +123,6 @@
                     </div>
 
                     <div class="modal-footer">
-                        
                         <button type="button"
                                 class="btn-action btn-primary btn-small"
                                 id="replyBtn">
