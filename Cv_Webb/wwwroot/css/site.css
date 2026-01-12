@@ -2187,6 +2187,40 @@ body {
 }
 
 
+/* Bilden som ska visas i bakgrunden */
+.project-bg-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Gör att bilden fyller rutan snyggt utan att dras ut */
+    z-index: 0; /* Läggs längst bak */
+    opacity: 0.2; /* Gör bilden genomskinlig så man kan läsa texten ovanpå */
+    display: none; /* Dölj tills en bild är vald */
+    pointer-events: none; /* Gör att man inte kan klicka på bilden av misstag */
+}
+
+/* Behållaren för text och knappar */
+.add-project-content-overlay {
+    position: relative;
+    z-index: 1; /* Ligger ovanpå bilden */
+    /* Flexbox-inställningar för att centrera innehållet som förut (om du vill ha det) */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrerar innehållet horisontellt */
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+/* Säkerställ att föräldern har relativ position (lade till inline i HTML men bra att ha här också) */
+.add-project-card-right {
+    position: relative;
+    overflow: hidden;
+    /* Behåll dina gamla styles för background-color, padding, height etc här */
+}
+
 
 
 /* ===== Layout / Header ===== */

@@ -57,6 +57,7 @@ function openJoinRoleModal(projectId, projectName) {
 }
 
 
+
 // ==============================
 // --- INIT-FUNKTIONER ---
 // ==============================
@@ -610,6 +611,34 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const imgInput = document.getElementById('projectImageInput');
+    const imgPreview = document.getElementById('projectImagePreview');
+
+    if (imgInput && imgPreview) {
+        imgInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Sätt bildens källa till filen vi just läste in
+                    imgPreview.src = e.target.result;
+                    // Visa bilden
+                    imgPreview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(file);
+            } else {
+                // Om användaren avbryter valet, dölj bilden igen
+                imgPreview.src = "";
+                imgPreview.style.display = 'none';
+            }
+        });
+    }
+});
 
     // ==============================
     // --- DOMContentLoaded (EN gång) ---
