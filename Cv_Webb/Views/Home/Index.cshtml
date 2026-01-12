@@ -69,18 +69,10 @@
                 <div class="p-4 text-center">
 
                     @* --- Profilbild --- *@
-                    @if (!string.IsNullOrEmpty(person.ImageUrl))
-                    {
-                        <img src="~/images/ProfilePicture/@person.ImageUrl"
-                             class="home-profile-img"
-                             alt="Profilbild för @person.FirstName" />
-                    }
-                    else
-                    {
-                        <div class="home-profile-img-fallback">
-                            <i class="fas fa-user"></i>
-                        </div>
-                    }
+                    <img src="~/images/ProfilePicture/@(string.IsNullOrEmpty(person.ImageUrl) ? "defaultPicture.jpg" : person.ImageUrl)"
+                         class="home-profile-img"
+                         alt="Profilbild för @person.FirstName" />
+
 
                     <h5 class="home-profile-name">
                         @person.FirstName @person.LastName
