@@ -290,7 +290,7 @@ namespace CV_siten.Controllers
 
                 TempData["StatusMessage"] = "Du har nu gått med i projektet!";
             }
-            return RedirectToAction("Profile", "Person");
+            return RedirectToAction("ProjectDetails", "Project", new { id = projectId });
         }
 
         // --- GÅ MED I PROJEKT (POST - Från Detaljvy) ---
