@@ -39,10 +39,9 @@
                                     foreach (var m in Model)
                                     {
                                         <tr class="@(m.IsRead ? "" : "table-light") message-row"
-                                            data-from="@(m.Sender != null
-                                            ? (m.Sender.FirstName + " " + m.Sender.LastName)
-                                            : (m.SenderName ?? "Extern"))"
-                                            data-subject="@m.Subject">
+                                            data-from="@(m.Sender != null ? (m.Sender.FirstName + " " + m.Sender.LastName) : (m.SenderName + " (extern)"))"
+                                            data-subject="@m.Subject"
+                                            data-sender-id="@m.SenderId">
 
                                             <td data-bs-toggle="modal" data-bs-target="#readMessageModal">
                                                 <strong>

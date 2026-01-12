@@ -1,9 +1,29 @@
-﻿// ==============================
+﻿// ==========================================
+// --- ROBUST INITIALISERINGSMOTOR ---
+// ==========================================
+
+// Denna variabel behövs för att komma ihåg vilken profil man skickar meddelande från
+let __lastSendMessageTrigger = null;
+
+/**
+ * Hjälpfunktion för att köra init-funktioner säkert.
+ * Förhindrar att ett fel i en funktion stoppar resten av skriptet.
+ */
+function safeInit(initFn, name) {
+    try {
+        if (typeof initFn === 'function') {
+            initFn();
+        }
+    } catch (e) {
+        console.error(`Fel vid laddning av ${name}:`, e);
+    }
+}
+
+// ==============================
 // --- ALLMÄNNA FUNKTIONER ---
 // ==============================
 
 // Växlar mellan visning och redigering på profilsidan / projectdetails.
-// Klarar både inline style="display:none" och class .u-hidden
 function enableEdit(sectionName) {
     const container = document.getElementById('section-' + sectionName);
     if (!container) return;
@@ -30,14 +50,11 @@ function enableEdit(sectionName) {
     }
 
     if (saveBtn) {
-        // vissa av dina vyer vill ha inline-flex, andra bara "block"
         saveBtn.style.display = 'inline-flex';
         saveBtn.classList?.remove('u-hidden');
     }
 }
 
-
-// Öppnar modalen för att gå med i ett projekt och fyller i ID/Namn (stöd för inline onclick)
 function showJoinPopup(projectId, projectName) {
     openJoinRoleModal(projectId, projectName);
 }
@@ -56,12 +73,27 @@ function openJoinRoleModal(projectId, projectName) {
     myModal.show();
 }
 
-
-
 // ==============================
 // --- INIT-FUNKTIONER ---
 // ==============================
 
+// Popup för när man sparar profiländringar (SKICKAR VIDARE ELLER DÖLJER)
+function initSaveSuccessRedirect() {
+    const successPopup = document.getElementById('saveSuccessPopup');
+    if (!successPopup) return;
+
+    const redirectUrl = successPopup.getAttribute('data-redirect-url');
+
+    setTimeout(() => {
+        if (redirectUrl) {
+            window.location.replace(redirectUrl);
+        } else {
+            successPopup.style.display = 'none';
+        }
+    }, 3000);
+}
+
+// Popup för när man skapat ett projekt
 function initAddProjectSuccessPopup() {
     const popupData = document.getElementById('popup-data');
     if (!popupData) return;
@@ -74,7 +106,6 @@ function initAddProjectSuccessPopup() {
 
     if (!popup || !redirectUrl) return;
 
-    // Visa popup (klarar både style och u-hidden)
     popup.style.display = 'flex';
     popup.classList?.remove('u-hidden');
 
@@ -106,9 +137,7 @@ function initReceiverSearch() {
 
     let timer = null;
 
-    function clearResults() {
-        resultsEl.innerHTML = "";
-    }
+    function clearResults() { resultsEl.innerHTML = ""; }
 
     function setSelected(person) {
         receiverIdEl.value = person.id;
@@ -120,53 +149,28 @@ function initReceiverSearch() {
         const res = await fetch(`/Message/SearchPerson?q=${encodeURIComponent(q)}`, {
             headers: { "Accept": "application/json" }
         });
-        if (!res.ok) return [];
-        return await res.json();
+        return res.ok ? await res.json() : [];
     }
 
     function render(items) {
         clearResults();
         if (!items || items.length === 0) return;
-
-        for (const p of items) {
+        items.forEach(p => {
             const btn = document.createElement('button');
             btn.type = "button";
             btn.className = "list-group-item list-group-item-action d-flex align-items-center gap-2";
-
-            const img = document.createElement('img');
-            img.alt = p.name;
-            img.style.width = "32px";
-            img.style.height = "32px";
-            img.style.borderRadius = "50%";
-            img.style.objectFit = "cover";
-            img.src = p.imageUrl || "/images/profilePicture/defaultPicture.jpg";
-            img.onerror = () => { img.src = "/images/profilePicture/defaultPicture.jpg"; };
-
-            const span = document.createElement('span');
-            span.textContent = p.name;
-
-            btn.appendChild(img);
-            btn.appendChild(span);
-
+            btn.innerHTML = `<img src="${p.imageUrl || '/images/profilePicture/defaultPicture.jpg'}" style="width:32px;height:32px;border-radius:50%;object-fit:cover" onerror="this.src='/images/profilePicture/defaultPicture.jpg'"><span>${p.name}</span>`;
             btn.addEventListener('click', () => setSelected(p));
             resultsEl.appendChild(btn);
-        }
+        });
     }
 
     searchInput.addEventListener('input', function () {
-        const q = (searchInput.value || "").trim();
+        const q = (this.value || "").trim();
         receiverIdEl.value = "";
         clearTimeout(timer);
-
-        if (q.length < 2) {
-            clearResults();
-            return;
-        }
-
-        timer = setTimeout(async () => {
-            const items = await search(q);
-            render(items);
-        }, 200);
+        if (q.length < 2) return clearResults();
+        timer = setTimeout(async () => render(await search(q)), 200);
     });
 }
 
@@ -188,17 +192,27 @@ function initMessagesPage() {
     if (readModalEl) {
         readModalEl.addEventListener("show.bs.modal", (event) => {
             const triggerEl = event.relatedTarget;
-            if (!triggerEl) return;
-
-            const row = triggerEl.closest('tr.message-row');
+            const row = triggerEl?.closest('tr.message-row');
             if (!row) return;
 
             const from = row.getAttribute('data-from') || '';
-            const senderId = row.getAttribute('data-sender-id') || '';
+            const senderId = row.getAttribute('data-sender-id');
             const subject = row.getAttribute('data-subject') || '';
+            const content = row.querySelector('td.message-content')?.textContent.trim() || '';
 
-            const contentCell = row.querySelector('td.message-content');
-            const content = contentCell ? contentCell.textContent.trim() : '';
+            // --- LOGIK FÖR SVARA-KNAPPEN ---
+            if (replyBtn) {
+                // Vi kollar om senderId har ett riktigt värde
+                const hasSender = senderId && senderId !== "" && senderId !== "null" && senderId !== "0";
+                // Vi dubbelkollar också om namnet innehåller "(extern)"
+                const isExternalText = from.includes("(extern)");
+
+                if (hasSender && !isExternalText) {
+                    replyBtn.style.display = 'inline-flex'; // Visa för inloggade
+                } else {
+                    replyBtn.style.display = 'none'; // Dölj för externa
+                }
+            }
 
             if (readFromEl) readFromEl.textContent = "Från: " + from;
             if (readContentEl) readContentEl.textContent = content;
@@ -209,48 +223,30 @@ function initMessagesPage() {
 
     if (deleteModalEl) {
         deleteModalEl.addEventListener("show.bs.modal", (event) => {
-            const triggerBtn = event.relatedTarget;
-            if (!triggerBtn) return;
-
-            const id = triggerBtn.getAttribute("data-id") || "";
-            const from = triggerBtn.getAttribute("data-from") || "";
-            const subject = triggerBtn.getAttribute("data-subject") || "";
-
-            if (deleteIdEl) deleteIdEl.value = id;
-            if (deleteInfoEl) deleteInfoEl.textContent = `${from} – ${subject}`.trim();
+            const btn = event.relatedTarget;
+            if (!btn) return;
+            if (deleteIdEl) deleteIdEl.value = btn.getAttribute("data-id") || "";
+            if (deleteInfoEl) deleteInfoEl.textContent = `${btn.getAttribute("data-from")} – ${btn.getAttribute("data-subject")}`.trim();
         });
     }
 
     if (replyBtn) {
         replyBtn.addEventListener('click', function () {
-            if (!lastOpenedMessage || !lastOpenedMessage.senderId) return;
+            if (!lastOpenedMessage.senderId) return;
 
-            const receiverSearch = document.getElementById('receiverSearch');
-            const receiverId = document.getElementById('receiverId');
-            const subjectInput = document.getElementById('sendSubject');
-            const receiverResults = document.getElementById('receiverResults');
+            const rSearch = document.getElementById('receiverSearch');
+            const rId = document.getElementById('receiverId');
+            const rSubject = document.getElementById('sendSubject');
 
-            if (replyBtn) {
-                const isExternal = !senderId || senderId === "0";
-                replyBtn.classList.toggle("u-reply-external", isExternal);
+            if (rSearch) rSearch.value = lastOpenedMessage.from;
+            if (rId) rId.value = lastOpenedMessage.senderId;
+            if (rSubject) {
+                const s = lastOpenedMessage.subject;
+                rSubject.value = s.toLowerCase().startsWith('re:') ? s : 'Re: ' + s;
             }
 
-            if (receiverSearch) receiverSearch.value = lastOpenedMessage.from || '';
-            if (receiverId) receiverId.value = lastOpenedMessage.senderId || '';
-            if (subjectInput) {
-                const s = (lastOpenedMessage.subject || '').trim();
-                subjectInput.value = s.toLowerCase().startsWith('re:') ? s : ('Re: ' + s);
-            }
-            if (receiverResults) receiverResults.innerHTML = "";
-
-            if (readModalEl && window.bootstrap) {
-                const readInstance = window.bootstrap.Modal.getInstance(readModalEl);
-                if (readInstance) readInstance.hide();
-            }
-            if (sendModalEl && window.bootstrap) {
-                const sendInstance = window.bootstrap.Modal.getOrCreateInstance(sendModalEl);
-                sendInstance.show();
-            }
+            bootstrap.Modal.getInstance(readModalEl)?.hide();
+            bootstrap.Modal.getOrCreateInstance(sendModalEl).show();
         });
     }
 
@@ -258,123 +254,159 @@ function initMessagesPage() {
         const btn = e.target.closest('.btn-mark-read');
         if (!btn) return;
 
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-
         const messageId = btn.getAttribute('data-id');
-        if (!messageId) return;
-
         const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
 
         const res = await fetch('/Message/MarkRead', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'RequestVerificationToken': token
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': token },
             body: `id=${encodeURIComponent(messageId)}`
         });
 
-        if (!res.ok) return;
-
-        const row = btn.closest('tr');
-        row?.classList.remove('table-light');
-
-        const badge = row?.querySelector('.message-badge-new');
-        if (badge) {
-            badge.textContent = 'Läst';
-            badge.classList.remove('message-badge-new');
-            badge.classList.add('message-badge-read');
+        if (res.ok) {
+            const row = btn.closest('tr');
+            row?.classList.remove('table-light');
+            const badge = row?.querySelector('.message-badge-new');
+            if (badge) {
+                badge.textContent = 'Läst';
+                badge.classList.replace('message-badge-new', 'message-badge-read');
+            }
+            btn.remove();
         }
-
-        btn.remove();
     }, true);
-}
-
-
-
-function openSendModalIfNeeded() {
-    const shouldOpen = document.body?.dataset?.openSendModal === "true";
-    if (!shouldOpen) return;
-
-    const el = document.getElementById("sendMessageModal");
-    if (!el || !window.bootstrap) return;
-
-    (bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el)).show();
 }
 
 function initSendMessageModalValidation() {
     const modal = document.getElementById('sendMessageModal');
     if (!modal) return;
 
-    const form = modal.querySelector('#sendMessageForm') || modal.querySelector('form');
     const submitBtn = modal.querySelector('#sendMessageSubmitBtn');
-    if (!form || !submitBtn) return;
-
-    const receiverId = modal.querySelector('#receiverId');
-    const receiverSearch = modal.querySelector('#receiverSearch');
-
-    const senderName = modal.querySelector('#senderName'); 
-    const subject = modal.querySelector('#sendSubject');
-    const content = modal.querySelector('#sendContent');
-
-    const receiverErr = modal.querySelector('#receiverClientError');
-    const senderErr = modal.querySelector('#senderNameClientError');
-    const subjectErr = modal.querySelector('#subjectClientError');
-    const contentErr = modal.querySelector('#contentClientError');
-
-    const showErr = (el, msg) => { if (el) { el.textContent = msg; el.style.display = 'block'; } };
-    const clearErr = (el) => { if (el) { el.textContent = ''; el.style.display = 'none'; } };
-
-
-    receiverSearch?.addEventListener('input', () => clearErr(receiverErr));
-    senderName?.addEventListener('input', () => clearErr(senderErr));
-    subject?.addEventListener('input', () => clearErr(subjectErr));
-    content?.addEventListener('input', () => clearErr(contentErr));
+    const form = modal.querySelector('form');
+    if (!submitBtn || !form) return;
 
     submitBtn.addEventListener('click', () => {
-        let ok = true;
+        const receiverId = modal.querySelector('#receiverId')?.value.trim();
+        const subject = modal.querySelector('#sendSubject')?.value.trim();
+        const content = modal.querySelector('#sendContent')?.value.trim();
 
-        clearErr(receiverErr);
-        clearErr(senderErr);
-        clearErr(subjectErr);
-        clearErr(contentErr);
-
-        if (!receiverId?.value?.trim()) {
-            ok = false;
-            showErr(receiverErr, "Välj en mottagare i listan.");
+        if (!receiverId || !subject || !content) {
+            alert("Vänligen fyll i alla obligatoriska fält.");
+            return;
         }
-
-        if (senderName && senderName.value.trim().length < 2) {
-            ok = false;
-            showErr(senderErr, "Ange ditt namn (minst 2 tecken).");
-        }
-
-        if (!subject?.value?.trim()) {
-            ok = false;
-            showErr(subjectErr, "Ange ett ämne.");
-        }
-
-        if (!content?.value?.trim()) {
-            ok = false;
-            showErr(contentErr, "Skriv ett meddelande.");
-        }
-
-        if (!ok) {
-            if (senderErr?.style.display === 'block') senderName?.focus();
-            else if (receiverErr?.style.display === 'block') receiverSearch?.focus();
-            else if (subjectErr?.style.display === 'block') subject?.focus();
-            else if (contentErr?.style.display === 'block') content?.focus();
-            return; 
-        }
-
- 
-        if (form.requestSubmit) form.requestSubmit();
-        else form.submit();
+        form.requestSubmit ? form.requestSubmit() : form.submit();
     });
 }
 
+function initProfileImagePreview() {
+    const input = document.getElementById('imageInput');
+    const container = document.getElementById('profile-image-preview');
+    if (!input || !container) return;
+
+    input.addEventListener('change', function (e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            container.innerHTML = `<img src="${event.target.result}" class="img-thumbnail mb-2" style="width:150px;height:150px;object-fit:cover;border-radius:50%;border:3px solid #002d5a;">`;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function initProjectImagePreview() {
+    const input = document.getElementById('projectImageInput');
+    const preview = document.getElementById('projectImagePreview');
+    if (!input || !preview) return;
+
+    input.addEventListener('change', function (e) {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                preview.src = ev.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    });
+}
+
+function initCvUploadPdfOnly() {
+    const cvInput = document.getElementById('cvFileInput');
+    const cvForm = document.getElementById('cvUploadForm');
+    if (!cvInput || !cvForm) return;
+
+    cvInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== 'pdf') {
+            alert("Felaktigt filformat! Du kan bara ladda upp PDF-filer.");
+            this.value = "";
+        } else {
+            cvForm.submit();
+        }
+    });
+}
+
+function initDateRangeValidation() {
+    const start = document.querySelector('input[name="StartDate"]');
+    const end = document.querySelector('input[name="EndDate"]');
+    if (!start || !end) return;
+
+    start.addEventListener("change", () => {
+        if (start.value) end.min = start.value;
+        if (end.value && start.value && end.value < start.value) {
+            end.value = "";
+            alert("Slutdatumet har rensats eftersom det var före startdatumet.");
+        }
+    });
+}
+
+function initSmartBackButton() {
+    if (window.location.pathname.includes("/Project/ProjectDetails")) {
+        const ref = document.referrer;
+        if (ref && !ref.includes(window.location.pathname)) {
+            sessionStorage.setItem("originalProjectSource", ref);
+        }
+    }
+
+    const btn = document.getElementById("smartBackBtn");
+    if (btn) {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const source = sessionStorage.getItem("originalProjectSource");
+            window.location.href = source || "/Project/AllProjects";
+        });
+    }
+}
+
+function initSendMessagePrefillFromProfile() {
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-bs-target="#sendMessageModal"]');
+        if (btn) __lastSendMessageTrigger = btn;
+    }, true);
+
+    const sendEl = document.getElementById('sendMessageModal');
+    if (!sendEl) return;
+
+    sendEl.addEventListener('show.bs.modal', function (event) {
+        const trigger = event.relatedTarget || __lastSendMessageTrigger || document.activeElement;
+        if (!trigger) return;
+
+        const receiverId = trigger.getAttribute?.('data-receiver-id');
+        if (!receiverId) return;
+
+        const receiverName = trigger.getAttribute?.('data-receiver-name') || '';
+        const rIdEl = sendEl.querySelector('#receiverId');
+        const rSearchEl = sendEl.querySelector('#receiverSearch');
+
+        if (rIdEl) rIdEl.value = receiverId;
+        if (rSearchEl) rSearchEl.value = receiverName;
+    });
+}
 
 function initModalCleanup() {
     function cleanup() {
@@ -382,336 +414,54 @@ function initModalCleanup() {
         document.body.style.removeProperty('padding-right');
         document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
     }
-
     ['sendMessageModal', 'readMessageModal', 'deleteMessageModal'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.addEventListener('hidden.bs.modal', cleanup);
+        document.getElementById(id)?.addEventListener('hidden.bs.modal', cleanup);
     });
 }
 
-function initSendMessageModalPrefill() {
-    const sendEl = document.getElementById('sendMessageModal');
-    if (!sendEl || !window.bootstrap) return;
+// ==========================================
+// --- MASTER DOM LOAD (Kör allt säkert) ---
+// ==========================================
 
-    // Prefill när modalen öppnas via en trigger med data-receiver-id / data-receiver-name
-    sendEl.addEventListener('show.bs.modal', (event) => {
-        const trigger = event.relatedTarget;
-        if (!trigger) return;
+document.addEventListener("DOMContentLoaded", function () {
+    // Grundläggande logik & Popups
+    safeInit(initAddProjectSuccessPopup, "Add Project Popup");
+    safeInit(initSaveSuccessRedirect, "Save Success Redirect");
+    safeInit(initScrollRestoreOnSearch, "Scroll Restore");
+    safeInit(initReceiverSearch, "Receiver Search");
 
-        const receiverId = trigger.getAttribute('data-receiver-id');
-        const receiverName = trigger.getAttribute('data-receiver-name') || '';
+    // Meddelandehantering
+    safeInit(initMessagesPage, "Messages Logic");
+    safeInit(initSendMessagePrefillFromProfile, "Send Message Prefill");
+    safeInit(initSendMessageModalValidation, "Message Validation");
+    safeInit(initModalCleanup, "Modal Cleanup");
 
-        const receiverIdEl = document.getElementById('receiverId');
-        const receiverSearchEl = document.getElementById('receiverSearch');
-        const subjectEl = document.getElementById('sendSubject');
-        const resultsEl = document.getElementById('receiverResults');
+    // Förhandsgranskningar
+    safeInit(initProfileImagePreview, "Profile Preview");
+    safeInit(initProjectImagePreview, "Project Preview");
 
-        if (receiverIdEl && receiverId) receiverIdEl.value = receiverId;
-        if (receiverSearchEl && receiverName) receiverSearchEl.value = receiverName;
+    // Projekt & CV & Övrigt
+    safeInit(initCvUploadPdfOnly, "CV PDF Check");
+    safeInit(initDateRangeValidation, "Date Validation");
+    safeInit(initSmartBackButton, "Smart Back Button");
 
-        if (subjectEl) subjectEl.value = '';
-        if (resultsEl) resultsEl.innerHTML = '';
-    });
-}
-
-let __lastSendMessageTrigger = null;
-
-function initSendMessagePrefillFromProfile() {
-    // 1) Fånga klicket FÖRE allt annat (så ingen stopPropagation kan döda den)
-    document.addEventListener('click', function (e) {
-        const btn = e.target.closest('[data-bs-target="#sendMessageModal"]');
-        if (btn) __lastSendMessageTrigger = btn;
-    }, true); // <-- capture
-
-    // 2) När modalen öppnas: använd relatedTarget, fallback till sparad knapp / activeElement
-    const sendEl = document.getElementById('sendMessageModal');
-    if (!sendEl) return;
-
-    sendEl.addEventListener('show.bs.modal', function (event) {
-        const trigger =
-            event.relatedTarget ||
-            __lastSendMessageTrigger ||
-            document.activeElement;
-
-        if (!trigger) return;
-
-        const receiverId = trigger.getAttribute?.('data-receiver-id');
-        if (!receiverId) return; // öppnas från inbox-knappen -> ingen prefill
-
-        const receiverName = trigger.getAttribute?.('data-receiver-name') || '';
-
-        const receiverIdEl = sendEl.querySelector('#receiverId');
-        const receiverSearchEl = sendEl.querySelector('#receiverSearch');
-        const resultsEl = sendEl.querySelector('#receiverResults');
-
-        if (receiverIdEl) receiverIdEl.value = receiverId;
-        if (receiverSearchEl) receiverSearchEl.value = receiverName;
-        if (resultsEl) resultsEl.innerHTML = '';
-    });
-}
-
-
-
-function initProfileImagePreview() {
-    const imageInput = document.getElementById('imageInput');
-    const previewContainer = document.getElementById('profile-image-preview');
-    if (!imageInput || !previewContainer) return;
-
-    imageInput.addEventListener('change', function (event) {
-        const file = event.target.files && event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            previewContainer.innerHTML = `
-                <img src="${e.target.result}"
-                     class="img-thumbnail mb-2"
-                     style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid #002d5a;" />
-            `;
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-function initSaveSuccessRedirect() {
-    const successPopup = document.getElementById('saveSuccessPopup');
-    if (!successPopup) return;
-
-    const redirectUrl = successPopup.getAttribute('data-redirect-url');
-    if (!redirectUrl) return;
-
-    setTimeout(() => {
-        window.location.replace(redirectUrl);
-    }, 3000);
-}
-
-function initDateRangeValidation() {
-    const startDateInput = document.querySelector('input[name="StartDate"]');
-    const endDateInput = document.querySelector('input[name="EndDate"]');
-    if (!startDateInput || !endDateInput) return;
-
-    startDateInput.addEventListener("change", function () {
-        if (startDateInput.value) {
-            endDateInput.min = startDateInput.value;
-        }
-
-        if (endDateInput.value && startDateInput.value && endDateInput.value < startDateInput.value) {
-            endDateInput.value = "";
-            alert("Slutdatumet har rensats eftersom det var före det nya startdatumet.");
-        }
-    });
-}
-
-function initSmartBackButton() {
-    // Spara referrer om vi är på ProjectDetails
-    if (window.location.pathname.includes("/Project/ProjectDetails")) {
-        const referrer = document.referrer;
-
-        if (referrer && !referrer.includes(window.location.pathname)) {
-            sessionStorage.setItem("originalProjectSource", referrer);
-        }
-    }
-
-    const smartBackBtn = document.getElementById("smartBackBtn");
-    if (!smartBackBtn) return;
-
-    smartBackBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        const source = sessionStorage.getItem("originalProjectSource");
-
-        if (source) {
-            window.location.href = source;
-        } else {
-            window.location.href = "/Project/AllProjects";
-        }
-    });
-}
-
-function initJoinProjectDelegation() {
-    // Klick på knappar med data-join-project-id (utan dubbla handlers)
+    // Event Delegation för dynamiska knappar
     document.addEventListener("click", (e) => {
-        const btn = e.target.closest("[data-join-project-id]");
-        if (!btn) return;
+        const joinBtn = e.target.closest('.all-projects-join-btn');
+        if (joinBtn) {
+            openJoinRoleModal(joinBtn.getAttribute('data-project-id'), joinBtn.getAttribute('data-project-name'));
+        }
 
-        const projectId = btn.getAttribute("data-join-project-id") || "";
-        const projectName = btn.getAttribute("data-join-project-name") || "";
-
-        openJoinRoleModal(projectId, projectName);
-    });
-}
-
-function initEditButtonsDelegation() {
-    // Stöd för både data-edit-field och data-enable-edit
-    document.addEventListener("click", (e) => {
-        const btn =
-            e.target.closest("[data-edit-field]") ||
-            e.target.closest("[data-enable-edit]");
-
-        if (!btn) return;
-
-        const field = btn.getAttribute("data-edit-field") || btn.getAttribute("data-enable-edit");
-        if (!field) return;
-
-        enableEdit(field);
-    });
-}
-
-function initCvUpload() {
-    const uploadBtn = document.querySelector('[data-action="cv-upload"]');
-    const fileInput = document.getElementById("cvFileInput");
-    const uploadForm = document.getElementById("cvUploadForm");
-    if (!uploadBtn || !fileInput) return;
-
-    uploadBtn.addEventListener("click", () => fileInput.click());
-
-    fileInput.addEventListener("change", () => {
-        if (uploadForm) uploadForm.submit();
-    });
-}
-
-function initConfirmForms() {
-    document.querySelectorAll("form[data-confirm]").forEach((form) => {
-        form.addEventListener("submit", (e) => {
-            const msg = form.getAttribute("data-confirm") || "Är du säker?";
-            if (!window.confirm(msg)) e.preventDefault();
-        });
-    });
-}
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Fånga upp alla knappar med klassen 'all-projects-join-btn'
-    const joinButtons = document.querySelectorAll('.all-projects-join-btn');
-
-    joinButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            // Hämta data från knappen
-            const projectId = this.getAttribute('data-project-id');
-            const projectName = this.getAttribute('data-project-name');
-
-            // Fyll i modalens fält
-            const idInput = document.getElementById('modalProjectId');
-            const textDisplay = document.getElementById('modalProjectText');
-
-            if (idInput && textDisplay) {
-                idInput.value = projectId;
-                textDisplay.innerText = "Gå med i: " + projectName;
-
-                // Visa modalen (Bootstrap 5 syntax)
-                const joinModal = new bootstrap.Modal(document.getElementById('joinRoleModal'));
-                joinModal.show();
-            }
-        });
-    });
-
-    // Logik för att stänga success-popupen i ProjectDetails om den finns
-    const successPopup = document.getElementById('saveSuccessPopup');
-    if (successPopup) {
-        setTimeout(() => {
-            successPopup.style.display = 'none';
-        }, 3000);
-    }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    // Vi använder .cv-delete-form-wrap (som i din HTML)
-    // Vi använder querySelectorAll för att fånga både knappen i sidebaren och i main content
-    const deleteCvForms = document.querySelectorAll('.cv-delete-form-wrap');
-
-    deleteCvForms.forEach(form => {
-        form.addEventListener('submit', function (e) {
-            if (!confirm("Är du säker på att du vill ta bort ditt CV permanent?")) {
-                e.preventDefault(); // Avbryter inskickningen om användaren klickar "Avbryt"
-            }
-        });
-    });
-});
-
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const cvInput = document.getElementById('cvFileInput');
-        const cvForm = document.getElementById('cvUploadForm');
-
-        if (cvInput && cvForm) {
-            cvInput.addEventListener('change', function () {
-                const file = this.files[0];
-                if (file) {
-                    const fileName = file.name;
-                    const extension = fileName.split('.').pop().toLowerCase();
-
-                    if (extension !== 'pdf') {
-                        // Visa en snabb varning
-                        alert("Felaktigt filformat! Du kan bara ladda upp PDF-filer.");
-                        // Rensa inputen så att den felaktiga filen försvinner
-                        this.value = "";
-                    } else {
-                        // Om det är en PDF, skicka formuläret som vanligt
-                        cvForm.submit();
-                    }
-                }
-            });
+        const editBtn = e.target.closest('[data-edit-field]') || e.target.closest('[data-enable-edit]');
+        if (editBtn) {
+            enableEdit(editBtn.getAttribute('data-edit-field') || editBtn.getAttribute('data-enable-edit'));
         }
     });
 
-document.addEventListener("DOMContentLoaded", function () {
-    const imgInput = document.getElementById('projectImageInput');
-    const imgPreview = document.getElementById('projectImagePreview');
-
-    if (imgInput && imgPreview) {
-        imgInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    // Sätt bildens källa till filen vi just läste in
-                    imgPreview.src = e.target.result;
-                    // Visa bilden
-                    imgPreview.style.display = 'block';
-                }
-
-                reader.readAsDataURL(file);
-            } else {
-                // Om användaren avbryter valet, dölj bilden igen
-                imgPreview.src = "";
-                imgPreview.style.display = 'none';
-            }
+    // CV Delete Confirm
+    document.querySelectorAll('.cv-delete-form-wrap').forEach(form => {
+        form.addEventListener('submit', (e) => {
+            if (!confirm("Är du säker på att du vill ta bort ditt CV permanent?")) e.preventDefault();
         });
-    }
-});
-
-    // ==============================
-    // --- DOMContentLoaded (EN gång) ---
-    // ==============================
-
-    document.addEventListener("DOMContentLoaded", function () {
-        initAddProjectSuccessPopup();
-        initScrollRestoreOnSearch();
-
-        initReceiverSearch();
-        initMessagesPage();
-        initModalCleanup();
-
-        openSendModalIfNeeded();
-        initSendMessageModalPrefill();
-        initSendMessagePrefillFromProfile();
-        initSendMessageModalValidation();
-
-        initProfileImagePreview();
-        initSaveSuccessRedirect();
-
-        initDateRangeValidation();
-        initSmartBackButton();
-
-        initJoinProjectDelegation();
-        initEditButtonsDelegation();
-        initCvUpload();
-        initConfirmForms();
-
-        initAllProjectsJoinButtons();
-        initHideProjectDetailsSuccessPopup();
-        initCvDeleteConfirm();
-        initCvUploadPdfOnly();
     });
+});
