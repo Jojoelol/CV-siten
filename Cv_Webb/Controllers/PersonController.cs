@@ -109,17 +109,20 @@ namespace CV_siten.Controllers
                .Where(p => p.Id != targetId && p.IsActive && !p.IsPrivate)
                .ToListAsync();
 
-            var bestMatch = others
-                .Select(p => new { Person = p, Score = CalculateMatchScore(person, p) })
-                .Where(x => x.Score >= 2)
-                .OrderByDescending(x => x.Score)
-                .FirstOrDefault();
+            var matches = others
+                .Select(p =>
+                {
+                    var score = CalculateMatchScore(person, p);
+                    var percent = Math.Min(score * 10, 100);
+                    return new { Person = p, Score = score, MatchPercent = percent };
+                })
+                .Where(x => x.MatchPercent >= 70)   //Minst 70% matchning
+                .OrderByDescending(x => x.MatchPercent)
+                .Take(4)                            //Max 4 profiler
+                .ToList();
 
-            if (bestMatch != null)
-            {
-                ViewBag.SimilarPerson = bestMatch.Person;
-                ViewBag.MatchScore = Math.Min(bestMatch.Score * 10, 100);
-            }
+            ViewBag.SimilarPersons = matches;
+
 
             return View(person);
         }

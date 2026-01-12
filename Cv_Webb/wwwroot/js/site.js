@@ -280,22 +280,79 @@ function initSendMessageModalValidation() {
     const modal = document.getElementById('sendMessageModal');
     if (!modal) return;
 
+    const form = modal.querySelector('#sendMessageForm') || modal.querySelector('form');
     const submitBtn = modal.querySelector('#sendMessageSubmitBtn');
-    const form = modal.querySelector('form');
-    if (!submitBtn || !form) return;
+    if (!form || !submitBtn) return;
+
+    const receiverId = modal.querySelector('#receiverId');
+    const receiverSearch = modal.querySelector('#receiverSearch');
+    const senderName = modal.querySelector('#senderName'); 
+    const subject = modal.querySelector('#sendSubject');
+    const content = modal.querySelector('#sendContent');
+
+    const receiverErr = modal.querySelector('#receiverClientError');
+    const senderErr = modal.querySelector('#senderNameClientError');
+    const subjectErr = modal.querySelector('#subjectClientError');
+    const contentErr = modal.querySelector('#contentClientError');
+
+    const showErr = (el, msg) => {
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = 'block';
+    };
+
+    const clearErr = (el) => {
+        if (!el) return;
+        el.textContent = '';
+        el.style.display = 'none';
+    };
+
+    receiverSearch?.addEventListener('input', () => clearErr(receiverErr));
+    senderName?.addEventListener('input', () => clearErr(senderErr));
+    subject?.addEventListener('input', () => clearErr(subjectErr));
+    content?.addEventListener('input', () => clearErr(contentErr));
 
     submitBtn.addEventListener('click', () => {
-        const receiverId = modal.querySelector('#receiverId')?.value.trim();
-        const subject = modal.querySelector('#sendSubject')?.value.trim();
-        const content = modal.querySelector('#sendContent')?.value.trim();
+        let ok = true;
 
-        if (!receiverId || !subject || !content) {
-            alert("Vänligen fyll i alla obligatoriska fält."); //ÄNDRA till ordentlig visuell feedback vid behov
+        clearErr(receiverErr);
+        clearErr(senderErr);
+        clearErr(subjectErr);
+        clearErr(contentErr);
+
+        if (!receiverId?.value?.trim()) {
+            ok = false;
+            showErr(receiverErr, "Välj en mottagare i listan.");
+        }
+
+        if (senderName && senderName.value.trim().length < 2) {
+            ok = false;
+            showErr(senderErr, "Ange ditt namn (minst 2 tecken).");
+        }
+
+        if (!subject?.value?.trim()) {
+            ok = false;
+            showErr(subjectErr, "Ange ett ämne.");
+        }
+
+        if (!content?.value?.trim()) {
+            ok = false;
+            showErr(contentErr, "Skriv ett meddelande.");
+        }
+
+        if (!ok) {
+            if (senderErr?.style.display === 'block') senderName?.focus();
+            else if (receiverErr?.style.display === 'block') receiverSearch?.focus();
+            else if (subjectErr?.style.display === 'block') subject?.focus();
+            else if (contentErr?.style.display === 'block') content?.focus();
             return;
         }
-        form.requestSubmit ? form.requestSubmit() : form.submit();
+
+        if (form.requestSubmit) form.requestSubmit();
+        else form.submit();
     });
 }
+
 function initProfileImagePreview() {
     const input = document.getElementById('imageInput');
     const container = document.getElementById('profile-image-preview');

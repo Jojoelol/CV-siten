@@ -69,7 +69,7 @@ namespace CV_siten.Controllers
             {
                 ViewBag.SectionTitle = "UTVALDA PROFILER";
                 ViewBag.MatchData = new Dictionary<int, int>();
-                return View(await query.Take(3).ToListAsync());
+                return View(await query.Take(5).ToListAsync()); //visar 5 profiler när utloggad
             }
 
             // Matchningslogik för inloggad person (VG-Krav 5) - Nu synkad med PersonController
@@ -81,7 +81,7 @@ namespace CV_siten.Controllers
             })
             .Where(x => x.Score >= 2) // Ändrat från 5 till 2 för att matcha PersonController
             .OrderByDescending(x => x.Score)
-            .Take(3)
+            .Take(5) //visar 5 utvalda profiler när inloggad
             .ToList();
 
             ViewBag.MatchData = matches.ToDictionary(x => x.Person.Id, x => x.MatchPercent);
