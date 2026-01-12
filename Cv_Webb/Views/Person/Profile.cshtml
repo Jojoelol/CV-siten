@@ -356,35 +356,63 @@
 		</div>
 
 		@* Liknande personer *@
-		@if (ViewBag.SimilarPerson != null)
+		@if (ViewBag.SimilarPersons != null && ViewBag.SimilarPersons.Count > 0)
 		{
 			<div class="cv-section u-similar-section">
 				<div class="cv-header-row">
 					<h3 class="section-title"><i class="fas fa-user-friends"></i> Hitta liknande personer</h3>
 				</div>
-				<div class="similar-profile-card u-similar-card">
-					<div class="u-similar-avatar">
-						@if (!string.IsNullOrEmpty(ViewBag.SimilarPerson.ImageUrl))
-						{
-							<img src="~/images/ProfilePicture/@ViewBag.SimilarPerson.ImageUrl" alt="Profilbild" class="u-img-cover-full" />
-						}
-						else
-						{
-							<div class="u-similar-avatar-fallback"><i class="fas fa-user"></i></div>
-						}
-					</div>
-					<div class="u-similar-content">
-						<h5 class="u-similar-name">@ViewBag.SimilarPerson.FirstName @ViewBag.SimilarPerson.LastName</h5>
-						<p class="u-similar-title">@ViewBag.SimilarPerson.JobTitle</p>
-						<div class="match-badge mb-2 u-match-badge">
-							<i class="fas fa-bullseye"></i> @ViewBag.MatchScore% Matchning
+
+				<div class="profile-grid-container home-profile-grid">
+					@foreach (var match in ViewBag.SimilarPersons)
+					{
+						var person = match.Person;
+						var percent = match.MatchPercent;
+
+						<div class="profile-card home-profile-card">
+							<div class="home-profile-card-topbar"></div>
+
+							<div class="p-4 text-center">
+
+								<img src="~/images/ProfilePicture/@(string.IsNullOrEmpty(person.ImageUrl) ? "defaultPicture.jpg" : person.ImageUrl)"
+									 class="home-profile-img"
+									 alt="Profilbild för @person.FirstName" />
+
+								<h5 class="home-profile-name">
+									@person.FirstName @person.LastName
+								</h5>
+
+								<p class="home-profile-jobtitle">
+									@person.JobTitle
+								</p>
+
+								<div class="match-badge mb-3 home-match-badge">
+									<i class="fas fa-bullseye"></i> @percent% Matchning
+								</div>
+
+								<div class="home-profile-descbox">
+									<p class="text-muted small mb-0 home-profile-desc">
+										@(string.IsNullOrEmpty(person.Description)
+																		? "Ingen beskrivning tillgänglig."
+																		: person.Description)
+									</p>
+								</div>
+
+								<a asp-controller="Person"
+								   asp-action="Profile"
+								   asp-route-id="@person.Id"
+								   class="btn btn-primary w-100 home-profile-btn">
+									Visa profil
+								</a>
+
+							</div>
 						</div>
-						<br />
-						<a asp-action="Profile" asp-route-id="@ViewBag.SimilarPerson.Id" class="btn btn-sm btn-primary u-similar-btn">Visa profil</a>
-					</div>
+					}
 				</div>
 			</div>
 		}
+
+
 	</section>
 	<partial name="SendMessageModal" />
 
