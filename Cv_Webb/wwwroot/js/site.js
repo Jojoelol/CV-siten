@@ -175,8 +175,7 @@ function initMessagesPage() {
     const deleteModalEl = document.getElementById("deleteMessageModal");
     const sendModalEl = document.getElementById("sendMessageModal");
 
-
-    if (!readModalEl && !deleteModalEl && !sendModalEl) return;
+    if (!readModalEl && !deleteModalEl) return;
 
     const readFromEl = document.getElementById('readMessageFrom');
     const readContentEl = document.getElementById('readMessageContent');
@@ -186,27 +185,27 @@ function initMessagesPage() {
 
     let lastOpenedMessage = { from: "", senderId: "", subject: "" };
 
+    if (readModalEl) {
+        readModalEl.addEventListener("show.bs.modal", (event) => {
+            const triggerEl = event.relatedTarget;
+            if (!triggerEl) return;
 
-    readModalEl.addEventListener("show.bs.modal", (event) => {
-        const triggerEl = event.relatedTarget;
-        if (!triggerEl) return;
+            const row = triggerEl.closest('tr.message-row');
+            if (!row) return;
 
-        const row = triggerEl.closest('tr.message-row');
-        if (!row) return;
+            const from = row.getAttribute('data-from') || '';
+            const senderId = row.getAttribute('data-sender-id') || '';
+            const subject = row.getAttribute('data-subject') || '';
 
-        const from = row.getAttribute('data-from') || '';
-        const senderId = row.getAttribute('data-sender-id') || '';
-        const subject = row.getAttribute('data-subject') || '';
+            const contentCell = row.querySelector('td.message-content');
+            const content = contentCell ? contentCell.textContent.trim() : '';
 
-        const contentCell = row.querySelector('td.message-content');
-        const content = contentCell ? contentCell.textContent.trim() : '';
+            if (readFromEl) readFromEl.textContent = "Från: " + from;
+            if (readContentEl) readContentEl.textContent = content;
 
-        if (readFromEl) readFromEl.textContent = "Från: " + from;
-        if (readContentEl) readContentEl.textContent = content;
-
-        lastOpenedMessage = { from, senderId, subject };
-    });
-
+            lastOpenedMessage = { from, senderId, subject };
+        });
+    }
 
     if (deleteModalEl) {
         deleteModalEl.addEventListener("show.bs.modal", (event) => {
@@ -410,6 +409,44 @@ function initSendMessageModalPrefill() {
         if (resultsEl) resultsEl.innerHTML = '';
     });
 }
+
+let __lastSendMessageTrigger = null;
+
+function initSendMessagePrefillFromProfile() {
+    // 1) Fånga klicket FÖRE allt annat (så ingen stopPropagation kan döda den)
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-bs-target="#sendMessageModal"]');
+        if (btn) __lastSendMessageTrigger = btn;
+    }, true); // <-- capture
+
+    // 2) När modalen öppnas: använd relatedTarget, fallback till sparad knapp / activeElement
+    const sendEl = document.getElementById('sendMessageModal');
+    if (!sendEl) return;
+
+    sendEl.addEventListener('show.bs.modal', function (event) {
+        const trigger =
+            event.relatedTarget ||
+            __lastSendMessageTrigger ||
+            document.activeElement;
+
+        if (!trigger) return;
+
+        const receiverId = trigger.getAttribute?.('data-receiver-id');
+        if (!receiverId) return; // öppnas från inbox-knappen -> ingen prefill
+
+        const receiverName = trigger.getAttribute?.('data-receiver-name') || '';
+
+        const receiverIdEl = sendEl.querySelector('#receiverId');
+        const receiverSearchEl = sendEl.querySelector('#receiverSearch');
+        const resultsEl = sendEl.querySelector('#receiverResults');
+
+        if (receiverIdEl) receiverIdEl.value = receiverId;
+        if (receiverSearchEl) receiverSearchEl.value = receiverName;
+        if (resultsEl) resultsEl.innerHTML = '';
+    });
+}
+
+
 
 function initProfileImagePreview() {
     const imageInput = document.getElementById('imageInput');
@@ -654,6 +691,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         openSendModalIfNeeded();
         initSendMessageModalPrefill();
+        initSendMessagePrefillFromProfile();
         initSendMessageModalValidation();
 
         initProfileImagePreview();
