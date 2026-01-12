@@ -29,6 +29,8 @@ namespace CV_siten.Models.ViewModels.Account
         [Required(ErrorMessage = "Lösenord är obligatoriskt")]
         [DataType(DataType.Password)]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Lösenordet måste vara minst 6 tecken.")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$",
+            ErrorMessage = "Lösenordet måste innehålla minst en versal (A–Z), en siffra (0–9) och ett specialtecken.")]
         [Display(Name = "Lösenord")]
         public string Password { get; set; }
 
