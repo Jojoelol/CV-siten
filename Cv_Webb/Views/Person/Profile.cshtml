@@ -1,5 +1,9 @@
 ﻿@model CV_siten.Data.Models.Person
 
+@{
+	bool isOwner = ViewBag.IsOwner is bool b && b;
+}
+
 <div class="profile-page-wrapper">
 	<aside class="profile-sidebar">
 		<div class="sidebar-card">
@@ -36,7 +40,7 @@
 					<p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
 				</div>
 
-				@if (ViewBag.IsOwner != true)
+				@if (!isOwner)
 				{
 					<button type="button"
 							class="btn-action btn-primary u-btn-fullwidth-top"
@@ -46,7 +50,25 @@
 							data-receiver-name="@($"{Model.FirstName} {Model.LastName}")">
 						Skicka meddelande
 					</button>
+
+					@* CV-knapp eller text beroende på om CV finns *@
+					@if (!string.IsNullOrEmpty(Model.CvUrl))
+					{
+						<a href="@Model.CvUrl"
+						   target="_blank"
+						   class="btn-action btn-primary u-btn-fullwidth-top">
+							Ladda ned @Model.FirstName @Model.LastName:s CV
+						</a>
+					}
+					else
+					{
+						<div class="u-btn-fullwidth-top text-center text-muted">
+							@Model.FirstName @Model.LastName har inte laddat upp något CV.
+						</div>
+					}
 				}
+
+
 
 				@* Besöksstatistik *@
 				@if (ViewBag.IsOwner == true)
