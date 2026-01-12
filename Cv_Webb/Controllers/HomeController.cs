@@ -42,7 +42,8 @@ namespace CV_siten.Controllers
 
             if (!string.IsNullOrEmpty(skill))
             {
-                query = query.Where(p => p.Skills.Contains(skill));
+                // Utökad sökning för att inkludera utbildning och titel likt din Search-metod
+                query = query.Where(p => p.Skills.Contains(skill) || p.Education.Contains(skill) || p.JobTitle.Contains(skill));
                 isSearching = true;
             }
 
@@ -64,14 +65,14 @@ namespace CV_siten.Controllers
                 return View(await query.Take(3).ToListAsync());
             }
 
-            // Matchningslogik för inloggad person (VG-Krav 5)
+            // Matchningslogik för inloggad person (VG-Krav 5) - Nu synkad med PersonController
             var others = await query.Where(p => p.Id != currentPerson.Id).ToListAsync();
 
             var matches = others.Select(p => {
                 var score = CalculateMatchScore(currentPerson, p);
                 return new { Person = p, Score = score, MatchPercent = Math.Min(score * 10, 100) };
             })
-            .Where(x => x.Score >= 5)
+            .Where(x => x.Score >= 2) // Ändrat från 5 till 2 för att matcha PersonController
             .OrderByDescending(x => x.Score)
             .Take(3)
             .ToList();
@@ -82,48 +83,54 @@ namespace CV_siten.Controllers
             return View(matches.Select(x => x.Person).ToList());
         }
 
-        // Fuzzy matching för kompetenser inkl. synonymer
+        // --- SYNKOADE HJÄLPMETODER (Identiska med PersonController) ---
+
         private bool FuzzySkillMatch(string a, string b)
         {
             a = a.ToLower().Trim();
             b = b.ToLower().Trim();
-
             if (a == b || a.Contains(b) || b.Contains(a)) return true;
 
             var synonyms = new Dictionary<string, string[]>
             {
-                { "javascript", new[] { "js" } },
-                { "js", new[] { "javascript" } },
-                { "c#", new[] { "c sharp" } }
+                { "javascript", new[] { "js" } }, { "js", new[] { "javascript" } },
+                { "c#", new[] { "c sharp", "c-sharp" } }, { "c sharp", new[] { "c#", "c-sharp" } },
+                { "react", new[] { "react.js", "reactjs" } }, { "sql", new[] { "t-sql", "mysql" } }
             };
 
-            if (synonyms.TryGetValue(a, out var synA) && synA.Contains(b)) return true;
-            if (synonyms.TryGetValue(b, out var synB) && synB.Contains(a)) return true;
-
+            if (synonyms.ContainsKey(a) && synonyms[a].Contains(b)) return true;
+            if (synonyms.ContainsKey(b) && synonyms[b].Contains(a)) return true;
             return false;
         }
 
-        // Beräkna matchningsscore mellan två personer
         private int CalculateMatchScore(Person a, Person b)
         {
             int score = 0;
+            // Jobbtitel ger 3 poäng
+            if (!string.IsNullOrEmpty(a.JobTitle) && a.JobTitle.Equals(b.JobTitle, StringComparison.OrdinalIgnoreCase)) score += 3;
 
-            if (!string.IsNullOrEmpty(a.JobTitle) && a.JobTitle.Equals(b.JobTitle, StringComparison.OrdinalIgnoreCase))
-                score += 3;
-
+            // Skills ger 2 poäng per match
             if (!string.IsNullOrEmpty(a.Skills) && !string.IsNullOrEmpty(b.Skills))
             {
-                var skillsA = a.Skills.Split(',').Select(s => s.Trim().ToLower());
-                var skillsB = b.Skills.Split(',').Select(s => s.Trim().ToLower());
-
+                var skillsA = a.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToLower());
+                var skillsB = b.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToLower());
                 foreach (var skA in skillsA)
+                {
                     foreach (var skB in skillsB)
+                    {
                         if (FuzzySkillMatch(skA, skB)) { score += 2; break; }
+                    }
+                }
             }
+
+            // Utbildning ger 2 poäng (Tillägg för att matcha PersonController)
+            if (!string.IsNullOrEmpty(a.Education) && a.Education.Equals(b.Education, StringComparison.OrdinalIgnoreCase)) score += 2;
+
             return score;
         }
 
-        // Separat sökfunktion för person och projekt
+        // --- ÖVRIGA METODER ---
+
         public async Task<IActionResult> Search(string search, string skill)
         {
             var query = _context.Persons.Where(p => p.IsActive);
