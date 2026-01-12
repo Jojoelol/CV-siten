@@ -2,7 +2,7 @@
 <div class="modal fade" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form asp-controller="Message" asp-action="Send" method="post">
+            <form id="sendMessageForm" asp-controller="Message" asp-action="Send" method="post" novalidate>
                 @Html.AntiForgeryToken()
 
                 <div class="modal-header">
@@ -11,13 +11,18 @@
                 </div>
 
                 <div class="modal-body">
+
                     @if (!(User?.Identity?.IsAuthenticated ?? false))
                     {
                         <div class="mb-3">
                             <label class="form-label">Ditt namn</label>
-                            <input class="form-control" type="text" name="SenderName" required />
+                            <input class="form-control" type="text" name="SenderName" id="senderName" />
+                            <div id="senderNameClientError" class="text-danger mt-1" style="display:none;"></div>
+
+                            @Html.ValidationMessage("SenderName", "", new { @class = "text-danger" })
                         </div>
                     }
+
                     <div class="mb-3">
                         <label class="form-label">Sök mottagare (förnamn / efternamn)</label>
 
@@ -28,23 +33,40 @@
 
                         <input type="hidden"
                                id="receiverId"
-                               name="ReceiverId" />
+                               name="ReceiverId"
+                               value="@(ViewData["SendReceiverId"] ?? "")" />
 
+                        <div id="receiverClientError" class="text-danger mt-1" style="display:none;"></div>
+
+                        <div id="receiverSelected" class="form-text mt-2"></div>
                         <div id="receiverResults" class="list-group mt-2"></div>
+
                         @Html.ValidationMessage("ReceiverId", "", new { @class = "text-danger" })
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Ämne</label>
-                        <input id="sendSubject" class="form-control" type="text" name="Subject" required />
+                        <input id="sendSubject"
+                               class="form-control"
+                               type="text"
+                               name="Subject"
+                               value="@(ViewData["SendSubject"] ?? "")" />
+
+                        <div id="subjectClientError" class="text-danger mt-1" style="display:none;"></div>
                         @Html.ValidationMessage("Subject", "", new { @class = "text-danger" })
                     </div>
-
+          
                     <div class="mb-3">
                         <label class="form-label">Meddelande</label>
-                        <textarea class="form-control" name="Content" rows="4" required></textarea>
+                        <textarea id="sendContent"
+                                  class="form-control"
+                                  name="Content"
+                                  rows="4">@(ViewData["SendContent"] ?? "")</textarea>
+
+                        <div id="contentClientError" class="text-danger mt-1" style="display:none;"></div>
                         @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
                     </div>
+
                 </div>
 
                 <div class="modal-footer">
@@ -55,3 +77,4 @@
         </div>
     </div>
 </div>
+

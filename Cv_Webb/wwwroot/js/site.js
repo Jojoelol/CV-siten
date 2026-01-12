@@ -174,7 +174,7 @@ function initMessagesPage() {
     const deleteModalEl = document.getElementById("deleteMessageModal");
     const sendModalEl = document.getElementById("sendMessageModal");
 
-    // Om sidan inte har message-modal-systemet, gör inget
+
     if (!readModalEl && !deleteModalEl && !sendModalEl) return;
 
     const readFromEl = document.getElementById('readMessageFrom');
@@ -183,10 +183,9 @@ function initMessagesPage() {
     const deleteInfoEl = document.getElementById("deleteMessageInfo");
     const replyBtn = document.getElementById('replyBtn');
 
-    // Håller info om senaste öppnade meddelande
     let lastOpenedMessage = { from: "", senderId: "", subject: "" };
 
-    // READ modal fylls när den öppnas
+
     if (readModalEl) {
         readModalEl.addEventListener("show.bs.modal", (event) => {
             const triggerRow = event.relatedTarget;
@@ -204,7 +203,6 @@ function initMessagesPage() {
         });
     }
 
-    // DELETE modal fylls när den öppnas
     if (deleteModalEl) {
         deleteModalEl.addEventListener("show.bs.modal", (event) => {
             const triggerBtn = event.relatedTarget;
@@ -219,7 +217,6 @@ function initMessagesPage() {
         });
     }
 
-    // Reply-knapp: fyll send-modal och växla modaler
     if (replyBtn) {
         replyBtn.addEventListener('click', function () {
             if (!lastOpenedMessage || !lastOpenedMessage.senderId) return;
@@ -237,7 +234,6 @@ function initMessagesPage() {
             }
             if (receiverResults) receiverResults.innerHTML = "";
 
-            // Stäng read modal och öppna send modal
             if (readModalEl && window.bootstrap) {
                 const readInstance = window.bootstrap.Modal.getInstance(readModalEl);
                 if (readInstance) readInstance.hide();
@@ -248,7 +244,138 @@ function initMessagesPage() {
             }
         });
     }
+
+    document.addEventListener('click', async function (e) {
+        const btn = e.target.closest('.btn-mark-read');
+        if (!btn) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        const messageId = btn.getAttribute('data-id');
+        if (!messageId) return;
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+        const res = await fetch('/Message/MarkRead', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': token
+            },
+            body: `id=${encodeURIComponent(messageId)}`
+        });
+
+        if (!res.ok) return;
+
+        const row = btn.closest('tr');
+        row?.classList.remove('table-light');
+
+        const badge = row?.querySelector('.message-badge-new');
+        if (badge) {
+            badge.textContent = 'Läst';
+            badge.classList.remove('message-badge-new');
+            badge.classList.add('message-badge-read');
+        }
+
+        btn.remove();
+    }, true);
 }
+
+
+
+function openSendModalIfNeeded() {
+    const shouldOpen = document.body?.dataset?.openSendModal === "true";
+    if (!shouldOpen) return;
+
+    const el = document.getElementById("sendMessageModal");
+    if (!el || !window.bootstrap) return;
+
+    (bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el)).show();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    openSendModalIfNeeded();
+});
+
+function initSendMessageModalValidation() {
+    const modal = document.getElementById('sendMessageModal');
+    if (!modal) return;
+
+    const form = modal.querySelector('#sendMessageForm') || modal.querySelector('form');
+    if (!form) return;
+
+    const receiverId = modal.querySelector('#receiverId');
+
+    const senderName = modal.querySelector('#senderName'); // finns bara när utloggad
+    const subject = modal.querySelector('#sendSubject');
+    const content = modal.querySelector('#sendContent');
+
+    const receiverErr = modal.querySelector('#receiverClientError');
+    const senderErr = modal.querySelector('#senderNameClientError');
+    const subjectErr = modal.querySelector('#subjectClientError');
+    const contentErr = modal.querySelector('#contentClientError');
+
+    function showErr(el, msg) {
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function clearErr(el) {
+        if (!el) return;
+        el.textContent = '';
+        el.style.display = 'none';
+    }
+
+
+    senderName?.addEventListener('input', () => clearErr(senderErr));
+    subject?.addEventListener('input', () => clearErr(subjectErr));
+    content?.addEventListener('input', () => clearErr(contentErr));
+
+    form.addEventListener('submit', function (e) {
+        let ok = true;
+
+
+        clearErr(receiverErr);
+        clearErr(senderErr);
+        clearErr(subjectErr);
+        clearErr(contentErr);
+
+        if (!receiverId || !receiverId.value || receiverId.value.trim() === "") {
+            ok = false;
+            showErr(receiverErr, "Välj en mottagare i listan.");
+        }
+
+        if (senderName && (!senderName.value || senderName.value.trim().length < 2)) {
+            ok = false;
+            showErr(senderErr, "Ange ditt namn (minst 2 tecken).");
+        }
+
+        if (!subject || !subject.value || subject.value.trim().length < 1) {
+            ok = false;
+            showErr(subjectErr, "Ange ett ämne.");
+        }
+
+        if (!content || !content.value || content.value.trim().length < 1) {
+            ok = false;
+            showErr(contentErr, "Skriv ett meddelande");
+        }
+
+        if (!ok) {
+            e.preventDefault();
+
+            if (senderErr && senderErr.style.display === 'block') senderName?.focus();
+            else if (receiverErr && receiverErr.style.display === 'block') modal.querySelector('#receiverSearch')?.focus();
+            else if (subjectErr && subjectErr.style.display === 'block') subject?.focus();
+            else if (contentErr && contentErr.style.display === 'block') content?.focus();
+        }
+    });
+}
+
+
+
 
 function initModalCleanup() {
     function cleanup() {
@@ -460,9 +587,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initReceiverSearch();
     initMessagesPage();
-    initModalCleanup();
-
+    initModalCleanup(); 
+    openSendModalIfNeeded();
     initSendMessageModalPrefill();
+    initSendMessageModalValidation();
 
     initProfileImagePreview();
     initSaveSuccessRedirect();
