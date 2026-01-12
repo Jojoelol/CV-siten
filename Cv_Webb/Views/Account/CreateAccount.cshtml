@@ -15,12 +15,12 @@
         <div class="form-group mb-4 text-center">
             <label class="d-block mb-2 fw-bold">Profilbild</label>
 
-            @* Eftersom detta är 'Create' finns det aldrig en befintlig bild ännu *@
-            <div class="mb-2 create-account-image-placeholder">
+            <div id="profile-image-preview" class="mb-2 create-account-image-placeholder">
                 Ingen bild
             </div>
 
-            <input type="file" asp-for="ImageFile" class="form-control mt-2" accept="image/*" />
+            <input type="file" asp-for="ImageFile" id="imageInput" class="form-control mt-2" accept="image/*" />
+            <span id="imageFileError" class="text-danger" style="display:none;"></span>
             <small class="text-muted">Ladda upp en bild för att göra din profil mer personlig.</small>
         </div>
 

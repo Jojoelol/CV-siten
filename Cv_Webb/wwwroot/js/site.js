@@ -296,20 +296,64 @@ function initSendMessageModalValidation() {
         form.requestSubmit ? form.requestSubmit() : form.submit();
     });
 }
-
 function initProfileImagePreview() {
     const input = document.getElementById('imageInput');
     const container = document.getElementById('profile-image-preview');
     if (!input || !container) return;
 
     input.addEventListener('change', function (e) {
+
+        // ❗ Om valideringen markerat filen som ogiltig → gör INGENTING
+        if (this.dataset.invalidFile === "true") return;
+
         const file = e.target.files?.[0];
         if (!file) return;
+
         const reader = new FileReader();
         reader.onload = (event) => {
-            container.innerHTML = `<img src="${event.target.result}" class="img-thumbnail mb-2" style="width:150px;height:150px;object-fit:cover;border-radius:50%;border:3px solid #002d5a;">`;
+            container.innerHTML = `
+                <img src="${event.target.result}"
+                     class="img-thumbnail mb-2"
+                     style="width:150px;height:150px;object-fit:cover;border-radius:50%;border:3px solid #002d5a;">
+            `;
         };
         reader.readAsDataURL(file);
+    });
+}
+
+function initImageFileTypeValidation() {
+    const input = document.getElementById('imageInput');
+    const errorEl = document.getElementById('imageFileError');
+    if (!input || !errorEl) return;
+
+    input.addEventListener('change', function () {
+        const file = this.files?.[0];
+
+        // Rensa tidigare status
+        this.dataset.invalidFile = "false";
+
+        if (!file) {
+            errorEl.style.display = "none";
+            errorEl.textContent = "";
+            return;
+        }
+
+        const allowed = ['jpg', 'jpeg', 'png'];
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (!allowed.includes(ext)) {
+            errorEl.textContent = "Endast .jpg och .png är tillåtna bildformat.";
+            errorEl.style.display = "block";
+
+            // Markera som ogiltig
+            this.dataset.invalidFile = "true";
+
+            // Rensa filen
+            this.value = "";
+        } else {
+            errorEl.style.display = "none";
+            errorEl.textContent = "";
+        }
     });
 }
 
@@ -437,6 +481,7 @@ document.addEventListener("DOMContentLoaded", function () {
     safeInit(initModalCleanup, "Modal Cleanup");
 
     // Förhandsgranskningar
+    safeInit(initImageFileTypeValidation, "Image File Type Validation");
     safeInit(initProfileImagePreview, "Profile Preview");
     safeInit(initProjectImagePreview, "Project Preview");
 
