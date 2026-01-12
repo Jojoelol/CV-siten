@@ -140,33 +140,51 @@ namespace CV_siten.Controllers
 
         public async Task<IActionResult> Search(string search, string skill)
         {
+            // Spara sökorden för att kunna visa dem i HTML (t.ex. "Resultat för: Oscar")
             ViewBag.SearchQuery = search;
-            var query = _context.Persons.Where(p => p.IsActive);
+            ViewBag.SkillQuery = skill;
 
+            // 1. Sök efter Personer
+            var personQuery = _context.Persons.Where(p => p.IsActive);
+
+            // Sekretessfilter: Oinloggade ser inte privata profiler
             if (User.Identity?.IsAuthenticated != true)
-                query = query.Where(p => !p.IsPrivate);
+            {
+                personQuery = personQuery.Where(p => !p.IsPrivate);
+            }
 
             if (!string.IsNullOrEmpty(search))
             {
-                // Dela upp sökningen här också för att klara förnamn + efternamn samtidigt
                 var parts = search.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 foreach (var part in parts)
                 {
-                    query = query.Where(p => p.FirstName.Contains(part) || p.LastName.Contains(part));
+                    personQuery = personQuery.Where(p => p.FirstName.Contains(part) || p.LastName.Contains(part));
                 }
             }
 
             if (!string.IsNullOrEmpty(skill))
             {
-                query = query.Where(p => p.Skills.Contains(skill) || p.Education.Contains(skill) || p.JobTitle.Contains(skill));
+                personQuery = personQuery.Where(p => p.Skills.Contains(skill) ||
+                                                    p.Education.Contains(skill) ||
+                                                    p.JobTitle.Contains(skill));
             }
 
-            ViewBag.personResult = await query.ToListAsync();
+            // Spara personerna i ViewBag
+            ViewBag.PersonResult = await personQuery.ToListAsync();
 
-            var projektResult = await _context.Projects
-                .Where(p => string.IsNullOrEmpty(search) || p.ProjectName.Contains(search))
-                .ToListAsync();
+            // 2. Sök efter Projekt
+            var projektQuery = _context.Projects.AsQueryable();
 
+            if (!string.IsNullOrEmpty(search))
+            {
+                // Här kan du välja om du vill splitta ord även för projekt, 
+                // men oftast söker man på hela projektnamnet
+                projektQuery = projektQuery.Where(p => p.ProjectName.Contains(search));
+            }
+
+            var projektResult = await projektQuery.ToListAsync();
+
+            // Vi skickar projektlistan som huvudmodell till SearchResult-vyn
             return View("SearchResult", projektResult);
         }
 

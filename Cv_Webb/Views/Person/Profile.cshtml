@@ -1,14 +1,10 @@
 ﻿@model CV_siten.Data.Models.Person
 
-@{
-	bool isOwner = ViewBag.IsOwner is bool b && b;
-}
-
 <div class="profile-page-wrapper">
 	<aside class="profile-sidebar">
 		<div class="sidebar-card">
 
-			@* 1. Profilbild *@
+			@* Profilbild *@
 			<div class="pic-placeholder">
 				<img class="u-img-cover-full"
 					 src="~/images/ProfilePicture/@(string.IsNullOrEmpty(Model.ImageUrl) ? "defaultPicture.jpg" : Model.ImageUrl)"
@@ -16,11 +12,11 @@
 			</div>
 
 			<div class="profile-info-text">
-				@* 2. Namn och Roll *@
+				@* Namn och Roll *@
 				<h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
 				<p class="profile-title">@Model.JobTitle</p>
 
-				@* 3. Kontaktuppgifter *@
+				@* Kontaktuppgifter *@
 				<div class="profile-contact-details">
 					<p class="contact-item">
 						<i class="fas fa-phone"></i> <strong>Tel:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Ej angivet" : Model.PhoneNumber)
@@ -35,12 +31,12 @@
 					</p>
 				</div>
 
-				@* 4. Bio/Beskrivning *@
+				@* Beskrivning *@
 				<div class="profile-bio">
 					<p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
 				</div>
 
-				@if (!isOwner)
+				@if (!ViewBag.IsOwner)
 				{
 					<button type="button"
 							class="btn-action btn-primary u-btn-fullwidth-top"
@@ -51,7 +47,6 @@
 						Skicka meddelande
 					</button>
 
-					@* CV-knapp eller text beroende på om CV finns *@
 					@if (!string.IsNullOrEmpty(Model.CvUrl))
 					{
 						<a href="@Model.CvUrl"
@@ -79,7 +74,7 @@
 				}
 			</div>
 
-			@* 5. Knappar i Sidebar *@
+			@* Knappar i sidebar *@
 			<div class="sidebar-actions-container">
 				@if (ViewBag.IsOwner == true)
 				{
@@ -108,12 +103,10 @@
 					else
 					{
 						<div class="cv-button-row-container">
-							@* 2/3 av bredden *@
 							<a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary cv-btn-view">
 								Visa CV
 							</a>
 
-							@* 1/3 av bredden *@
 							<div class="cv-delete-form-wrap">
 								<button type="button" class="btn-action btn-danger cv-btn-delete-text"
 										data-bs-toggle="modal" data-bs-target="#deleteCvModal">
@@ -243,7 +236,7 @@
 				<h3 class="section-title">Mina Projekt</h3>
 			</div>
 
-			@* --- PROJEKTBLOCK VERKTYGSFÄLT --- *@
+			@* Projekt: Sök/Sortering *@
 			<form asp-action="Profile" asp-fragment="projects-section" method="get" class="content-toolbar">
 				<input type="hidden" name="id" value="@Model.Id" />
 
@@ -292,7 +285,7 @@
 				</div>
 			</form>
 
-			@* --- PROJEKTGRID --- *@
+			@* Projektgrid *@
 			@if (Model.PersonProjects != null && Model.PersonProjects.Count > 0)
 			{
 				<div class="projects-grid u-projects-grid">
@@ -362,9 +355,7 @@
 			}
 		</div>
 
-		
-
-		@* --- LIKNANDE PERSONER --- *@
+		@* Liknande personer *@
 		@if (ViewBag.SimilarPerson != null)
 		{
 			<div class="cv-section u-similar-section">
@@ -396,6 +387,8 @@
 		}
 	</section>
 	<partial name="SendMessageModal" />
+
+	@* Popup: Ta bort CV *@
 	<div class="modal fade" id="deleteCvModal" tabindex="-1" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content border-0 shadow">
@@ -410,7 +403,6 @@
 				<div class="modal-footer bg-light">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
 
-					@* Här flyttar vi in ditt ursprungliga formulär *@
 					<form asp-controller="Person" asp-action="DeleteCv" method="post">
 						<input type="hidden" name="personId" value="@Model.Id" />
 						<button type="submit" class="btn btn-danger">Ja, ta bort</button>
