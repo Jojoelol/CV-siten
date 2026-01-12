@@ -36,7 +36,14 @@ namespace CV_siten.Controllers
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(p => (p.FirstName + " " + p.LastName).Contains(search));
+                // Vi delar upp söksträngen i ord (t.ex. "Oscar" och "Test")
+                var searchParts = search.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var part in searchParts)
+                {
+                    // Varje ord i sökningen måste finnas i antingen förnamn eller efternamn
+                    query = query.Where(p => p.FirstName.Contains(part) || p.LastName.Contains(part));
+                }
                 isSearching = true;
             }
 
@@ -133,6 +140,7 @@ namespace CV_siten.Controllers
 
         public async Task<IActionResult> Search(string search, string skill)
         {
+            ViewBag.SearchQuery = search;
             var query = _context.Persons.Where(p => p.IsActive);
 
             if (User.Identity?.IsAuthenticated != true)
@@ -140,7 +148,12 @@ namespace CV_siten.Controllers
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(p => p.FirstName.Contains(search) || p.LastName.Contains(search));
+                // Dela upp sökningen här också för att klara förnamn + efternamn samtidigt
+                var parts = search.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                foreach (var part in parts)
+                {
+                    query = query.Where(p => p.FirstName.Contains(part) || p.LastName.Contains(part));
+                }
             }
 
             if (!string.IsNullOrEmpty(skill))
