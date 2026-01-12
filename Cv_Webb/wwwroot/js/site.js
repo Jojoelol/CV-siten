@@ -455,15 +455,36 @@ function initCvUploadPdfOnly() {
 function initDateRangeValidation() {
     const start = document.querySelector('input[name="StartDate"]');
     const end = document.querySelector('input[name="EndDate"]');
+
+    // Om vi inte hittar fälten, gör ingenting
     if (!start || !end) return;
 
-    start.addEventListener("change", () => {
-        if (start.value) end.min = start.value;
-        if (end.value && start.value && end.value < start.value) {
-            end.value = "";
-            alert("Slutdatumet har rensats eftersom det var före startdatumet.");
+    // Funktion som sätter reglerna
+    const updateConstraints = () => {
+        if (start.value) {
+            // 1. Sätt min-datum på slutdatumet till startdatumet
+            end.min = start.value;
+
+            // 2. Om slutdatum redan är valt och är FÖRE startdatum -> Rensa
+            if (end.value && end.value < start.value) {
+                end.value = "";
+                // Valfritt: Visa en varning bara om användaren faktiskt interagerar
+                // alert("Slutdatumet har rensats eftersom det var före startdatumet.");
+            }
+        } else {
+            // Om inget startdatum finns, ta bort begränsningen
+            end.removeAttribute("min");
         }
-    });
+    };
+
+    // Kör direkt vid laddning (Fixar buggen vid omladdning/redigering)
+    updateConstraints();
+
+    // Kör när användaren ändrar startdatum
+    start.addEventListener("change", updateConstraints);
+
+    // Kör när användaren klickar på/fokuserar slutdatum (Extra säkerhet)
+    end.addEventListener("focus", updateConstraints);
 }
 
 function initSmartBackButton() {
