@@ -374,4 +374,27 @@
 		}
 	</section>
 	<partial name="SendMessageModal" />
+	<div class="modal fade" id="deleteCvModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow">
+				<div class="modal-header bg-danger text-white">
+					<h5 class="modal-title">Bekräfta borttagning</h5>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body p-4 text-center">
+					<i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+					<p>Är du säker på att du vill ta bort ditt CV? Detta går inte att ångra.</p>
+				</div>
+				<div class="modal-footer bg-light">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+
+					@* Här flyttar vi in ditt ursprungliga formulär *@
+					<form asp-controller="Person" asp-action="DeleteCv" method="post">
+						<input type="hidden" name="personId" value="@Model.Id" />
+						<button type="submit" class="btn btn-danger">Ja, ta bort</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
