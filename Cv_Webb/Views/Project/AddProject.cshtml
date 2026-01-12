@@ -39,10 +39,7 @@
                         <div class="col-md-6 mb-3">
                             <label asp-for="Status" class="form-label fw-bold add-project-label">Status:</label>
                             <select asp-for="Status" class="form-select add-project-input">
-                                @* Dummy-valet: disabled gör att det inte går att klicka på, 
-           det tomma värdet "" gör att [Required] i din ViewModel triggas *@
                                 <option value="" disabled selected>Välj status...</option>
-
                                 <option value="Aktivt">Aktivt</option>
                                 <option value="Avslutat">Avslutat</option>
                                 <option value="Pausat">Pausat</option>
