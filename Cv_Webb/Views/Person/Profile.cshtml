@@ -92,12 +92,12 @@
 							</a>
 
 							@* 1/3 av bredden *@
-							<form asp-controller="Person" asp-action="DeleteCv" method="post" class="cv-delete-form-wrap">
-								<input type="hidden" name="personId" value="@Model.Id" />
-								<button type="submit" class="btn-action btn-danger cv-btn-delete-text">
-									<i class="fas fa-trash-alt"></i>Ta bort CV
+							<div class="cv-delete-form-wrap">
+								<button type="button" class="btn-action btn-danger cv-btn-delete-text"
+										data-bs-toggle="modal" data-bs-target="#deleteCvModal">
+									<i class="fas fa-trash-alt"></i> Ta bort CV
 								</button>
-							</form>
+							</div>
 						</div>
 					}
 
@@ -340,32 +340,7 @@
 			}
 		</div>
 
-		@* --- HUVUDHANDLINGAR (Blå & Röd) --- *@
-		@if (string.IsNullOrEmpty(Model.CvUrl))
-		{
-			<form id="cvUploadFormBottom" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
-				<input type="hidden" name="personId" value="@Model.Id" />
-				<input type="file" id="cvFileInputBottom" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadFormBottom').submit();" />
-			</form>
-			<button type="button" class="btn-action btn-primary cv-full-btn" onclick="document.getElementById('cvFileInputBottom').click();">Ladda upp mitt CV</button>
-		}
-		else
-		{
-			<div class="cv-button-row-container">
-				@* 2/3 av bredden *@
-				<a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary cv-btn-view">
-					Visa CV
-				</a>
-
-				@* 1/3 av bredden *@
-				<form asp-controller="Person" asp-action="DeleteCv" method="post" class="cv-delete-form-wrap">
-					<input type="hidden" name="personId" value="@Model.Id" />
-					<button type="submit" class="btn-action btn-danger cv-btn-delete-text">
-						<i class="fas fa-trash-alt"></i> <span>Ta bort CV</span>
-					</button>
-				</form>
-			</div>
-		}
+		
 
 		@* --- LIKNANDE PERSONER --- *@
 		@if (ViewBag.SimilarPerson != null)
