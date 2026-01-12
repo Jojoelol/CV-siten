@@ -1,8 +1,9 @@
 ﻿@using CV_siten.Models.ViewModels.Account
 @model LoginViewModel
 
-<div class="yellow-box welcome-area" style="max-width: 500px; margin: 20px auto; padding: 20px;">
+<div class="yellow-box welcome-area login-card">
     <h2>Inloggning</h2>
+
     <form asp-controller="Account" asp-action="Login" method="post">
         @* Visar generella felmeddelanden *@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -39,7 +40,6 @@
             @ViewBag.Error
         </div>
     }
-
 </div>
 
 @section Scripts {

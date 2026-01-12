@@ -4,7 +4,7 @@
     ViewData["Title"] = "Skapa konto";
 }
 
-<div class="yellow-box welcome-area" style="max-width: 600px; margin: 20px auto; padding: 30px;">
+<div class="yellow-box welcome-area create-account-card">
     <h2>Skapa ett nytt konto</h2>
     <p>Fyll i dina uppgifter för att börja bygga din profil.</p>
     <hr />
@@ -16,7 +16,7 @@
             <label class="d-block mb-2 fw-bold">Profilbild</label>
 
             @* Eftersom detta är 'Create' finns det aldrig en befintlig bild ännu *@
-            <div class="mb-2" style="width: 150px; height: 150px; background: #eee; border-radius: 50%; display: inline-block; line-height: 150px; color: #aaa; border: 2px dashed #ccc;">
+            <div class="mb-2 create-account-image-placeholder">
                 Ingen bild
             </div>
 
@@ -48,6 +48,7 @@
             <input asp-for="Address" class="form-control" />
             <span asp-validation-for="Address" class="text-danger"></span>
         </div>
+
         <div class="row mt-2">
             <div class="col-md-6 form-group">
                 <label asp-for="PostalCode" class="control-label"></label>

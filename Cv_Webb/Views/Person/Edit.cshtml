@@ -1,6 +1,6 @@
 ﻿@model CV_siten.Models.ViewModels.Account.EditAccountViewModel
 
-<div class="yellow-box welcome-area" style="max-width: 600px; margin: 20px auto; padding: 30px;">
+<div class="yellow-box welcome-area edit-account-card">
 
     <h2>Redigera profil</h2>
     <hr />
@@ -9,11 +9,12 @@
     @if (TempData["SuccessMessage"] != null)
     {
         @* Vi lägger till data-redirect-url här så site.js kan läsa den *@
-        <div id="saveSuccessPopup" class="success-popup-overlay"
+        <div id="saveSuccessPopup"
+             class="success-popup-overlay"
              data-redirect-url="@Url.Action("Profile", "Person")">
             <div class="success-popup-content animated-popup">
                 <i class="fas fa-check-circle success-icon"></i>
-                <h3 style="color: #002d5a; font-weight: bold;">Profil sparad!</h3>
+                <h3 class="edit-account-success-title">Profil sparad!</h3>
                 <p class="text-muted">Dina ändringar har sparats korrekt.</p>
                 <p class="small">Du omdirigeras till din profil om ett ögonblick...</p>
                 <div class="spinner-border spinner-border-sm text-primary mt-2" role="status"></div>
@@ -36,12 +37,11 @@
                 {
                     <img src="@Url.Content("~/images/ProfilePicture/" + Model.ImageUrl)"
                          alt="Profilbild"
-                         class="img-thumbnail mb-2"
-                         style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; border: 3px solid #002d5a;" />
+                         class="img-thumbnail mb-2 edit-account-profile-img" />
                 }
                 else
                 {
-                    <div class="mb-2" style="width: 150px; height: 150px; background: #eee; border-radius: 50%; display: inline-block; line-height: 150px; color: #aaa; border: 2px dashed #ccc;">
+                    <div class="mb-2 edit-account-image-placeholder">
                         Ingen bild
                     </div>
                 }
@@ -113,7 +113,7 @@
 
         @* --- ÅTGÄRDSKNAPPAR --- *@
         <div class="d-grid gap-2 mb-4">
-            <button type="submit" class="btn btn-primary" style="background-color: #002d5a;">
+            <button type="submit" class="btn btn-primary edit-account-save-btn">
                 <i class="fas fa-save"></i> Spara ändringar
             </button>
         </div>
@@ -129,23 +129,8 @@
     </form>
 </div>
 
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-
-
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <script>
-            // Vänta 3 sekunder (3000 ms) och omdirigera sedan
-            setTimeout(function () {
-                // Vi skickar användaren till Profile-vyn i Person-controllern
-                window.location.href = '@Url.Action("Profile", "Person")';
-            }, 3000);
-        </script>
     }
 }

@@ -3,10 +3,11 @@
 @{
     ViewData["Title"] = "Mina meddelanden";
 }
+
 <div class="background">
-  <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
 
                 <div class="yellow-box p-4 message-card">
 
@@ -22,97 +23,105 @@
                     </div>
 
                     <div class="table-responsive">
-
                         <table class="table table-hover message-table">
-                        <thead>
-                            <tr>
-                                <th>Från</th>
-                                <th>Ämne</th>
-                                <th>Datum</th>
-                                <th>Status</th>
-                                <th>Åtgärder</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model != null && Model.Count > 0)
-                            {
-                                foreach (var m in Model)
+                            <thead>
+                                <tr>
+                                    <th>Från</th>
+                                    <th>Ämne</th>
+                                    <th>Datum</th>
+                                    <th>Status</th>
+                                    <th>Åtgärder</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Count > 0)
                                 {
-                                    <tr class="@(m.IsRead ? "" : "table-light") message-row"
-                                        role="button"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#readMessageModal"
-                                        data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
-                                        data-sender-id="@m.SenderId"
-                                        data-subject="@m.Subject">
+                                    foreach (var m in Model)
+                                    {
+                                        <tr class="@(m.IsRead ? "" : "table-light") message-row"
+                                            role="button"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#readMessageModal"
+                                            data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
+                                            data-sender-id="@m.SenderId"
+                                            data-subject="@m.Subject">
 
-                                         <td>
-                                         <strong>
-                                         @(m.Sender != null
-                                         ? m.Sender.FirstName + " " + m.Sender.LastName
-                                         : m.SenderName + " (extern)")
+                                            <td>
+                                                <strong>
+                                                    @(m.Sender != null
+                                                                                                ? m.Sender.FirstName + " " + m.Sender.LastName
+                                                                                                : m.SenderName + " (extern)")
                                         </strong>
-                                        </td>
-                                        <td>@m.Subject</td>
-                                        <td>@m.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-                                        <td>
-                                            @if (m.IsRead)
-                                            {
+                                    </td>
+                                    <td>@m.Subject</td>
+                                    <td>@m.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>
+                                        @if (m.IsRead)
+                                                {
                                                     <span class="badge message-badge-read">Läst</span>
-                                            }
-                                            else
-                                            {
+                                                }
+                                                else
+                                                {
                                                     <span class="badge message-badge-new">Nytt</span>
-                                            }
-                                        </td>
+                                                }
+                                            </td>
+
                                             <td class="message-actions">
-                                            @if (!m.IsRead)
-                                            {
-                                                <form asp-controller="Message" asp-action="MarkRead" method="post" style="display:inline;">
-                                                    @Html.AntiForgeryToken()
-                                                    <input type="hidden" name="id" value="@m.Id" />
-                                                    <button class="btn btn-sm btn-outline-dark">Markera läst</button>
-                                                </form>
-                                            }
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-danger ms-2 btn-delete-message"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#deleteMessageModal"
-                                                    data-id="@m.Id"
-                                                    data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
-                                                    data-subject="@m.Subject">
-                                                X
-                                            </button>
-                                        </td>
-                                        <td style="display:none;" class="message-content">
-                                            @m.Content
+                                                @if (!m.IsRead)
+                                                {
+                                                    <form asp-controller="Message"
+                                                          asp-action="MarkRead"
+                                                          method="post"
+                                                          class="u-inline-form">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@m.Id" />
+                                                        <button class="btn btn-sm btn-outline-dark">Markera läst</button>
+                                                    </form>
+                                                }
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger ms-2 btn-delete-message"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteMessageModal"
+                                                        data-id="@m.Id"
+                                                        data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
+                                                        data-subject="@m.Subject">
+                                                    X
+                                                </button>
+                                            </td>
+
+                                            <td class="message-content u-hidden">
+                                                @m.Content
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-5">
+                                            <i>Du har inga fler meddelanden just nu.</i>
                                         </td>
                                     </tr>
                                 }
-                            }
-                            else
-                            {
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted py-5">
-                                        <i>Du har inga fler meddelanden just nu.</i>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
+
                 </div>
+
             </div>
         </div>
-    </div>
-    <!-- Skicka meddelande -->
-    <div class="modal fade" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
 
-                <form asp-controller="Message" asp-action="Send" method="post">
-                    @Html.AntiForgeryToken()
+        <!-- Skicka meddelande -->
+        <div class="modal fade" id="sendMessageModal" tabindex="-1" aria-labelledby="sendMessageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
 
-                    <div class="modal-body">
+                    <form asp-controller="Message" asp-action="Send" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="modal-body">
                             @if (!User.Identity.IsAuthenticated)
                             {
                                 <div class="mb-3">
@@ -120,74 +129,74 @@
                                     <input class="form-control" name="SenderName" required />
                                 </div>
                             }
-                        <div class="mb-3">
-                            <label class="form-label">Sök mottagare (förnamn / efternamn)</label>
 
-                            <input id="receiverSearch"
-                                   class="form-control"
-                                   type="text"
-                                   placeholder=""
-                                   autocomplete="off" />
+                            <div class="mb-3">
+                                <label class="form-label">Sök mottagare (förnamn / efternamn)</label>
 
-                            <input type="hidden"
-                                   id="receiverId"
-                                   name="ReceiverId"
-                                   value="@(ViewData["SendReceiverId"] ?? "")" />
+                                <input id="receiverSearch"
+                                       class="form-control"
+                                       type="text"
+                                       placeholder=""
+                                       autocomplete="off" />
 
-                            <div id="receiverSelected" class="form-text mt-2"></div>
+                                <input type="hidden"
+                                       id="receiverId"
+                                       name="ReceiverId"
+                                       value="@(ViewData["SendReceiverId"] ?? "")" />
 
-                            <div id="receiverResults" class="list-group mt-2"></div>
+                                <div id="receiverSelected" class="form-text mt-2"></div>
 
-                            @Html.ValidationMessage("ReceiverId", "", new { @class = "text-danger" })
+                                <div id="receiverResults" class="list-group mt-2"></div>
+
+                                @Html.ValidationMessage("ReceiverId", "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ämne</label>
+                                <input id="sendSubject"
+                                       class="form-control"
+                                       type="text"
+                                       name="Subject"
+                                       value="@(ViewData["SendSubject"] ?? "")"
+                                       required />
+                                @Html.ValidationMessage("Subject", "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Meddelande</label>
+                                <textarea class="form-control"
+                                          name="Content"
+                                          rows="4"
+                                          required>@(ViewData["SendContent"] ?? "")</textarea>
+                                @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
+                            </div>
+
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Ämne</label>
-                            <input id="sendSubject"
-                                   class="form-control"
-                                   type="text"
-                                   name="Subject"
-                                   value="@(ViewData["SendSubject"] ?? "")"
-                                   required />
-                            @Html.ValidationMessage("Subject", "", new { @class = "text-danger" })
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
+                            <button type="submit" class="btn btn-primary">Skicka</button>
                         </div>
+                    </form>
 
-                        <div class="mb-3">
-                            <label class="form-label">Meddelande</label>
-                            <textarea class="form-control"
-                                      name="Content"
-                                      rows="4"
-                                      required>@(ViewData["SendContent"] ?? "")</textarea>
-                            @Html.ValidationMessage("Content", "", new { @class = "text-danger" })
-                        </div>
-
-                    </div>
-
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
-                        <button type="submit" class="btn btn-primary">Skicka</button>
-                    </div>
-                </form>
-
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="readMessageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+        <!-- Läs meddelande -->
+        <div class="modal fade" id="readMessageModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
 
-                <div class="modal-header">
-                    <h5 class="modal-title" id="readMessageFrom"></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div id="readMessageContent"
-                         style="white-space: pre-wrap;">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="readMessageFrom"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                </div>
+
+                    <div class="modal-body">
+                        <div id="readMessageContent" class="u-prewrap"></div>
+                    </div>
+
                     <div class="modal-footer">
                         <button type="button"
                                 class="btn-action btn-primary btn-small"
@@ -201,10 +210,15 @@
                             Stäng
                         </button>
                     </div>
+
+                </div>
             </div>
         </div>
-    </div>  
+
+    </div>
 </div>
+
+<!-- Ta bort meddelande -->
 <div class="modal fade" id="deleteMessageModal" tabindex="-1" aria-labelledby="deleteMessageModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -231,6 +245,4 @@
 
         </div>
     </div>
-   </div>
 </div>
-

@@ -11,7 +11,7 @@ namespace CV_siten.Models.ViewModels // Kontrollera att detta matchar din mappst
         [Display(Name = "Projektnamn")]
         public string ProjectName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Beskrivning måste anges")]
+        
         [Display(Name = "Beskrivning")]
         public string? Description { get; set; }
 

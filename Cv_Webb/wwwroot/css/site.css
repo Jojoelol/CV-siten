@@ -37,7 +37,7 @@ body {
     border-radius: 8px;
     width: 95%;
     max-width: none;
-    /* Lagt till en lätt skugga för "VG-nivå" på design [cite: 116] */
+    /* Lagt till en lätt skugga för "VG-nivå" på design */
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
@@ -78,10 +78,10 @@ body {
     height: 200px;
     background: #ffffff;
     border: 2px solid #2c3e50; /* Ramen matchar sidans huvudfärg */
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-content: center;
-    border-radius: 50%; /* Rund profilbild ger ett modernare intryck [cite: 76] */
+    border-radius: 50%; /* Rund profilbild ger ett modernare intryck */
     overflow: hidden;
 }
 
@@ -93,7 +93,7 @@ body {
     border-radius: 10px;
 }
 
-/* Projekt-listan [cite: 84] */
+/* Projekt-listan */
 .projects-list {
     display: flex;
     flex-direction: row;
@@ -101,6 +101,7 @@ body {
     gap: 15px;
 }
 
+/* Basen för project-pill + senare förbättringar sammanslaget */
 .project-pill {
     border-radius: 12px;
     width: 180px;
@@ -113,32 +114,31 @@ body {
     border: none;
     color: white;
     font-weight: 500;
-    transition: transform 0.2s; /* Liten interaktionseffekt */
+
+    /* (från senare dublett) */
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-    .project-pill:hover {
-        transform: translateY(-5px); /* Lyfter vid hover för bättre UX */
-        background: #2980b9;
-    }
+.project-pill:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    border-color: #3498db !important;
+    background-color: #ffffff !important;
+}
 
+/* Säkerställer att ikonerna i pillerna också är centrerade */
+.project-pill i {
+    display: inline-block;
+}
 
-
-/* MIN PROFIL*/
+/* MIN PROFIL */
 
 /* Container för hela profilsidan */
-/* Lägg till i site.css om de inte redan är där */
 .profile-page-wrapper {
     display: flex;
     height: calc(100vh - 80px); /* Justera efter din headers höjd */
     overflow: hidden;
-}
-
-.profile-sidebar {
-    flex: 0 0 350px;
-    background-color: #2c3e50;
-    color: white;
-    padding: 30px;
-    overflow-y: auto;
 }
 
 .profile-main-content {
@@ -148,11 +148,29 @@ body {
     background-color: #f4f7f6;
 }
 
+/* (sammanslagen dublett) profile-sidebar */
+.profile-sidebar {
+    flex: 0 0 350px;
+    background-color: #2c3e50;
+    color: white;
+
+    /* sista padding vann i din fil */
+    padding: 40px 25px;
+
+    /* från första varianten */
+    overflow-y: auto;
+
+    height: calc(100vh - 70px);
+    box-sizing: border-box;
+}
+
+/* (sammanslagen dublett) sidebar-card */
 .sidebar-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    width: 100%;
 }
 
 .profile-name {
@@ -166,24 +184,9 @@ body {
     margin-bottom: 20px;
 }
 
-/* Höger del: Scrollbar */
-/*.profile-main-content {
-    flex: 1;
-    padding: 40px;
-    overflow-y: scroll;*/ /* Gör denna del scrollbar */
-/*background-color: #f4f7f6;*/
-/*}*/
-
 /* Verktygsfältet */
-/* Justering för hela verktygsfältet */
-.content-toolbar {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    width: 100%;
-}
-
-.form-control-custom, .form-select-custom {
+.form-control-custom,
+.form-select-custom {
     padding: 8px 15px;
     border: 1px solid #dee2e6;
     border-radius: 4px;
@@ -206,10 +209,9 @@ body {
     width: 100%;
 }
 
-/* Knappar */
+/* (sammanslagen dublett) btn-action */
 .btn-action {
-    padding: 10px 20px;
-    border-radius: 4px;
+    /* från tidiga regeln */
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -217,6 +219,17 @@ body {
     transition: 0.3s;
     font-size: 0.9rem;
     text-align: center;
+
+    /* från senare regeln */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 15px;
+    min-height: 45px;
+    border-radius: 6px;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
 }
 
 .btn-primary {
@@ -224,25 +237,23 @@ body {
     color: white !important;
 }
 
-    .btn-primary:hover {
-        background-color: #2980b9;
-    }
+.btn-primary:hover {
+    background-color: #2980b9;
+}
 
 .btn-outline {
     background-color: transparent;
     color: #3498db !important;
 }
 
-    .btn-outline:hover {
-        background-color: #3498db;
-        color: white !important;
-    }
+.btn-outline:hover {
+    background-color: #3498db;
+    color: white !important;
+}
 
 .section-title {
     color: #2c3e50;
-/*    margin-bottom: 20px;
-*/    border-bottom: 2px solid #3498db;
-    /*display: inline-block;*/
+    border-bottom: 2px solid #3498db;
 }
 
 /* Unik huvudcontainer för att undvika krockar */
@@ -265,39 +276,24 @@ body {
     text-decoration: none;
     color: #333;
 }
-    .sr-profile-card:hover {
-        transform: scale(1.02);
-        text-decoration: none;
-        color: #333;
-    }
 
+/* (rensad dublett) sr-profile-card:hover */
+.sr-profile-card:hover {
+    transform: scale(1.02);
+    text-decoration: none;
+    color: #333;
+}
 
-    .sr-results-list {
-        display: flex; /* Aktiverar flexbox */
-        flex-direction: row; /* Lägger elementen horisontellt (standard) */
-        flex-wrap: wrap; /* Gör att de hoppar ner på ny rad om de inte får plats */
-        justify-content: center; /* Centrerar hela raden av knappar på sidan */
-        gap: 20px; /* Skapar mellanrum mellan knapparna */
-        padding: 20px;
-        width: 100%;
-    }
-
-    .sr-profile-card:hover {
-        transform: scale(1.02);
-        text-decoration: none;
-        color: #333;
-    }
-
+/* (rensad dublett) sr-results-list */
 .sr-results-list {
-    display: flex; /* Aktiverar flexbox */
-    flex-direction: row; /* Lägger elementen horisontellt (standard) */
-    flex-wrap: wrap; /* Gör att de hoppar ner på ny rad om de inte får plats */
-    justify-content: center; /* Centrerar hela raden av knappar på sidan */
-    gap: 20px; /* Skapar mellanrum mellan knapparna */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
     padding: 20px;
     width: 100%;
 }
-
 
 /* Unik bildbox */
 .sr-img-wrapper {
@@ -347,20 +343,22 @@ body {
 
 .sr-bio-text {
     margin: 0;
-    line-height: 1.6; /* Förbättrar läsbarhet [cite: 58] */
+    line-height: 1.6; /* Förbättrar läsbarhet */
     text-align: left;
 }
 
-.sr-matchPerson{
-    position:absolute;
+/* (sammanslagen dublett) sr-matchPerson */
+.sr-matchPerson {
+    position: absolute;
+    color: white;
 }
 
+/* (rensad dublett) sr-main */
 .sr-main {
     background-color: #2c3e50;
     margin: 0;
     padding: 40px 0;
     width: 100%;
-    /* Säkerställer att bakgrunden täcker hela skärmen även om listan är kort */
     min-height: calc(100vh - 60px);
 }
 
@@ -369,32 +367,13 @@ body {
     font-size: 1.2rem;
     text-align: center;
     width: 100%;
-    margin-top: 50px; /* Ger lite avstånd från rubriken */
-
+    margin-top: 50px;
 }
 
-
-.profile-sidebar {
-    flex: 0 0 350px;
-    background-color: #2c3e50;
-    color: white;
-    padding: 40px 25px; /*/ Ökad padding för mer luft /*/
-    height: calc(100vh-70px);
-    box-sizing: border-box;
-}
-
-
-.sidebar-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-
+/* (sammanslagen dublett) profile-info-text */
 .profile-info-text {
     text-align: center;
-    margin-bottom: 25px;/* / Skapar avstånd ner till knapparna /*/
+    margin-bottom: 25px;
     width: 100%;
 }
 
@@ -403,17 +382,15 @@ body {
     font-size: 0.95rem;
     line-height: 1.5;
     color: #ecf0f1;
-    word-wrap: break-word; /*/ Förhindrar att lång text skjuter ut /*/
+    word-wrap: break-word;
 }
-
 
 .sidebar-actions-container {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 15px; /*/ EXAKT avstånd mellan varje knapprad /*/
+    gap: 15px;
 }
-
 
 .cv-button-row {
     display: flex;
@@ -425,26 +402,9 @@ body {
     flex: 1;
 }
 
-.btn-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 12px 15px;
-    min-height: 45px; /*/ Säkerställer att knapparna har en bra storlek*/
-border-radius: 6px;
-font-weight: 600;
-text-decoration: none !important;
-transition: all 0.2s ease;
-cursor: pointer;
-}
-
-/* Ta bort eller kommentera ut width: 100% från din generella .btn-action 
-   om du inte vill att ALLA knappar på hela siten ska vara fullbredd. */
-
 .toolbar-buttons {
     display: flex;
-    justify-content: space-between; /* Viktigt: Skapar mellanrummet  */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     margin-top: 15px;
@@ -453,15 +413,15 @@ cursor: pointer;
 
 .right-buttons {
     display: flex;
-    gap: 10px; /* Mellanrum mellan 'Lägg till' och 'Gå med' */
+    gap: 10px;
 }
 
 /* Denna klass overridar din 100% bredd och gör knapparna mindre */
 .btn-small {
-    width: auto !important; /* Tvingar knappen att bara vara så bred som texten */
-    min-width: 110px; /* Ger en snygg minimibredd så de ser enhetliga ut */
+    width: auto !important;
+    min-width: 110px;
     padding: 6px 15px !important;
-    height: 38px !important; /* Gör dem lite lägre än standardknappar */
+    height: 38px !important;
     font-size: 0.85rem !important;
     white-space: nowrap;
     display: inline-flex;
@@ -469,11 +429,13 @@ cursor: pointer;
     justify-content: center;
 }
 
-/* Säkerställ att föräldern inte tvingar ner knapparna på ny rad */
+/* (sammanslagen dublett) content-toolbar:
+   OBS! flex-direction: column kom från en tidigare regel och behövdes för att behålla nuvarande layout. */
 .content-toolbar {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: column; /* viktigt att behålla */
+    justify-content: space-between;
+    gap: 20px;
     width: 100%;
 }
 
@@ -481,45 +443,41 @@ cursor: pointer;
     background: white;
     padding: 20px;
     border-radius: 8px;
-    border-left: 4px solid #3498db; /* Blå kant för att matcha din design */
+    border-left: 4px solid #3498db;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     color: #2c3e50;
     line-height: 1.6;
 }
 
 .section-divider {
-    margin: 0; /* Tar bort de 40px som fanns tidigare */
-    margin-bottom: 20px; /* Matchar exakt din .cv-section margin-bottom */
+    margin: 0;
+    margin-bottom: 20px;
     border: 0;
     border-top: 0px solid #ffffff;
-}
-.hr{
-
 }
 
 .projects-block {
     background: #fff;
-    padding: 15px 20px 20px 20px; /* Minskad padding i toppen från 20px till 15px */
+    padding: 15px 20px 20px 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-top: 0; /* Tar bort margin-top som krockar med dividern */
+    margin-top: 0;
 }
 
 /* Behållare för rubrik och redigera-knapp */
 .cv-header-row {
     display: flex;
-    justify-content: space-between; /* Skjuter knappen till höger */
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    border-bottom: 2px solid #3498db; /* Flyttar linjen till hela raden */
+    border-bottom: 2px solid #3498db;
     padding-bottom: 5px;
 }
 
-    /* Justering för rubriken så den inte har en egen linje som krockar */
-    .cv-header-row .section-title {
-        margin-bottom: 0;
-        border-bottom: none;
-    }
+.cv-header-row .section-title {
+    margin-bottom: 0;
+    border-bottom: none;
+}
 
 /* Specifik styling för de små redigeringsknapparna */
 .btn-edit-small {
@@ -539,7 +497,7 @@ cursor: pointer;
 /* Ny styling för kontaktuppgifter i sidebaren */
 .profile-contact-details {
     text-align: left;
-    background: rgba(255, 255, 255, 0.05); /* En mycket lätt ljusare bakgrund */
+    background: rgba(255, 255, 255, 0.05);
     padding: 15px;
     border-radius: 8px;
     margin: 20px 0;
@@ -554,14 +512,9 @@ cursor: pointer;
     line-height: 1.4;
 }
 
-    .contact-item strong {
-        color: #3498db; /* Blå färg för labels */
-        font-weight: 600;
-    }
-
-/* Säkerställ att sidebaren har tillräckligt med utrymme */
-.profile-info-text {
-    width: 100%;
+.contact-item strong {
+    color: #3498db;
+    font-weight: 600;
 }
 
 .cv-section textarea.edit-mode {
@@ -575,100 +528,99 @@ cursor: pointer;
 }
 
 .save-btn {
-    background-color: #27ae60 !important; /* Grön färg för Spara */
+    background-color: #27ae60 !important;
     border-color: #27ae60 !important;
 }
 
-.p-projects-container{
+.p-projects-container {
     padding-top: 40px;
 }
 
+/* (sammanslagen dublett) success-popup-overlay */
 .success-popup-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 45, 90, 0.9);
+    background: rgba(0, 45, 90, 0.85);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10000;
+    z-index: 9999;
 }
 
+/* (sammanslagen dublett) success-popup-content */
 .success-popup-content {
     background: white;
-    padding: 30px;
-    border-radius: 12px;
+    padding: 40px;
+    border-radius: 15px;
     text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 400px;
+    width: 90%;
 }
 
+/* Animation för att "poppa upp" */
+.animated-popup {
+    animation: popupScale 0.4s ease-out forwards;
+}
+
+/* (rensad dublett) keyframes */
+@keyframes popupScale {
+    0% {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* (rensad dublett) success-icon */
 .success-icon {
     font-size: 4rem;
     color: #28a745;
     margin-bottom: 15px;
 }
 
-@keyframes popupScale {
-    from {
-        transform: scale(0.7);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
 /* Behållaren för sök-input, select och knappen */
 .toolbar-inputs {
     display: flex;
     gap: 10px;
-    flex: 1; /* Gör att hela gruppen tar upp tillgänglig plats till vänster */
+    flex: 1;
     align-items: center;
 }
 
-    /* Gör sökfältet till 3 delar (75%) */
-    .toolbar-inputs .form-control-custom {
-        flex: 3;
-        min-width: 0;
-        height: 38px;
-    }
-
-    /* Gör rullistan till 1 del (25%) */
-    .toolbar-inputs .form-select-custom {
-        flex: 1;
-        min-width: 0;
-        height: 38px;
-    }
-
-    /* Sökknappen behåller sin fasta storlek */
-    .toolbar-inputs .btn-small {
-        flex: none;
-        padding: 0 20px;
-        height: 38px;
-    }
-
-/* Justering för hela verktygsfältet */
-.content-toolbar {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    width: 100%;
+.toolbar-inputs .form-control-custom {
+    flex: 3;
+    min-width: 0;
+    height: 38px;
 }
 
-/*PROJECTDETAILS*/
-/* Specifikt för resurs-korten i projektvyn */
+.toolbar-inputs .form-select-custom {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+}
+
+.toolbar-inputs .btn-small {
+    flex: none;
+    padding: 0 20px;
+    height: 38px;
+}
+
+/* PROJECTDETAILS */
 .file-card {
     transition: all 0.2s ease;
     cursor: pointer;
 }
 
-    .file-card:hover {
-        background-color: rgba(52, 152, 219, 0.05);
-        border-style: solid;
-    }
+.file-card:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+    border-style: solid;
+}
 
 /* Anpassa projekt-piller för deltagare så de ser ut som profil-länkar */
 .projects-list .project-pill i {
@@ -684,46 +636,29 @@ cursor: pointer;
 
 /* Ny styling för projektbilden i sidebaren */
 .project-image-container {
-    width: 100%; /* Fyller hela kortets bredd minus padding */
-    height: 200px; /* Eller den höjd du föredrar */
-    border-radius: 8px; /* Samma rundning som profile-contact-details */
-    overflow: hidden; /* Klipper bilden snyggt vid hörnen */
-    background: rgba(255, 255, 255, 0.05); /* Samma bakgrund som kontakt-rutan */
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
 }
 
-    .project-image-container img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Ser till att bilden fyller rutan utan att bli utdragen */
-    }
-
-    .project-image-container i {
-        font-size: 4rem;
-        color: #3498db;
-    }
-
-.project-pill {
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+.project-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-    .project-pill:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-        border-color: #3498db !important;
-        background-color: #ffffff !important;
-    }
+.project-image-container i {
+    font-size: 4rem;
+    color: #3498db;
+}
 
-    /* Säkerställer att ikonerna i pillerna också är centrerade */
-    .project-pill i {
-        display: inline-block;
-    }
-
-/*css för inaktivera och aktivera profil*/
+/* css för inaktivera och aktivera profil */
 .btn-danger-outline {
     border: 2px solid #e74c3c;
     color: #e74c3c;
@@ -734,13 +669,13 @@ cursor: pointer;
     transition: 0.2s ease-in-out;
 }
 
-    .btn-danger-outline:hover {
-        background-color: #e74c3c;
-        color: white;
-    }
+.btn-danger-outline:hover {
+    background-color: #e74c3c;
+    color: white;
+}
 
 .btn-success-outline {
-    border: 2px solid #27ae60; /* Grön */
+    border: 2px solid #27ae60;
     color: #27ae60;
     background-color: transparent;
     padding: 8px 16px;
@@ -749,13 +684,13 @@ cursor: pointer;
     transition: 0.2s ease-in-out;
 }
 
-    .btn-success-outline:hover {
-        background-color: #27ae60;
-        color: white;
-    }
+.btn-success-outline:hover {
+    background-color: #27ae60;
+    color: white;
+}
 
 .message-card {
-    max-width: 1100px; 
+    max-width: 1100px;
     margin: 0 auto 40px auto;
 }
 
@@ -775,9 +710,9 @@ cursor: pointer;
     transition: background-color 0.15s ease;
 }
 
-    .message-row:hover {
-        background-color: rgba(52, 152, 219, 0.06);
-    }
+.message-row:hover {
+    background-color: rgba(52, 152, 219, 0.06);
+}
 
 .message-badge-new {
     background-color: #3498db !important;
@@ -798,10 +733,10 @@ cursor: pointer;
     color: #e74c3c !important;
 }
 
-    .btn-delete-message:hover {
-        background-color: #e74c3c !important;
-        color: #fff !important;
-    }
+.btn-delete-message:hover {
+    background-color: #e74c3c !important;
+    color: #fff !important;
+}
 
 #sendMessageModal .modal-title,
 #readMessageModal .modal-title,
@@ -829,56 +764,1414 @@ cursor: pointer;
     border: 2px solid #f4f7f6;
 }
 
-/* Popup-overlay som täcker hela skärmen */
-.success-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
+.project-card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.2s;
+}
+
+/* ====== Helper-klasser (flyttat från inline style="...") ====== */
+
+/* (rensad dublett) u-hidden */
+.u-hidden {
+    display: none !important;
+}
+
+.u-img-cover-full {
     width: 100%;
     height: 100%;
-    background: rgba(0, 45, 90, 0.85); /* Mörkblå transparent bakgrund */
+    object-fit: cover;
+}
+
+/* Skicka meddelande-knappen */
+.u-btn-fullwidth-top {
+    margin-top: 15px;
+    width: 100%;
+}
+
+/* Profilstats */
+.u-profile-stats {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ecf0f1;
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+/* TempData status alert */
+.u-status-alert {
+    font-size: 0.75rem;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+/* Exportera XML-knapp */
+.u-export-xml-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    margin-top: 5px;
+    text-decoration: none;
     display: flex;
-    justify-content: center;
     align-items: center;
-    z-index: 9999;
+    justify-content: center;
 }
 
-/* Själva rutan */
-.success-popup-content {
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
+.u-export-xml-icon {
+    margin-right: 8px;
+}
+
+/* Konto-inställningar container */
+.u-account-settings {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Privacy-box */
+.privacy-status {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-width: 400px;
-    width: 90%;
+    border: 1px solid;
 }
 
-/* Animation för att "poppa upp" */
-.animated-popup {
-    animation: popupScale 0.4s ease-out forwards;
+.privacy-status.is-private {
+    background-color: #2c3e50;
+    border-color: #34495e;
 }
 
-@keyframes popupScale {
-    0% {
-        transform: scale(0.7);
-        opacity: 0;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+.privacy-status.is-public {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
 }
 
-.success-icon {
-    font-size: 4rem;
-    color: #28a745;
+.privacy-status-text {
+    font-size: 0.8em;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.privacy-status.is-private .privacy-status-text {
+    color: #ecf0f1;
+}
+
+.privacy-status.is-public .privacy-status-text {
+    color: #856404;
+}
+
+.u-privacy-btn {
+    width: 100%;
+    font-size: 0.8em;
+}
+
+/* Inaktivera/Aktivera */
+.u-inactivate-btn {
+    font-size: 0.8em;
+    opacity: 0.8;
+    width: 100%;
+}
+
+.u-activate-btn {
+    font-size: 0.8em;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    width: 100%;
+}
+
+/* CV-knappar rad */
+.u-cv-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.u-cv-view-btn {
+    flex: 3;
+    text-align: center;
+}
+
+.u-cv-delete-form {
+    flex: 1;
+}
+
+.u-cv-delete-btn {
+    width: 100%;
+}
+
+/* Textareas i edit mode */
+.u-textarea-100 {
+    width: 100%;
+    min-height: 100px;
+}
+
+/* Toolbar */
+.u-toolbar-top-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
     margin-bottom: 15px;
 }
 
-.project-card:hover {
-    transform: translateY(-5px); /* Lyfter vid hover för bättre UX */
-    background: #2980b9;
-    transition: transform 0.2s;
+.u-toolbar-search {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.u-toolbar-sort {
+    width: auto;
+    min-width: 200px;
+    margin: 0;
+}
+
+.u-toolbar-search-btn {
+    width: 100px;
+    margin: 0;
+}
+
+.u-right-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.u-nowrap-btn {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.u-clear-search-btn {
+    margin-left: auto;
+    width: 100px;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Projects grid + card */
+.u-projects-grid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.u-project-card {
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    min-height: 380px;
+    border: 1px solid #eee;
+}
+
+.u-project-owner-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #3498db;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 5px 12px;
+    border-radius: 0 12px 0 10px;
+    letter-spacing: 0.5px;
+    z-index: 5;
+    box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.u-project-card-image {
+    width: 100%;
+    height: 160px;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.u-project-placeholder-icon {
+    font-size: 3rem;
+    color: #cbd5e0;
+}
+
+.u-project-card-body {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.u-project-title-block {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #f0f2f5;
+    padding-bottom: 10px;
+}
+
+.u-project-name {
+    font-weight: 800;
+    display: block;
+    color: #002d5a;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.u-project-role {
+    font-size: 0.9rem;
+    color: #3498db;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.u-user-tag-icon {
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+
+.u-project-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #4a5568;
+}
+
+.u-detail-icon {
+    width: 15px;
+    color: #718096;
+}
+
+.u-status-dot {
+    width: 15px;
+    font-size: 0.6rem;
+    vertical-align: middle;
+}
+
+.u-status-dot.is-active {
+    color: #48bb78;
+}
+
+.u-status-dot.is-inactive {
+    color: #a0aec0;
+}
+
+.u-project-participants-row {
+    margin-top: auto;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #f0f2f5;
+}
+
+.u-project-participants-badge {
+    display: flex;
+    align-items: center;
+    background: #ebf5ff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: #2b6cb0;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.u-participants-icon {
+    margin-right: 6px;
+}
+
+/* Similar person section */
+.u-similar-section {
+    margin-top: 40px;
+    border-top: 2px solid #eee;
+    padding-top: 20px;
+}
+
+.u-similar-card {
+    display: flex;
+    align-items: center;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    max-width: 450px;
+}
+
+.u-similar-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+    border: 2px solid #002d5a;
+}
+
+.u-similar-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    background: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.u-similar-content {
+    flex-grow: 1;
+}
+
+.u-similar-name {
+    margin: 0;
+    color: #002d5a;
+    font-weight: bold;
+}
+
+.u-similar-title {
+    margin: 0 0 8px 0;
+    font-size: 0.85em;
+    color: #666;
+}
+
+.u-match-badge {
+    background: #e7f3ff;
+    color: #0056b3;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+    border: 1px solid #b3d7ff;
+}
+
+.u-similar-btn {
+    background-color: #002d5a;
+    border: none;
+}
+
+/* ====== ChangePassword (flyttat från inline styles) ====== */
+
+.change-password-card {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.change-password-title {
+    color: #002d5a;
+    font-weight: bold;
+}
+
+.change-password-label {
+    color: #002d5a;
+}
+
+.change-password-submit {
+    background-color: #002d5a;
+    border: none;
+    padding: 10px 20px;
+}
+
+.change-password-cancel {
+    padding: 10px 20px;
+}
+
+/* ====== CreateAccount (flyttat från inline styles) ====== */
+
+.create-account-card {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+}
+
+/* Profilbild-placeholder (ingen bild) */
+.create-account-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background: #eee;
+    border-radius: 50%;
+    display: inline-block;
+    line-height: 150px;
+    color: #aaa;
+    border: 2px dashed #ccc;
+}
+
+/* ====== Login (flyttat från inline styles) ====== */
+
+.login-card {
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* ====== Messages (flyttat från inline styles) ====== */
+
+.u-inline-form {
+    display: inline;
+}
+
+.u-prewrap {
+    white-space: pre-wrap;
+}
+
+/* ====== Home/Startsida (flyttat från inline styles) ====== */
+
+.home-page {
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Welcome */
+.home-welcome {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    border-left: 8px solid #002d5a;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.home-welcome-title {
+    color: #002d5a;
+    font-weight: bold;
+}
+
+.home-welcome-text {
+    color: #444;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+/* Latest project area */
+.home-latest-project {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.home-latest-project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.home-latest-project-title {
+    color: #002d5a;
+    margin-bottom: 0;
+}
+
+.home-latest-project-link {
+    font-weight: 600;
+}
+
+.home-latest-project-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.home-latest-project-name {
+    color: #0056b3;
+    font-weight: bold;
+}
+
+.home-latest-project-desc {
+    color: #555;
+}
+
+.home-latest-project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+/* Section title */
+.home-section-title {
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Profile grid */
+.home-profile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+/* Profile cards */
+.home-profile-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    border: none;
+}
+
+.home-profile-card-topbar {
+    height: 10px;
+    background-color: #0056b3;
+}
+
+.home-profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f0f2f5;
+    margin-bottom: 15px;
+}
+
+.home-profile-img-fallback {
+    width: 100px;
+    height: 100px;
+    background: #f0f2f5;
+    border-radius: 50%;
+    margin: 0 auto 15px auto;
+    line-height: 100px;
+    color: #adb5bd;
+    font-size: 2rem;
+}
+
+.home-profile-name {
+    color: #002d5a;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.home-profile-jobtitle {
+    color: #0056b3;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+/* Match badge */
+.home-match-badge {
+    background: #e7f3ff;
+    color: #0056b3;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-block;
+    border: 1px solid #b3d7ff;
+}
+
+/* Description box + clamp */
+.home-profile-descbox {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 20px;
+    min-height: 60px;
+}
+
+.home-profile-desc {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Button */
+.home-profile-btn {
+    background-color: #002d5a;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 500;
+}
+
+/* ====== Search Results (flyttat från inline styles) ====== */
+
+.sr-title {
+    color: white;
+}
+
+/* Bilder (flyttat från inline img-styles) */
+.sr-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ====== EditAccount (flyttat från inline styles) ====== */
+
+.edit-account-card {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 30px;
+}
+
+.edit-account-success-title {
+    color: #002d5a;
+    font-weight: bold;
+}
+
+.edit-account-profile-img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #002d5a;
+}
+
+.edit-account-image-placeholder {
+    width: 150px;
+    height: 150px;
+    background: #eee;
+    border-radius: 50%;
+    display: inline-block;
+    line-height: 150px;
+    color: #aaa;
+    border: 2px dashed #ccc;
+}
+
+.edit-account-save-btn {
+    background-color: #002d5a;
+}
+
+/* ====== AddProject (flyttat från inline styles) ====== */
+
+.add-project-page {
+    padding: 20px;
+    min-height: 100vh;
+    background-color: #2c3e50;
+}
+
+.add-project-header {
+    background-color: white;
+    border-radius: 12px;
+    padding: 25px;
+    border-left: 8px solid #002d5a;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.add-project-title {
+    color: #002d5a;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.add-project-subtitle {
+    color: #666;
+    margin-bottom: 0;
+}
+
+.add-project-card-left {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.add-project-label {
+    color: #002d5a;
+}
+
+.add-project-input {
+    border-radius: 8px;
+}
+
+.add-project-save-btn {
+    background-color: #28a745;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.add-project-cancel-btn {
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.add-project-card-right {
+    background-color: rgba(255,255,255,0.95);
+    padding: 40px;
+    border-radius: 15px;
+    border: 2px dashed #0056b3;
+    height: 100%;
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.add-project-image-icon {
+    font-size: 3rem;
+    color: #0056b3;
+}
+
+.add-project-image-title {
+    color: #002d5a;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.add-project-zip-icon {
+    font-size: 2rem;
+    color: #6c757d;
+}
+
+/* Success popup (flyttat från inline display:none) */
+.add-project-success-popup.u-hidden {
+    display: none !important;
+}
+
+.add-project-success-icon {
+    color: #28a745;
+    font-size: 3rem;
+}
+
+/* ====== AllProjects (flyttat från inline styles) ====== */
+
+.all-projects-page {
+    padding: 40px;
+}
+
+.all-projects-wrapper {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.all-projects-title {
+    color: #002d5a;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #3498db;
+    display: inline-block;
+}
+
+.all-projects-toolbar {
+    margin-bottom: 30px;
+}
+
+.all-projects-toolbar-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.all-projects-search-col {
+    flex: 1;
+    min-width: 200px;
+}
+
+.all-projects-sort-col {
+    width: 300px;
+
+}
+
+.all-projects-search-btn,
+.all-projects-clear-btn,
+.all-projects-clear-spacer {
+    height: 46px; /* Måste matcha den nya höjden på input-fälten */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.all-projects-label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.all-projects-input {
+    width: 100%;
+    margin: 0;
+    padding: 6px 12px; /* Minskat vertikalt padding för att ge texten plats */
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    height: 46px; /* Ökad höjd från 40px till 46px */
+    line-height: 1.6; /* Ökat radavstånd så att bokstäver som 'g' syns helt */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.all-projects-buttons-col {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 110px;
+    min-height: 85px;
+    justify-content: flex-end;
+}
+
+.all-projects-search-btn {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+}
+
+.all-projects-clear-btn {
+    width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0;
+    background-color: #e74c3c;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.all-projects-btn-icon {
+    margin-right: 6px;
+}
+
+.all-projects-clear-spacer {
+    height: 40px;
+    width: 100%;
+}
+
+.all-projects-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border: 2px dashed #dee2e6;
+    margin-top: 20px;
+}
+
+.all-projects-empty-icon {
+    font-size: 4rem;
+    color: #cbd5e0;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.all-projects-empty-title {
+    color: #4a5568;
+    font-weight: bold;
+}
+
+.all-projects-empty-create {
+    background-color: #002d5a;
+    border: none;
+    padding: 10px 20px;
+}
+
+.all-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.all-projects-card {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    border: 1px solid #eee;
+}
+
+.all-projects-card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.all-projects-card-image {
+    width: 100%;
+    height: 160px;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.all-projects-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.all-projects-card-head {
+    padding: 20px 20px 5px 20px;
+}
+
+.all-projects-card-name {
+    font-weight: 800;
+    display: block;
+    color: #002d5a;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.all-projects-card-owner {
+    font-size: 0.85rem;
+    color: #3498db;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.all-projects-owner-icon {
+    font-size: 0.8rem;
+}
+
+.all-projects-card-body {
+    padding: 5px 20px 20px 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.all-projects-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.all-projects-status-dot {
+    font-size: 0.6rem;
+}
+
+.all-projects-status-dot.is-active {
+    color: #48bb78;
+}
+
+.all-projects-status-dot.is-inactive {
+    color: #a0aec0;
+}
+
+.all-projects-card-footer {
+    margin-top: auto;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f0f2f5;
+}
+
+.all-projects-members-badge {
+    background: #ebf5ff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: #2b6cb0;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.all-projects-member-btn {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.all-projects-join-btn {
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.all-projects-modal-header {
+    background-color: #002d5a;
+    color: white;
+}
+
+/* ====== EditProject (flyttat från inline styles) ====== */
+
+.edit-project-card {
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 30px;
+}
+
+.edit-project-image {
+    width: 250px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #002d5a;
+}
+
+.edit-project-image-placeholder {
+    width: 250px;
+    height: 150px;
+    background: #eee;
+    border-radius: 8px;
+    display: inline-block;
+    line-height: 150px;
+    color: #aaa;
+    border: 2px dashed #ccc;
+}
+
+.edit-project-save-btn {
+    background-color: #002d5a;
+    padding: 12px;
+}
+
+/* ====== Join Projects (flyttat från inline styles) ====== */
+
+.join-projects-card {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+}
+
+.join-projects-title {
+    color: #002d5a;
+}
+
+.join-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.join-projects-project-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+    border: 1px solid #eee;
+}
+
+.join-projects-image-wrap {
+    width: 100%;
+    height: 160px;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.join-projects-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.join-projects-fallback-icon {
+    font-size: 3rem;
+    color: #cbd5e0;
+}
+
+.join-projects-body {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.join-projects-head {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #f0f2f5;
+    padding-bottom: 10px;
+}
+
+.join-projects-name {
+    font-weight: 800;
+    display: block;
+    color: #002d5a;
+    font-size: 1.2rem;
+}
+
+.join-projects-owner {
+    font-size: 0.85rem;
+    color: #3498db;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.join-projects-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #4a5568;
+    margin-bottom: 15px;
+}
+
+.join-projects-status-dot {
+    font-size: 0.6rem;
+}
+
+.join-projects-status-dot.is-active {
+    color: #48bb78;
+}
+
+.join-projects-status-dot.is-inactive {
+    color: #a0aec0;
+}
+
+.join-projects-footer {
+    margin-top: auto;
+    padding-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #f0f2f5;
+}
+
+.join-projects-members-badge {
+    background: #ebf5ff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    color: #2b6cb0;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.join-projects-join-btn {
+    width: auto;
+    padding: 5px 15px;
+}
+
+/* ====== ProjectDetails (flyttat från inline styles) ====== */
+
+.project-details-image-wrap {
+    width: 100%;
+    height: 180px;
+    background-color: #3498db;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.project-details-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.project-details-edit-btn {
+    margin-top: 10px;
+    background-color: #002d5a;
+    border: none;
+}
+
+.project-details-admin-box {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.project-details-delete-btn {
+    width: 100%;
+}
+
+.project-details-preline {
+    white-space: pre-line;
+}
+
+.project-details-desc-textarea {
+    width: 100%;
+    min-height: 150px;
+}
+
+.project-details-participants-list {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.project-details-pill {
+    background-color: #ebf5ff;
+    color: #2c3e50;
+    border: 1px solid #dee2e6;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    width: 160px;
+    height: 140px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.project-details-pill.is-owner {
+    border: 2px solid #3498db;
+}
+
+.project-details-owner-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #3498db;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 0 11px 0 8px;
+}
+
+.project-details-pill-name {
+    font-weight: bold;
+    font-size: 1.05rem;
+    color: #212529;
+}
+
+.project-details-pill-role {
+    font-size: 0.85rem;
+}
+
+.project-details-private-note {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.project-details-no-participants {
+    margin-top: 15px;
+}
+
+.project-details-resources {
+    margin-top: 30px;
+}
+
+.project-details-resource-wrap {
+    max-width: 280px;
+    margin-top: 15px;
+}
+
+.project-details-file-card {
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    text-align: center;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.project-details-file-icon {
+    font-size: 2.5rem;
+    color: #e67e22;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.project-details-file-title {
+    font-weight: bold;
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.project-details-download-btn {
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+}
+
+.project-details-no-resources {
+    color: #7f8c8d;
+    font-style: italic;
+    margin-top: 15px;
+}
+
+.project-details-modal-header {
+    background-color: #002d5a;
+    color: white;
+}
+
+.project-details-success-icon {
+    color: #28a745;
+    font-size: 3rem;
+}
+
+.project-details-success-title {
+    color: #002d5a;
+    font-weight: bold;
+}
+
+/* ===== Layout / Header ===== */
+.main-header .layout-header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+}
+
+/* motsvarar: style="flex-shrink:0" */
+.main-header .logo {
+    flex-shrink: 0;
+}
+
+/* motsvarar: style="height:45px; width:auto" */
+.main-header .layout-logo-img {
+    height: 45px;
+    width: auto;
+    max-height: 45px;
+    display: block; /* tar bort inline-img “baseline”-strul */
+}
+
+/* motsvarar gamla: display:flex; gap:10px; margin-right:auto */
+.main-header .layout-searchbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+}
+
+    /* säkrare än bara width (om form-control skulle vinna) */
+    .main-header .layout-searchbar .layout-search-input {
+        flex: 0 0 200px;
+        width: 200px;
+        max-width: 200px;
+    }
+
+/* motsvarar gamla: display:flex; align-items:center; gap:15px */
+.main-header .layout-logged-in-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }

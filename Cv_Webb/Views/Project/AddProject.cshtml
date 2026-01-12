@@ -4,41 +4,44 @@
     ViewData["Title"] = "Lägg till projekt";
 }
 
-<div class="background" style="padding: 20px; min-height: 100vh; background-color: #2c3e50;">
-    <div class="mb-4" style="background-color: white; border-radius: 12px; padding: 25px; border-left: 8px solid #002d5a; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <h2 style="color: #002d5a; font-weight: bold; margin-bottom: 5px;">Skapa nytt projekt</h2>
-        <p style="color: #666; margin-bottom: 0;">Fyll i informationen nedan för att visa upp ditt arbete på din profil.</p>
+<div class="background add-project-page">
+
+    <div class="mb-4 add-project-header">
+        <h2 class="add-project-title">Skapa nytt projekt</h2>
+        <p class="add-project-subtitle">Fyll i informationen nedan för att visa upp ditt arbete på din profil.</p>
     </div>
 
     <form asp-action="AddProject" method="post" enctype="multipart/form-data">
         <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
         <div class="row">
             <div class="col-md-5">
-                <div style="background-color: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                <div class="add-project-card-left">
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold" style="color: #002d5a;">Namn:</label>
-                        <input asp-for="ProjectName" class="form-control" style="border-radius: 8px;" placeholder="t.ex. Hattmakarna" />
+                        <label class="form-label fw-bold add-project-label">Namn:</label>
+                        <input asp-for="ProjectName" class="form-control add-project-input" placeholder="t.ex. Hattmakarna" />
                         <span asp-validation-for="ProjectName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Role" class="form-label fw-bold" style="color: #002d5a;">Roll i projektet:</label>
-                        <input asp-for="Role" class="form-control" style="border-radius: 8px;" placeholder="t.ex. Databasansvarig" />
+                        <label asp-for="Role" class="form-label fw-bold add-project-label">Roll i projektet:</label>
+                        <input asp-for="Role" class="form-control add-project-input" placeholder="t.ex. Databasansvarig" />
                         @* Detta gör att du ser exakt vad som är fel om det inte går att spara *@
                         <span asp-validation-for="Role" class="text-danger"></span>
                     </div>
 
-                    @* --- NYTT: TYP OCH STATUS --- *@
+                    @* --- TYP OCH STATUS --- *@
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label asp-for="Type" class="form-label fw-bold" style="color: #002d5a;">Typ:</label>
-                            <input asp-for="Type" class="form-control" style="border-radius: 8px;" placeholder="t.ex. Webbapplikation" />
+                            <label asp-for="Type" class="form-label fw-bold add-project-label">Typ:</label>
+                            <input asp-for="Type" class="form-control add-project-input" placeholder="t.ex. Webbapplikation" />
                             <span asp-validation-for="Type" class="text-danger"></span>
                         </div>
+
                         <div class="col-md-6 mb-3">
-                            <label asp-for="Status" class="form-label fw-bold" style="color: #002d5a;">Status:</label>
-                            <select asp-for="Status" class="form-select" style="border-radius: 8px;">
+                            <label asp-for="Status" class="form-label fw-bold add-project-label">Status:</label>
+                            <select asp-for="Status" class="form-select add-project-input">
                                 <option value="Aktivt">Aktivt</option>
                                 <option value="Avslutat">Avslutat</option>
                                 <option value="Pausat">Pausat</option>
@@ -50,46 +53,52 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold" style="color: #002d5a;">Startdatum:</label>
-                            <input asp-for="StartDate" type="date" class="form-control" style="border-radius: 8px;" />
+                            <label class="form-label fw-bold add-project-label">Startdatum:</label>
+                            <input asp-for="StartDate" type="date" class="form-control add-project-input" />
                             <span asp-validation-for="StartDate" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold" style="color: #002d5a;">Slutdatum:</label>
-                            <input asp-for="EndDate" type="date" class="form-control" style="border-radius: 8px;" />
+                            <label class="form-label fw-bold add-project-label">Slutdatum:</label>
+                            <input asp-for="EndDate" type="date" class="form-control add-project-input" />
                             <span asp-validation-for="EndDate" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold" style="color: #002d5a;">Beskrivning:</label>
-                        <textarea asp-for="Description" class="form-control" rows="6" style="border-radius: 8px;" placeholder="Berätta om projektet..."></textarea>
+                        <label class="form-label fw-bold add-project-label">Beskrivning:</label>
+                        <textarea asp-for="Description"
+                                  class="form-control add-project-input"
+                                  rows="6"
+                                  placeholder="Berätta om projektet..."></textarea>
                         <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-success flex-grow-1" style="background-color: #28a745; border: none; padding: 12px; border-radius: 8px; font-weight: bold;">
+                        <button type="submit" class="btn btn-success flex-grow-1 add-project-save-btn">
                             Spara projekt
                         </button>
-                        <a asp-controller="Person" asp-action="Profile" class="btn btn-outline-secondary" style="padding: 12px; border-radius: 8px;">Avbryt</a>
+                        <a asp-controller="Person" asp-action="Profile" class="btn btn-outline-secondary add-project-cancel-btn">
+                            Avbryt
+                        </a>
                     </div>
+
                 </div>
             </div>
 
             <div class="col-md-7">
-                <div style="background-color: rgba(255,255,255,0.95); padding: 40px; border-radius: 15px; border: 2px dashed #0056b3; height: 100%; min-height: 450px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-                    <i class="bi bi-images" style="font-size: 3rem; color: #0056b3;"></i>
-                    <h4 style="color: #002d5a; margin-top: 20px; font-weight: bold;">Projektbild</h4>
+                <div class="add-project-card-right">
+                    <i class="bi bi-images add-project-image-icon"></i>
+                    <h4 class="add-project-image-title">Projektbild</h4>
                     <p class="text-muted">Ladda upp en bild som representerar ditt projekt (t.ex. en skärmdump).</p>
 
                     <div class="mt-3 w-75">
-                        <input type="file" name="imageFile" class="form-control" accept="image/*" style="border-radius: 8px;" />
+                        <input type="file" name="imageFile" class="form-control add-project-input" accept="image/*" />
                     </div>
 
                     <div class="mt-4 border-top pt-4 w-75">
-                        <i class="bi bi-file-earmark-zip" style="font-size: 2rem; color: #6c757d;"></i>
+                        <i class="bi bi-file-earmark-zip add-project-zip-icon"></i>
                         <h5 class="mt-2">Källkod (Valfritt)</h5>
-                        <input type="file" name="zipFile" class="form-control mt-2" accept=".zip,.rar,.7z" style="border-radius: 8px;" />
+                        <input type="file" name="zipFile" class="form-control mt-2 add-project-input" accept=".zip,.rar,.7z" />
                     </div>
                 </div>
             </div>
@@ -98,7 +107,7 @@
 
 </div>
 
-@* vi skapar ett dolt element som JS kan läsa av *@
+@* dolt element som JS kan läsa av *@
 @if (ViewBag.ShowSuccessPopup == true)
 {
     <div id="popup-data"
@@ -107,10 +116,10 @@
     </div>
 }
 
-@* Din popup-HTML *@
-<div id="successPopup" class="success-popup-overlay" style="display:none;">
+@* Popup HTML *@
+<div id="successPopup" class="success-popup-overlay add-project-success-popup u-hidden">
     <div class="success-popup-content">
-        <i class="bi bi-check-circle-fill" style="color: #28a745; font-size: 3rem;"></i>
+        <i class="bi bi-check-circle-fill add-project-success-icon"></i>
         <h3>Projektet har sparats!</h3>
         <p>Du skickas nu tillbaka till din profil...</p>
     </div>
