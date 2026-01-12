@@ -295,20 +295,18 @@ function openSendModalIfNeeded() {
     (bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el)).show();
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    openSendModalIfNeeded();
-});
-
 function initSendMessageModalValidation() {
     const modal = document.getElementById('sendMessageModal');
     if (!modal) return;
 
     const form = modal.querySelector('#sendMessageForm') || modal.querySelector('form');
-    if (!form) return;
+    const submitBtn = modal.querySelector('#sendMessageSubmitBtn');
+    if (!form || !submitBtn) return;
 
     const receiverId = modal.querySelector('#receiverId');
+    const receiverSearch = modal.querySelector('#receiverSearch');
 
-    const senderName = modal.querySelector('#senderName'); // finns bara när utloggad
+    const senderName = modal.querySelector('#senderName'); 
     const subject = modal.querySelector('#sendSubject');
     const content = modal.querySelector('#sendContent');
 
@@ -317,64 +315,56 @@ function initSendMessageModalValidation() {
     const subjectErr = modal.querySelector('#subjectClientError');
     const contentErr = modal.querySelector('#contentClientError');
 
-    function showErr(el, msg) {
-        if (!el) return;
-        el.textContent = msg;
-        el.style.display = 'block';
-    }
-
-    function clearErr(el) {
-        if (!el) return;
-        el.textContent = '';
-        el.style.display = 'none';
-    }
+    const showErr = (el, msg) => { if (el) { el.textContent = msg; el.style.display = 'block'; } };
+    const clearErr = (el) => { if (el) { el.textContent = ''; el.style.display = 'none'; } };
 
 
+    receiverSearch?.addEventListener('input', () => clearErr(receiverErr));
     senderName?.addEventListener('input', () => clearErr(senderErr));
     subject?.addEventListener('input', () => clearErr(subjectErr));
     content?.addEventListener('input', () => clearErr(contentErr));
 
-    form.addEventListener('submit', function (e) {
+    submitBtn.addEventListener('click', () => {
         let ok = true;
-
 
         clearErr(receiverErr);
         clearErr(senderErr);
         clearErr(subjectErr);
         clearErr(contentErr);
 
-        if (!receiverId || !receiverId.value || receiverId.value.trim() === "") {
+        if (!receiverId?.value?.trim()) {
             ok = false;
             showErr(receiverErr, "Välj en mottagare i listan.");
         }
 
-        if (senderName && (!senderName.value || senderName.value.trim().length < 2)) {
+        if (senderName && senderName.value.trim().length < 2) {
             ok = false;
             showErr(senderErr, "Ange ditt namn (minst 2 tecken).");
         }
 
-        if (!subject || !subject.value || subject.value.trim().length < 1) {
+        if (!subject?.value?.trim()) {
             ok = false;
             showErr(subjectErr, "Ange ett ämne.");
         }
 
-        if (!content || !content.value || content.value.trim().length < 1) {
+        if (!content?.value?.trim()) {
             ok = false;
-            showErr(contentErr, "Skriv ett meddelande");
+            showErr(contentErr, "Skriv ett meddelande.");
         }
 
         if (!ok) {
-            e.preventDefault();
-
-            if (senderErr && senderErr.style.display === 'block') senderName?.focus();
-            else if (receiverErr && receiverErr.style.display === 'block') modal.querySelector('#receiverSearch')?.focus();
-            else if (subjectErr && subjectErr.style.display === 'block') subject?.focus();
-            else if (contentErr && contentErr.style.display === 'block') content?.focus();
+            if (senderErr?.style.display === 'block') senderName?.focus();
+            else if (receiverErr?.style.display === 'block') receiverSearch?.focus();
+            else if (subjectErr?.style.display === 'block') subject?.focus();
+            else if (contentErr?.style.display === 'block') content?.focus();
+            return; 
         }
+
+ 
+        if (form.requestSubmit) form.requestSubmit();
+        else form.submit();
     });
 }
-
-
 
 
 function initModalCleanup() {
@@ -589,6 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+});
 
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -616,29 +607,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-// ==============================
-// --- DOMContentLoaded (EN gång) ---
-// ==============================
+    // ==============================
+    // --- DOMContentLoaded (EN gång) ---
+    // ==============================
 
-document.addEventListener("DOMContentLoaded", function () {
-    initAddProjectSuccessPopup();
-    initScrollRestoreOnSearch();
+    document.addEventListener("DOMContentLoaded", function () {
+        initAddProjectSuccessPopup();
+        initScrollRestoreOnSearch();
 
-    initReceiverSearch();
-    initMessagesPage();
-    initModalCleanup(); 
-    openSendModalIfNeeded();
-    initSendMessageModalPrefill();
-    initSendMessageModalValidation();
+        initReceiverSearch();
+        initMessagesPage();
+        initModalCleanup();
 
-    initProfileImagePreview();
-    initSaveSuccessRedirect();
+        openSendModalIfNeeded();
+        initSendMessageModalPrefill();
+        initSendMessageModalValidation();
 
-    initDateRangeValidation();
-    initSmartBackButton();
+        initProfileImagePreview();
+        initSaveSuccessRedirect();
 
-    initJoinProjectDelegation();
-    initEditButtonsDelegation();
-    initCvUpload();
-    initConfirmForms();
-});
+        initDateRangeValidation();
+        initSmartBackButton();
+
+        initJoinProjectDelegation();
+        initEditButtonsDelegation();
+        initCvUpload();
+        initConfirmForms();
+
+        initAllProjectsJoinButtons();
+        initHideProjectDetailsSuccessPopup();
+        initCvDeleteConfirm();
+        initCvUploadPdfOnly();
+    });
