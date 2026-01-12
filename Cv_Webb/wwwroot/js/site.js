@@ -290,7 +290,7 @@ function initSendMessageModalValidation() {
         const content = modal.querySelector('#sendContent')?.value.trim();
 
         if (!receiverId || !subject || !content) {
-            alert("Vänligen fyll i alla obligatoriska fält.");
+            alert("Vänligen fyll i alla obligatoriska fält."); //ÄNDRA till ordentlig visuell feedback vid behov
             return;
         }
         form.requestSubmit ? form.requestSubmit() : form.submit();
