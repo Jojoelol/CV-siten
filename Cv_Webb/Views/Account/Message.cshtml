@@ -80,7 +80,7 @@
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#deleteMessageModal"
                                                         data-id="@m.Id"
-                                                        data-from="@(m.Sender?.FirstName + " " + m.Sender?.LastName)"
+                                                        data-from="@(m.Sender != null ? (m.Sender.FirstName + " " + m.Sender.LastName) : (m.SenderName + " (extern)"))"
                                                         data-subject="@m.Subject">
                                                     X
                                                 </button>
