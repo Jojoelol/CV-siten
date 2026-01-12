@@ -76,21 +76,29 @@
             </div>
 
             <div class="col-md-7">
-                <div class="add-project-card-right">
-                    <i class="bi bi-images add-project-image-icon"></i>
-                    <h4 class="add-project-image-title">Projektbild</h4>
-                    <p class="text-muted">Ladda upp en bild som representerar ditt projekt.</p>
+                <div class="add-project-card-right" id="previewContainer" style="position: relative; overflow: hidden;">
 
-                    <div class="mt-3 w-75">
-                        <input asp-for="ImageFile" type="file" class="form-control add-project-input" accept="image/*" />
-                        <span asp-validation-for="ImageFile" class="text-danger"></span>
-                    </div>
+                    @* --- 1. PREVIEW-BILDEN (Ligger i bakgrunden) --- *@
+                    <img id="projectImagePreview" src="" alt="" class="project-bg-preview" />
 
-                    <div class="mt-4 border-top pt-4 w-75">
-                        <i class="bi bi-file-earmark-zip add-project-zip-icon"></i>
-                        <h5 class="mt-2">Källkod (Valfritt)</h5>
-                        <input asp-for="ZipFile" type="file" class="form-control mt-2 add-project-input" accept=".zip,.rar,.7z" />
-                        <span asp-validation-for="ZipFile" class="text-danger"></span>
+                    @* --- 2. INNEHÅLL (Ligger ovanpå bilden) --- *@
+                    <div class="add-project-content-overlay">
+                        <i class="bi bi-images add-project-image-icon"></i>
+                        <h4 class="add-project-image-title">Projektbild</h4>
+                        <p class="text-muted">Ladda upp en bild som representerar ditt projekt.</p>
+
+                        <div class="mt-3 w-75">
+                            @* Notera id="projectImageInput" här: *@
+                            <input asp-for="ImageFile" type="file" id="projectImageInput" class="form-control add-project-input" accept="image/*" />
+                            <span asp-validation-for="ImageFile" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4 border-top pt-4 w-75">
+                            <i class="bi bi-file-earmark-zip add-project-zip-icon"></i>
+                            <h5 class="mt-2">Källkod (Valfritt)</h5>
+                            <input asp-for="ZipFile" type="file" class="form-control mt-2 add-project-input" accept=".zip,.rar,.7z" />
+                            <span asp-validation-for="ZipFile" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
             </div>
