@@ -33,11 +33,13 @@
                                     <th>Åtgärder</th>
                                 </tr>
                             </thead>
+                            <!-- öppnar meddelande modalen-->
                             <tbody data-open-send-modal="@(ViewData["OpenSendModal"] as bool? == true ? "true" : "false")">
                                 @if (Model != null && Model.Count > 0)
                                 {
                                     foreach (var m in Model)
                                     {
+                                        <!-- loopar meddelanden + kallar på js för att autofylla mottagare om man ska svara-->
                                         <tr class="@(m.IsRead ? "" : "table-light") message-row"
                                             data-from="@(m.Sender != null ? (m.Sender.FirstName + " " + m.Sender.LastName) : (m.SenderName + " (extern)"))"
                                             data-subject="@m.Subject"
@@ -46,8 +48,8 @@
                                             <td data-bs-toggle="modal" data-bs-target="#readMessageModal">
                                                 <strong>
                                                     @(m.Sender != null
-                                                                                                ? m.Sender.FirstName + " " + m.Sender.LastName
-                                                                                                : m.SenderName + " (extern)")
+                                                    ? m.Sender.FirstName + " " + m.Sender.LastName
+                                                    : m.SenderName + " (extern)")
                                         </strong>
                                     </td>
 
@@ -55,6 +57,7 @@
                                             <td data-bs-toggle="modal" data-bs-target="#readMessageModal">@m.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
 
                                             <td data-bs-toggle="modal" data-bs-target="#readMessageModal">
+                                                <!--visar status på meddelande-->
                                         @if (m.IsRead)
                                                 {
                                                     <span class="badge message-badge-read">Läst</span>
@@ -66,6 +69,7 @@
                                             </td>
 
                                             <td class="message-actions">
+                                                <!--åtgärder, markera läst/ta bort-->
                                                 @if (!m.IsRead)
                                                 {
                                                     <button type="button"
@@ -85,7 +89,7 @@
                                                     X
                                                 </button>
                                             </td>
-
+                                            <!--gömmer själva meddelandet i tabellen-->
                                             <td class="message-content u-hidden">@m.Content</td>
                                         </tr>
                                     }
@@ -101,7 +105,7 @@
                             </tbody>
                         </table>
                     </div>
-
+                    <!--skicka meddelande modalen-->
                 </div>
                 <partial name="SendMessageModal" />
             </div>
