@@ -68,7 +68,6 @@
 						</div>
 					}
 
-<<<<<<< HEAD
 					@if (TempData["ErrorMessage"] != null)
 					{
 						<div class="alert alert-danger py-1 text-center u-error-alert">
@@ -76,11 +75,6 @@
 						</div>
 					}
 
-					@* Dina befintliga CV-knappar här under... *@
-
-					@* --- HUVUDHANDLINGAR (Blå & Röd) --- *@
-=======
->>>>>>> main
 					@if (string.IsNullOrEmpty(Model.CvUrl))
 					{
 						<form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
@@ -346,15 +340,14 @@
 			}
 		</div>
 
-<<<<<<< HEAD
 		@* --- HUVUDHANDLINGAR (Blå & Röd) --- *@
 		@if (string.IsNullOrEmpty(Model.CvUrl))
 		{
-			<form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
+			<form id="cvUploadFormBottom" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
 				<input type="hidden" name="personId" value="@Model.Id" />
-				<input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
+				<input type="file" id="cvFileInputBottom" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadFormBottom').submit();" />
 			</form>
-			<button type="button" class="btn-action btn-primary cv-full-btn" onclick="document.getElementById('cvFileInput').click();">Ladda upp mitt CV</button>
+			<button type="button" class="btn-action btn-primary cv-full-btn" onclick="document.getElementById('cvFileInputBottom').click();">Ladda upp mitt CV</button>
 		}
 		else
 		{
@@ -371,7 +364,9 @@
 						<i class="fas fa-trash-alt"></i> <span>Ta bort CV</span>
 					</button>
 				</form>
-=======
+			</div>
+		}
+
 		@* --- LIKNANDE PERSONER --- *@
 		@if (ViewBag.SimilarPerson != null)
 		{
@@ -400,7 +395,6 @@
 						<a asp-action="Profile" asp-route-id="@ViewBag.SimilarPerson.Id" class="btn btn-sm btn-primary u-similar-btn">Visa profil</a>
 					</div>
 				</div>
->>>>>>> main
 			</div>
 		}
 	</section>
