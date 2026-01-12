@@ -230,6 +230,11 @@ function initMessagesPage() {
             const subjectInput = document.getElementById('sendSubject');
             const receiverResults = document.getElementById('receiverResults');
 
+            if (replyBtn) {
+                const isExternal = !senderId || senderId === "0";
+                replyBtn.classList.toggle("u-reply-external", isExternal);
+            }
+
             if (receiverSearch) receiverSearch.value = lastOpenedMessage.from || '';
             if (receiverId) receiverId.value = lastOpenedMessage.senderId || '';
             if (subjectInput) {
