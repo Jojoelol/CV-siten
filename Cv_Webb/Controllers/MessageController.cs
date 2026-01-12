@@ -110,13 +110,16 @@ namespace CV_siten.Controllers
         {
             var me = await GetMyPersonAsync();
 
-            var msg = await _db.Messages.FirstOrDefaultAsync(m => m.Id == id && m.ReceiverId == me.Id);
-            if (msg == null) return NotFound();
+            var msg = await _db.Messages
+                .FirstOrDefaultAsync(m => m.Id == id && m.ReceiverId == me.Id);
+
+            if (msg == null)
+                return NotFound();
 
             msg.IsRead = true;
             await _db.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Inbox));
+            return Ok();
         }
 
         [HttpPost]
