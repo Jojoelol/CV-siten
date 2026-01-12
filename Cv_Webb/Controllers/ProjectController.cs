@@ -1,6 +1,6 @@
 ﻿using CV_siten.Data.Data;
 using CV_siten.Data.Models;
-using CV_siten.Models.ViewModels; 
+using CV_siten.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -64,8 +64,6 @@ namespace CV_siten.Controllers
         public IActionResult AddProject() => View();
 
         // --- SKAPA NYTT PROJEKT (POST) ---
-
-
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -86,7 +84,6 @@ namespace CV_siten.Controllers
                 if (person == null) return RedirectToAction("Index", "Home");
 
                 // 2. Mappa data från ViewModel till den faktiska databasmodellen (Project)
-                // Vi konverterar DateTime till DateTimeOffset här
                 var newProject = new Project
                 {
                     ProjectName = model.ProjectName,
@@ -98,7 +95,7 @@ namespace CV_siten.Controllers
                     OwnerId = person.Id
                 };
 
-                // 3. Hantera Projektbild (Hämtas från model.ImageFile)
+                // 3. Hantera Projektbild
                 if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
@@ -112,7 +109,7 @@ namespace CV_siten.Controllers
                     newProject.ImageUrl = fileName;
                 }
 
-                // 4. Hantera ZIP-fil (Hämtas från model.ZipFile)
+                // 4. Hantera ZIP-fil
                 if (model.ZipFile != null && model.ZipFile.Length > 0)
                 {
                     string zipFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ZipFile.FileName);
@@ -131,18 +128,16 @@ namespace CV_siten.Controllers
                     // 5. Spara projektet
                     _context.Projects.Add(newProject);
 
-                    // 6. Skapa kopplingen i PersonProject
+                    // 6. Skapa kopplingen i PersonProject (ägaren blir automatiskt medlem)
                     _context.PersonProjects.Add(new PersonProject
                     {
                         PersonId = person.Id,
-                        Project = newProject, // Använder objektet direkt istället för Id för säkerhet
+                        Project = newProject,
                         Role = model.Role ?? "Projektägare"
                     });
 
-                    // Spara allt i en batch för att undvika transaktionsfel
                     await _context.SaveChangesAsync();
 
-                    // Visa din popup-logik
                     ViewBag.ShowSuccessPopup = true;
                     return View(model);
                 }
@@ -152,7 +147,6 @@ namespace CV_siten.Controllers
                 }
             }
 
-            // Om något är fel (ModelState), skicka tillbaka vyn med felmeddelandena
             return View(model);
         }
 
@@ -184,7 +178,6 @@ namespace CV_siten.Controllers
                 ZipUrl = project.ZipUrl
             };
 
-            // VIKTIGT: Vi pekar ut den specifika vyn EditProject.cshtml
             return View("EditProject", viewModel);
         }
 
@@ -202,7 +195,7 @@ namespace CV_siten.Controllers
 
             if (project == null || person == null || project.OwnerId != person.Id) return Forbid();
 
-            // Uppdatera Bild om ny fil skickats
+            // Uppdatera Bild
             if (model.ImageFile != null && model.ImageFile.Length > 0)
             {
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ImageFile.FileName);
@@ -211,7 +204,7 @@ namespace CV_siten.Controllers
                 project.ImageUrl = fileName;
             }
 
-            // Uppdatera ZIP-fil om ny fil skickats
+            // Uppdatera ZIP-fil
             if (model.ZipFile != null && model.ZipFile.Length > 0)
             {
                 string fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.ZipFile.FileName);
@@ -233,7 +226,7 @@ namespace CV_siten.Controllers
             return RedirectToAction(nameof(ProjectDetails), new { id = project.Id });
         }
 
-        // --- UPPDATERA BESKRIVNING (Snabb-redigering via AJAX/JS) ---
+        // --- UPPDATERA BESKRIVNING (AJAX) ---
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> UpdateDescription(int id, string description)
@@ -249,30 +242,27 @@ namespace CV_siten.Controllers
             return RedirectToAction("ProjectDetails", new { id = id });
         }
 
-        // --- GÅ MED I PROJEKT (GET) ---
+        // --- GÅ MED I PROJEKT (GET - Lista) ---
         [Authorize]
-        // 1. Visar listan över projekt man kan gå med i
         [HttpGet]
         public async Task<IActionResult> JoinProject()
         {
-            // Hämta inloggad användare
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login", "Account");
 
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
 
-            // Hämta alla projekt som personen INTE redan är med i
+            // Hämta projekt där personen INTE är med
             var projects = await _context.Projects
                 .Include(p => p.Owner)
                 .Include(p => p.PersonProjects)
-                .Where(p => !p.PersonProjects
-                .Any(pp => pp.PersonId == person.Id))
+                .Where(p => !p.PersonProjects.Any(pp => pp.PersonId == person.Id))
                 .ToListAsync();
 
             return View(projects);
         }
 
-        // 2. Hanterar när man klickar på "Gå med" i modalen
+        // --- GÅ MED I PROJEKT (POST - Från Lista) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Join(int projectId, string role)
@@ -282,7 +272,6 @@ namespace CV_siten.Controllers
 
             if (person != null)
             {
-                // Skapa kopplingen i join-tabellen
                 var personProject = new PersonProject
                 {
                     PersonId = person.Id,
@@ -295,15 +284,13 @@ namespace CV_siten.Controllers
 
                 TempData["StatusMessage"] = "Du har nu gått med i projektet!";
             }
-
-            // Skicka tillbaka användaren till sin egen profil
             return RedirectToAction("Profile", "Person");
         }
 
+        // --- GÅ MED I PROJEKT (POST - Från Detaljvy) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
-        // Metoden heter JoinProject för att matcha formuläret i ProjectDetails.cshtml
         public async Task<IActionResult> JoinProject(int projectId, string role)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -311,7 +298,6 @@ namespace CV_siten.Controllers
 
             if (person != null)
             {
-                // Kontrollera om användaren redan är med i projektet
                 var isAlreadyMember = await _context.PersonProjects
                     .AnyAsync(pp => pp.PersonId == person.Id && pp.ProjectId == projectId);
 
@@ -327,19 +313,9 @@ namespace CV_siten.Controllers
                     _context.PersonProjects.Add(newParticipant);
                     await _context.SaveChangesAsync();
 
-                    // Detta triggar din popup i site.js
                     TempData["SuccessMessage"] = "Välkommen till projektet! Din anmälan är nu registrerad.";
                 }
             }
-
-            // Istället för RedirectToAction, returnera vyn direkt:
-            // Detta gör att vi stannar på samma historik-post.
-
-            //var project = await _context.Projects
-            //    .Include(p => p.PersonProjects).ThenInclude(pp => pp.Person)
-            //    .FirstOrDefaultAsync(p => p.Id == projectId);
-
-            //return View("ProjectDetails", project);
 
             return RedirectToAction("ProjectDetails", new { id = projectId });
         }
@@ -393,20 +369,20 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", "Person", new { id = person.Id });
         }
 
+        // --- LISTA ALLA PROJEKT (Sök & Sortering) ---
         [HttpGet]
         public async Task<IActionResult> AllProjects(string searchString, string sortBy)
         {
-            // Spara sök/sort i ViewBag för att behålla värdena i formuläret
             ViewBag.CurrentSearch = searchString;
             ViewBag.CurrentSort = sortBy;
 
-            // Börja med en grundfråga
             var query = _context.Projects
                 .Include(p => p.Owner)
                 .Include(p => p.PersonProjects)
+                    .ThenInclude(pp => pp.Person) // <--- VIKTIGT: Behövs för att visa deltagare och kolla sekretess!
                 .AsQueryable();
 
-            // --- FILTRERING (Sökning) ---
+            // Filtrering
             if (!string.IsNullOrEmpty(searchString))
             {
                 query = query.Where(p => p.ProjectName.Contains(searchString) ||
@@ -414,7 +390,7 @@ namespace CV_siten.Controllers
                                          p.Owner.LastName.Contains(searchString));
             }
 
-            // --- SORTERING ---
+            // Sortering
             query = sortBy switch
             {
                 "name_desc" => query.OrderByDescending(p => p.ProjectName),
@@ -422,12 +398,11 @@ namespace CV_siten.Controllers
                 "status_avslutat" => query.OrderBy(p => p.Status != "Avslutat").ThenBy(p => p.ProjectName),
                 "members_desc" => query.OrderByDescending(p => p.PersonProjects.Count),
                 "tid" => query.OrderByDescending(p => p.StartDate),
-                _ => query.OrderBy(p => p.ProjectName), // Standard: Namn A-Ö
+                _ => query.OrderBy(p => p.ProjectName),
             };
 
             var projects = await query.ToListAsync();
 
-            // Hämta inloggad person för "Gå med"-knapp logik
             var user = await _userManager.GetUserAsync(User);
             if (user != null)
             {
