@@ -20,6 +20,7 @@ namespace CV_siten.Controllers
             _userManager = userManager;
         }
 
+        //hämtar user och slår upp motsvarande person till deras id, används för personliga åtgärder (markera läst, radera)
         private async Task<Person> GetMyPersonAsync()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -31,6 +32,7 @@ namespace CV_siten.Controllers
             return person;
         }
 
+        //sammma fast returner null istället
         private async Task<Person?> TryGetMyPersonAsync()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -39,7 +41,7 @@ namespace CV_siten.Controllers
             return await _db.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
         }
 
-        [AllowAnonymous]
+        //returnerar tom message lista om user är null, hämtar alla deras meddelande om man är inloggad
         [HttpGet]
         public async Task<IActionResult> Inbox()
         {
@@ -60,18 +62,16 @@ namespace CV_siten.Controllers
         }
 
 
-        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Send(SendMessageViewModel vm)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid)  //om det failar här tas man tillbaka till inbox menyn
                 return await ReturnInboxWithModalAsync(vm);
 
             var me = await TryGetMyPersonAsync();
 
-            // Om inloggad: blocka "skicka till dig själv"
-            if (me != null && vm.ReceiverId == me.Id)
+            if (me != null && vm.ReceiverId == me.Id) 
             {
                 ModelState.AddModelError("ReceiverId", "Du kan inte skicka meddelande till dig själv.");
                 return await ReturnInboxWithModalAsync(vm);
@@ -84,9 +84,9 @@ namespace CV_siten.Controllers
                 return await ReturnInboxWithModalAsync(vm);
             }
 
-            var entity = new CV_siten.Data.Models.Message
+            var entity = new CV_siten.Data.Models.Message //skapar och sparar message
             {
-                SenderId = me?.Id,                      // OK nu när SenderId är int?
+                SenderId = me?.Id,                      
                 SenderName = me == null ? vm.SenderName : null,
                 SenderEmail = me == null ? vm.SenderEmail : null,
 
@@ -103,12 +103,12 @@ namespace CV_siten.Controllers
             return RedirectToAction(nameof(Inbox));
         }
 
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkRead(int id)
         {
-            var me = await GetMyPersonAsync();
+            var me = await GetMyPersonAsync(); //kräver inloggad användare
 
             var msg = await _db.Messages
                 .FirstOrDefaultAsync(m => m.Id == id && m.ReceiverId == me.Id);
@@ -122,6 +122,7 @@ namespace CV_siten.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/Message/Delete")]
@@ -141,12 +142,12 @@ namespace CV_siten.Controllers
             return RedirectToAction(nameof(Inbox));
         }
 
-        public IActionResult Index()
+        public IActionResult Index() //redirect
         {
             return RedirectToAction(nameof(Inbox));
         }
 
-        private async Task<IActionResult> ReturnInboxWithModalAsync(SendMessageViewModel? vm = null)
+        private async Task<IActionResult> ReturnInboxWithModalAsync(SendMessageViewModel? vm = null) //failsafe om något går fel
         {
             var me = await GetMyPersonAsync();
 
@@ -156,7 +157,7 @@ namespace CV_siten.Controllers
                 .OrderByDescending(m => m.Timestamp)
                 .ToListAsync();
 
-            if (vm != null)
+            if (vm != null) //fyller i det användaren skrev innan ifall något kraschade
             {
                 ViewData["OpenSendModal"] = true;
                 ViewData["SendReceiverId"] = vm.ReceiverId;
@@ -167,7 +168,7 @@ namespace CV_siten.Controllers
             return View("~/Views/Account/Message.cshtml", messages);
         }
         [HttpGet]
-        public async Task<IActionResult> SearchPerson(string q)
+        public async Task<IActionResult> SearchPerson(string q) //live "lista" när man söker mottagare
         {
             q = (q ?? "").Trim();
             if (q.Length < 2)

@@ -1,6 +1,4 @@
-﻿// ==========================================
-// --- ROBUST INITIALISERINGSMOTOR ---
-// ==========================================
+﻿
 
 // Denna variabel behövs för att komma ihåg vilken profil man skickar meddelande från
 let __lastSendMessageTrigger = null;
@@ -19,9 +17,6 @@ function safeInit(initFn, name) {
     }
 }
 
-// ==============================
-// --- ALLMÄNNA FUNKTIONER ---
-// ==============================
 
 // Växlar mellan visning och redigering på profilsidan / projectdetails.
 function enableEdit(sectionName) {
@@ -73,9 +68,6 @@ function openJoinRoleModal(projectId, projectName) {
     myModal.show();
 }
 
-// ==============================
-// --- INIT-FUNKTIONER ---
-// ==============================
 
 // Popup för när man sparar profiländringar (SKICKAR VIDARE ELLER DÖLJER)
 function initSaveSuccessRedirect() {
@@ -129,7 +121,7 @@ function initScrollRestoreOnSearch() {
     }
 }
 
-function initReceiverSearch() {
+function initReceiverSearch() { //används för att autofylla från mottagar listan
     const searchInput = document.getElementById('receiverSearch');
     const resultsEl = document.getElementById('receiverResults');
     const receiverIdEl = document.getElementById('receiverId');
@@ -174,7 +166,7 @@ function initReceiverSearch() {
     });
 }
 
-function initMessagesPage() {
+function initMessagesPage() { //svara modalen när man öppnar ett meddelande
     const readModalEl = document.getElementById("readMessageModal");
     const deleteModalEl = document.getElementById("deleteMessageModal");
     const sendModalEl = document.getElementById("sendMessageModal");
@@ -187,7 +179,7 @@ function initMessagesPage() {
     const deleteInfoEl = document.getElementById("deleteMessageInfo");
     const replyBtn = document.getElementById('replyBtn');
 
-    let lastOpenedMessage = { from: "", senderId: "", subject: "" };
+    let lastOpenedMessage = { from: "", senderId: "", subject: "" }; //visar från och ämne
 
     if (readModalEl) {
         readModalEl.addEventListener("show.bs.modal", (event) => {
@@ -200,17 +192,14 @@ function initMessagesPage() {
             const subject = row.getAttribute('data-subject') || '';
             const content = row.querySelector('td.message-content')?.textContent.trim() || '';
 
-            // --- LOGIK FÖR SVARA-KNAPPEN ---
             if (replyBtn) {
-                // Vi kollar om senderId har ett riktigt värde
-                const hasSender = senderId && senderId !== "" && senderId !== "null" && senderId !== "0";
-                // Vi dubbelkollar också om namnet innehåller "(extern)"
-                const isExternalText = from.includes("(extern)");
+                const hasSender = senderId && senderId !== "" && senderId !== "null" && senderId !== "0"; //kollar om sender har id 
+                const isExternalText = from.includes("(extern)"); //kollar om sender har (extern) i sitt namn alltså om sender är inloggad eller inte
 
                 if (hasSender && !isExternalText) {
-                    replyBtn.style.display = 'inline-flex'; // Visa för inloggade
+                    replyBtn.style.display = 'inline-flex'; //om sender är ifrån inloggad finns en svara knapp
                 } else {
-                    replyBtn.style.display = 'none'; // Dölj för externa
+                    replyBtn.style.display = 'none'; //om sender är extern finns ingen svara knapp
                 }
             }
 
@@ -230,7 +219,7 @@ function initMessagesPage() {
         });
     }
 
-    if (replyBtn) {
+    if (replyBtn) { //auto fyller ämnet med ett re: framför om man klickat svara
         replyBtn.addEventListener('click', function () {
             if (!lastOpenedMessage.senderId) return;
 
@@ -281,10 +270,10 @@ function initSendMessageModalValidation() {
     if (!modal) return;
 
     const form = modal.querySelector('#sendMessageForm') || modal.querySelector('form');
-    const submitBtn = modal.querySelector('#sendMessageSubmitBtn');
+    const submitBtn = modal.querySelector('#sendMessageSubmitBtn'); //validering när man klickar skicka
     if (!form || !submitBtn) return;
 
-    const receiverId = modal.querySelector('#receiverId');
+    const receiverId = modal.querySelector('#receiverId'); //allt valideringen kollar
     const receiverSearch = modal.querySelector('#receiverSearch');
     const senderName = modal.querySelector('#senderName'); 
     const subject = modal.querySelector('#sendSubject');
@@ -425,11 +414,12 @@ function initProjectImagePreview() {
             const reader = new FileReader();
             reader.onload = (ev) => {
                 preview.src = ev.target.result;
-                preview.style.display = 'block';
+                preview.style.display = 'block'; 
+
+                const placeholder = document.getElementById('projectImagePlaceholder');
+                if (placeholder) placeholder.style.display = 'none';
             };
             reader.readAsDataURL(file);
-        } else {
-            preview.style.display = 'none';
         }
     });
 }
@@ -505,7 +495,7 @@ function initSmartBackButton() {
     }
 }
 
-function initSendMessagePrefillFromProfile() {
+function initSendMessagePrefillFromProfile() { //autofyller namn när man skickar meddelande direkt från någons profil
     document.addEventListener('click', function (e) {
         const btn = e.target.closest('[data-bs-target="#sendMessageModal"]');
         if (btn) __lastSendMessageTrigger = btn;
@@ -530,7 +520,7 @@ function initSendMessagePrefillFromProfile() {
     });
 }
 
-function initModalCleanup() {
+function initModalCleanup() { //fixar bugg med modal som kan göra modaln hänger kvar efter man stängt ner den
     function cleanup() {
         document.body.classList.remove('modal-open');
         document.body.style.removeProperty('padding-right');
@@ -541,9 +531,6 @@ function initModalCleanup() {
     });
 }
 
-// ==========================================
-// --- MASTER DOM LOAD (Kör allt säkert) ---
-// ==========================================
 
 document.addEventListener("DOMContentLoaded", function () {
     // Grundläggande logik & Popups
