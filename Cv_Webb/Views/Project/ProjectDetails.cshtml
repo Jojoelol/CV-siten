@@ -249,7 +249,7 @@
                 <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Avbryt</button>
 
                 @* Här ligger det faktiska formuläret som skickar raderingen till din Controller *@
-                <form asp-controller="Project" asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                <form asp-controller="Project" asp-action="DeleteProject" asp-route-id="@Model.Id" method="post">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="btn btn-danger px-4 shadow-sm">Radera permanent</button>
                 </form>
