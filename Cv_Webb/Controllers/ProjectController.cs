@@ -268,45 +268,18 @@ namespace CV_siten.Controllers
             return View(projects);
         }
 
-        // --- GÅ MED I PROJEKT (POST - Från Lista) ---
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize] // Bra att ha
         public async Task<IActionResult> Join(int projectId, string role)
         {
             var user = await _userManager.GetUserAsync(User);
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-
             if (person != null)
             {
-                var personProject = new PersonProject
-                {
-                    PersonId = person.Id,
-                    ProjectId = projectId,
-                    Role = role
-                };
-
-                _context.PersonProjects.Add(personProject);
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Du har nu gått med i projektet!";
-            }
-            return RedirectToAction("ProjectDetails", "Project", new { id = projectId });
-        }
-
-        // --- GÅ MED I PROJEKT (POST - Från Detaljvy) ---
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize]
-        public async Task<IActionResult> JoinProject(int projectId, string role)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
-
-            if (person != null)
-            {
+                // 1. Kontrollera dubbletter (från din JoinProject-metod)
                 var isAlreadyMember = await _context.PersonProjects
                     .AnyAsync(pp => pp.PersonId == person.Id && pp.ProjectId == projectId);
-
                 if (!isAlreadyMember)
                 {
                     var newParticipant = new PersonProject
@@ -319,12 +292,73 @@ namespace CV_siten.Controllers
                     _context.PersonProjects.Add(newParticipant);
                     await _context.SaveChangesAsync();
 
+                    // Sätt meddelandet (Se till att namnet matchar vad din Popup lyssnar på!)
                     TempData["SuccessMessage"] = "Välkommen till projektet! Din anmälan är nu registrerad.";
                 }
             }
+                // Skicka alltid till Detaljvyn efteråt
+                return RedirectToAction("ProjectDetails", "Project", new { id = projectId });
+            }
+        
 
-            return RedirectToAction("ProjectDetails", new { id = projectId });
-        }
+        //// --- GÅ MED I PROJEKT (POST - Från Detaljvy) ---
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Authorize]
+        //public async Task<IActionResult> JoinProject(int projectId, string role)
+        //{
+        //    var user = await _userManager.GetUserAsync(User);
+        //    var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+        //    if (person != null)
+        //    {
+        //        var isAlreadyMember = await _context.PersonProjects
+        //            .AnyAsync(pp => pp.PersonId == person.Id && pp.ProjectId == projectId);
+
+        //        if (!isAlreadyMember)
+        //        {
+        //            var newParticipant = new PersonProject
+        //            {
+        //                PersonId = person.Id,
+        //                ProjectId = projectId,
+        //                Role = role
+        //            };
+
+        //            _context.PersonProjects.Add(newParticipant);
+        //            await _context.SaveChangesAsync();
+
+        //            TempData["SuccessMessage"] = "Välkommen till projektet! Din anmälan är nu registrerad.";
+        //        }
+        //    }
+
+        //    return RedirectToAction("ProjectDetails", new { id = projectId });
+        //}
+
+        //// --- GÅ MED I PROJEKT (POST - Från Lista) ---
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Join(int projectId, string role)
+        //{
+        //    var user = await _userManager.GetUserAsync(User);
+        //    var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
+
+        //    if (person != null)
+        //    {
+        //        var personProject = new PersonProject
+        //        {
+        //            PersonId = person.Id,
+        //            ProjectId = projectId,
+        //            Role = role
+        //        };
+
+        //        _context.PersonProjects.Add(personProject);
+        //        await _context.SaveChangesAsync();
+
+        //        TempData["SuccessMessage"] = "Du har nu gått med i projektet!";
+        //    }
+        //    return RedirectToAction("ProjectDetails", "Project", new { id = projectId });
+        //}
+
 
         // --- LÄMNA PROJEKT ---
         [HttpPost]
