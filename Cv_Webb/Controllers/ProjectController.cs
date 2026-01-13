@@ -288,7 +288,7 @@ namespace CV_siten.Controllers
                 _context.PersonProjects.Add(personProject);
                 await _context.SaveChangesAsync();
 
-                TempData["StatusMessage"] = "Du har nu gått med i projektet!";
+                TempData["SuccessMessage"] = "Du har nu gått med i projektet!";
             }
             return RedirectToAction("ProjectDetails", "Project", new { id = projectId });
         }
