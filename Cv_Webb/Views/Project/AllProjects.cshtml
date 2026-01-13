@@ -8,9 +8,7 @@
     <div class="projects-block all-projects-wrapper">
         <h2 class="all-projects-title">Alla Projekt</h2>
 
-        @* --- VERKTYGSFÄLT (Sök & Sortering) --- 
-           Formuläret skickas via GET till AllProjects-metoden i ProjectController.
-           Detta möjliggör att söksträngen och sorteringsvalen syns i URL:en (bookmarkable). *@
+        @* --- VERKTYGSFÄLT (Sök & Sortering) --- *@
         <form asp-action="AllProjects" method="get" class="content-toolbar all-projects-toolbar">
             <div class="all-projects-toolbar-row">
 
@@ -101,10 +99,10 @@
                             <div class="project-card-image all-projects-card-image">
                                 <img class="all-projects-card-img"
                                      src="@Url.Content(string.IsNullOrEmpty(project.ImageUrl)
-                                                                                                                     ? "~/images/projects/defaultbildProjekt.jpg"
-                                                                                                                     : "~/images/projects/" + project.ImageUrl)"
+                                     ? "~/images/projects/defaultbildProjekt.jpg"
+                                     : "~/images/projects/" + project.ImageUrl)"
                              alt="@project.ProjectName" />
-                    </div>
+                            </div>
 
                             <div class="all-projects-card-head">
                                 <span class="all-projects-card-name">@project.ProjectName</span>
@@ -159,6 +157,5 @@
         }
     </div>
 </div>
-
 
 <partial name="_JoinRoleModal" view-data='@new ViewDataDictionary(ViewData) { { "JoinAction", "Join" } }' />
