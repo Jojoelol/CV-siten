@@ -2,14 +2,14 @@
 
 Välkommen till vårt repository för CV-siten! Här är instruktioner för att komma igång, skapa databasen och köra applikationen.
 
-## 👥 Gruppmedlemmar
+## Gruppmedlemmar
 * Oscar Hallberg
 * Lino De Luca
 * Adam Pettersson
 * Joel Jansson
 * Joel Arrebäck 
 
-## ⚙️ Förutsättningar
+## Förutsättningar
 * .NET 8 SDK (eller den version ni kör)
 * Visual Studio 2022 (rekommenderas)
 * SQL Server (LocalDB eller Express)
@@ -18,7 +18,10 @@ Välkommen till vårt repository för CV-siten! Här är instruktioner för att 
 ### 1. Klona och öppna
 Klona repot och öppna lösningsfilen (`.sln`) i Visual Studio.
 
-### 2. Konfigurera Databasen=
+### 2. Välj CV-siten som startprojekt
+Högerklicka på `CV-siten` projektet i Solution Explorer och välj "Set as StartUp Project".
+
+### 3. Konfigurera Databasen=
 
 Tryck på tools -> Nuget Package Manager -> Package Manager Console 
 
