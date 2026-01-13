@@ -4,6 +4,21 @@
     ViewData["Title"] = "Profilsida";
 }
 
+@* --- MEDDELANDE-RUTA --- *@
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success mt-3">
+        @TempData["StatusMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
 <div class="profile-page-wrapper">
     @* --- SIDOMENY (Profilbild, Info, Åtgärder) --- *@
     <aside class="profile-sidebar">

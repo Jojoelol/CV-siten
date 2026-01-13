@@ -434,7 +434,6 @@ function initCvUploadPdfOnly() {
         if (!file) return;
         const ext = file.name.split('.').pop().toLowerCase();
         if (ext !== 'pdf') {
-            alert("Felaktigt filformat! Du kan bara ladda upp PDF-filer.");
             this.value = "";
         } else {
             cvForm.submit();
