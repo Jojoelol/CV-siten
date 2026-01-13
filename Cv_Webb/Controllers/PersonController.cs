@@ -311,7 +311,7 @@ namespace CV_siten.Controllers
             return RedirectToAction(nameof(Profile));
         }
 
-        // Exporterar profildata till XML-format (VG-krav eller extra funktionalitet)
+        // Exporterar profildata till XML-format
         [HttpGet]
         public async Task<IActionResult> ExportToXml()
         {
@@ -345,7 +345,6 @@ namespace CV_siten.Controllers
             }
         }
 
-        // --- HJÄLPMETODER (Privat) ---
         // Generisk metod för att spara filer med unika namn för att undvika dubbletter
         private async Task<string> SaveFileAsync(IFormFile file, string folderRelativePath)
         {
