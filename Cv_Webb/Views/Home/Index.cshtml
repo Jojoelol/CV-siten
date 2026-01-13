@@ -6,7 +6,7 @@
 
 <div class="background home-page">
 
-    @* --- Välkomstområde --- *@
+    @* --- Välkomstområde (Statisk text) --- *@
     <div class="welcome-area mb-4 home-welcome">
         <h2 class="home-welcome-title">Välkommen till CV-siten</h2>
         <p class="home-welcome-text">
@@ -14,9 +14,9 @@
         </p>
     </div>
 
-    @* --- Senaste projektet (G-krav 1) --- *@
+    @* --- Senaste projektet --- *@
     <div class="project-highlight-area mb-5 home-latest-project">
-        @* --- UPPDATERAD RUBRIKRAD --- *@
+
         <div class="home-latest-project-header">
             <h4 class="home-latest-project-title">
                 Senaste projektet
@@ -28,6 +28,7 @@
             </a>
         </div>
 
+        @* Kontrollera om det finns ett projekt skickat via ViewBag (från Controllern) *@
         @if (ViewBag.SenasteProjekt != null)
         {
             <div class="home-latest-project-card">
@@ -54,12 +55,14 @@
         }
     </div>
 
-    @* --- Sektionstitel (Ändras beroende på om man är inloggad eller ej) --- *@
+    @* --- Dynamisk sektionstitel ---
+       Titeln ändras i Controllern beroende på om vi visar "Utvalda profiler" (för gäster)
+       eller "Liknande profiler" (för inloggade med matchning) *@
     <h4 class="text-white mb-4 home-section-title">
         @ViewBag.SectionTitle
     </h4>
 
-    @* --- Urval av CV:n (G-krav 1) --- *@
+    @* --- Grid-layout för profiler --- *@
     <div class="profile-grid-container home-profile-grid">
         @foreach (var person in Model)
         {
@@ -68,7 +71,7 @@
 
                 <div class="p-4 text-center">
 
-                    @* --- Profilbild --- *@
+
                     <img src="~/images/ProfilePicture/@(string.IsNullOrEmpty(person.ImageUrl) ? "defaultPicture.jpg" : person.ImageUrl)"
                          class="home-profile-img"
                          alt="Profilbild för @person.FirstName" />
@@ -82,7 +85,8 @@
                         @person.JobTitle
                     </p>
 
-                    @* --- Matchningsprocent (Visas endast om data finns, t.ex. när man är inloggad) --- *@
+                    @* --- Matchningsprocent ---
+                       Visas endast om 'ViewBag.MatchData' finns OCH innehåller data för just denna person.*@
                     @if (ViewBag.MatchData != null && ViewBag.MatchData.ContainsKey(person.Id))
                     {
                         <div class="match-badge mb-3 home-match-badge">

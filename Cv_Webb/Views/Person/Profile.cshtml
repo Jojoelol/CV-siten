@@ -5,10 +5,11 @@
 }
 
 <div class="profile-page-wrapper">
+    @* --- SIDOMENY (Profilbild, Info, Åtgärder) --- *@
     <aside class="profile-sidebar">
         <div class="sidebar-card">
 
-            @* Profilbild *@
+            @* Profilbild: Visar standardbild om ingen finns *@
             <div class="pic-placeholder">
                 <img class="u-img-cover-full"
                      src="~/images/ProfilePicture/@(string.IsNullOrEmpty(Model.ImageUrl) ? "defaultPicture.jpg" : Model.ImageUrl)"
@@ -16,11 +17,9 @@
             </div>
 
             <div class="profile-info-text">
-                @* Namn och Roll *@
                 <h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
                 <p class="profile-title">@Model.JobTitle</p>
 
-                @* Kontaktuppgifter *@
                 <div class="profile-contact-details">
                     <p class="contact-item">
                         <i class="fas fa-phone"></i> <strong>Tel:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Ej angivet" : Model.PhoneNumber)
@@ -35,11 +34,11 @@
                     </p>
                 </div>
 
-                @* Beskrivning *@
                 <div class="profile-bio">
                     <p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
                 </div>
 
+                @* Åtgärder för BESÖKARE (dvs om jag tittar på någon annans profil) *@
                 @if (!ViewBag.IsOwner)
                 {
                     <button type="button"
@@ -67,7 +66,7 @@
                     }
                 }
 
-                @* Besöksstatistik *@
+                @* Besöksstatistik (Visas ENDAST för ägaren) *@
                 @if (ViewBag.IsOwner == true)
                 {
                     <div class="profile-stats u-profile-stats">
@@ -76,10 +75,11 @@
                 }
             </div>
 
-            @* Knappar i sidebar *@
+            @* Kontrollpanel för ÄGAREN *@
             <div class="sidebar-actions-container">
                 @if (ViewBag.IsOwner == true)
                 {
+                    @* Feedback-meddelanden från Controllern (t.ex. "Fil uppladdad") *@
                     @if (TempData["StatusMessage"] != null)
                     {
                         <div class="alert alert-info py-1 text-center u-status-alert">
@@ -94,8 +94,10 @@
                         </div>
                     }
 
+                    @* CV-uppladdning: Visar antingen uppladdningsknapp eller Visa/Ta bort *@
                     @if (string.IsNullOrEmpty(Model.CvUrl))
                     {
+                        @* Dold input för filval, triggas av knappen nedan via JS *@
                         <form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
                             <input type="hidden" name="personId" value="@Model.Id" />
                             <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
@@ -118,12 +120,14 @@
                         </div>
                     }
 
+                    @* Länkar till andra admin-sidor *@
                     <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">Redigera profil</a>
 
                     <a asp-controller="Person" asp-action="ExportToXml" class="btn-action u-export-xml-btn">
                         <i class="fas fa-file-export u-export-xml-icon"></i> Exportera CV (XML)
                     </a>
 
+                    @* Inställningar för synlighet *@
                     <div class="u-account-settings">
                         <div class="privacy-status @(Model.IsPrivate ? "is-private" : "is-public")">
                             <p class="privacy-status-text">
@@ -138,10 +142,7 @@
                             </form>
                         </div>
 
-                        @* FIXAT HÄR: 
-                           Använder nu asp-action="SetStatus" och skickar med isActive=false eller true 
-                           för att matcha din Controller.
-                        *@
+                        @* Aktivera/Inaktivera hela kontot *@
                         @if (Model.IsActive)
                         {
                             <form asp-controller="Person" asp-action="SetStatus" method="post">
@@ -168,16 +169,20 @@
         </div>
     </aside>
 
+    @* --- HUVUDINNEHÅLL (Kompetens, Utbildning, Erfarenhet, Projekt) --- *@
     <section class="profile-main-content">
-        @* Kompetenser *@
+
+        @* Sektion: Kompetenser (Med snabbredigering via AJAX/JS) *@
         <div class="cv-section" id="section-Skills">
             <form asp-action="UpdateProfileField" method="post">
                 <input type="hidden" name="id" value="@Model.Id" />
                 <input type="hidden" name="fieldName" value="Skills" />
+
                 <div class="cv-header-row">
                     <h3 class="section-title">Kompetenser</h3>
                     @if (ViewBag.IsOwner == true)
                     {
+                        @* Växlar mellan visningsläge och redigeringsläge via JS *@
                         <button type="button"
                                 class="btn-action btn-outline btn-edit-small edit-btn"
                                 data-edit-field="Skills">
@@ -187,12 +192,14 @@
                         <button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
                     }
                 </div>
+                @* Visar texten normalt *@
                 <p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Skills) ? "Inga kompetenser angivna." : Model.Skills)</p>
+                @* Visar textarea vid redigering *@
                 <textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Skills</textarea>
             </form>
         </div>
 
-        @* Utbildningar *@
+        @* Sektion: Utbildningar *@
         <div class="cv-section" id="section-Education">
             <form asp-action="UpdateProfileField" method="post">
                 <input type="hidden" name="id" value="@Model.Id" />
@@ -215,7 +222,7 @@
             </form>
         </div>
 
-        @* Erfarenheter *@
+        @* Sektion: Erfarenheter *@
         <div class="cv-section" id="section-Experience">
             <form asp-action="UpdateProfileField" method="post">
                 <input type="hidden" name="id" value="@Model.Id" />
@@ -238,13 +245,13 @@
             </form>
         </div>
 
-        @* Projektblock *@
+        @* --- PROJEKT-SEKTION --- *@
         <div class="projects-block" id="projects-section">
             <div class="cv-header-row">
                 <h3 class="section-title">Mina Projekt</h3>
             </div>
 
-            @* Projekt: Sök/Sortering *@
+            @* Filtrerings-toolbar för projekt *@
             <form asp-action="Profile" asp-fragment="projects-section" method="get" class="content-toolbar">
                 <input type="hidden" name="id" value="@Model.Id" />
 
@@ -293,7 +300,7 @@
                 </div>
             </form>
 
-            @* Projektgrid *@
+            @* Lista med projektkort *@
             @if (Model.PersonProjects != null && Model.PersonProjects.Count > 0)
             {
                 <div class="projects-grid u-projects-grid">
@@ -363,7 +370,7 @@
             }
         </div>
 
-        @* Liknande personer *@
+        @* --- LIKNANDE PERSONER (Matchning) --- *@
         @if (ViewBag.SimilarPersons != null && ViewBag.SimilarPersons.Count > 0)
         {
             <div class="cv-section u-similar-section">
@@ -422,9 +429,11 @@
 
 
     </section>
+
+    @* Inkluderar modal för att skicka meddelanden *@
     <partial name="SendMessageModal" />
 
-    @* Popup: Ta bort CV *@
+    @* Popup för att radera CV *@
     <div class="modal fade" id="deleteCvModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">

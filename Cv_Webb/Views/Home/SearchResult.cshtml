@@ -2,12 +2,16 @@
 
 @{
     ViewData["Title"] = "Sökresultat";
+
+    // Eftersom vyn tar emot en lista av Projekt som huvudmodell (@model),
+    // men sökningen även returnerar Personer, hämtar vi ut dem från ViewBag här.
     var personer = ViewBag.personResult as List<CV_siten.Data.Models.Person>;
 }
 
 <section class="sr-main">
     <h2 class="text-center sr-title">
         Sökresultat
+        @* Visa dynamiskt vad användaren sökte på (namn/fritext eller specifik kompetens) *@
         @if (!string.IsNullOrEmpty(ViewBag.SearchQuery))
         {
             <span>för "@ViewBag.SearchQuery"</span>
@@ -21,16 +25,19 @@
     <div class="sr-results-list">
         <h3 class="sr-matchPerson">Matchande Personer</h3>
 
+        @* Kontrollera att listan inte är tom innan vi försöker loopa *@
         @if (personer != null && personer.Any())
         {
             @foreach (var pers in personer)
             {
+                @* Gör hela kortet klickbart och länka till personens profil *@
                 <a class="sr-profile-card"
                    asp-controller="Person"
                    asp-action="Profile"
                    asp-route-id="@pers.Id">
 
                     <div class="sr-img-wrapper">
+                        @* Hantera profilbild: Använd default-bild om användaren inte laddat upp någon *@
                         <img class="sr-img"
                              src="~/images/ProfilePicture/@(string.IsNullOrEmpty(pers.ImageUrl) ? "defaultPicture.jpg" : pers.ImageUrl)"
                              alt="Profilbild" />
@@ -49,7 +56,9 @@
         }
         else
         {
+            @* Feedback till användaren om sökningen inte gav några träffar på personer *@
             <p class="sr-no-results">Inga personer hittades.</p>
         }
     </div>
+
 </section>

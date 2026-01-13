@@ -10,11 +10,14 @@
         <p class="add-project-subtitle">Fyll i informationen nedan för att visa upp ditt arbete på din profil.</p>
     </div>
 
+    @* Formulär för att skapa projekt. enctype="multipart/form-data" krävs för filuppladdning (bild/zip). *@
     <form asp-action="AddProject" method="post" enctype="multipart/form-data">
-        @* Sammanfattning av fel *@
+
+        @* Samlingsplats för övergripande valideringsfel *@
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
         <div class="row">
+            @* --- VÄNSTER SPALT: Textfält --- *@
             <div class="col-md-5">
                 <div class="add-project-card-left">
                     <div class="mb-3">
@@ -75,20 +78,21 @@
                 </div>
             </div>
 
+            @* --- HÖGER SPALT: Filuppladdning & Förhandsgranskning --- *@
             <div class="col-md-7">
                 <div class="add-project-card-right" id="previewContainer" style="position: relative; overflow: hidden;">
 
-                    @* --- 1. PREVIEW-BILDEN (Ligger i bakgrunden) --- *@
+                    @* Bild som visas i bakgrunden när användaren valt en fil (hanteras av JS) *@
                     <img id="projectImagePreview" src="" alt="" class="project-bg-preview" />
 
-                    @* --- 2. INNEHÅLL (Ligger ovanpå bilden) --- *@
+                    @* Innehåll som ligger "ovanpå" bilden *@
                     <div class="add-project-content-overlay">
                         <i class="bi bi-images add-project-image-icon"></i>
                         <h4 class="add-project-image-title">Projektbild</h4>
                         <p class="text-muted">Ladda upp en bild som representerar ditt projekt.</p>
 
                         <div class="mt-3 w-75">
-                            @* Notera id="projectImageInput" här: *@
+                            @* Input för projektbild *@
                             <input asp-for="ImageFile" type="file" id="projectImageInput" class="form-control add-project-input" accept="image/*" />
                             <span asp-validation-for="ImageFile" class="text-danger"></span>
                         </div>
@@ -96,6 +100,7 @@
                         <div class="mt-4 border-top pt-4 w-75">
                             <i class="bi bi-file-earmark-zip add-project-zip-icon"></i>
                             <h5 class="mt-2">Källkod (Valfritt)</h5>
+                            @* Input för ZIP-fil (kod) *@
                             <input asp-for="ZipFile" type="file" class="form-control mt-2 add-project-input" accept=".zip,.rar,.7z" />
                             <span asp-validation-for="ZipFile" class="text-danger"></span>
                         </div>
@@ -106,7 +111,7 @@
     </form>
 </div>
 
-@* Popup HTML *@
+@* --- POPUP: Bekräftelse vid lyckat sparande --- *@
 <div id="successPopup" class="success-popup-overlay add-project-success-popup u-hidden">
     <div class="success-popup-content">
         <i class="bi bi-check-circle-fill add-project-success-icon"></i>
@@ -115,7 +120,9 @@
     </div>
 </div>
 
+@* Kontrollera ViewBag för att se om popouten ska visas (sätts av Controllern) *@
 @if (ViewBag.ShowSuccessPopup == true)
 {
+    @* Data-attribut används av JavaScript för att trigga popouten och omdirigeringen *@
     <div id="popup-data" data-show="true" data-url="@Url.Action("Profile", "Person")"></div>
 }

@@ -8,20 +8,23 @@
     <div class="projects-block all-projects-wrapper">
         <h2 class="all-projects-title">Alla Projekt</h2>
 
-        @* --- VERKTYGSFÄLT (Sök & Sortering) --- *@
+        @* --- VERKTYGSFÄLT (Sök & Sortering) --- 
+           Formuläret skickas via GET till AllProjects-metoden i ProjectController.
+           Detta möjliggör att söksträngen och sorteringsvalen syns i URL:en (bookmarkable). *@
         <form asp-action="AllProjects" method="get" class="content-toolbar all-projects-toolbar">
             <div class="all-projects-toolbar-row">
 
-                @* 1. SÖKFÄLT *@
+                @* 1. SÖKFÄLT (Fritext) *@
                 <div class="all-projects-search-col">
                     <label class="all-projects-label text-muted fw-bold small">Sök projekt eller ägare:</label>
                     <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
                            placeholder="Skriv här..." class="form-control-custom all-projects-input">
                 </div>
 
-                @* 2. SORTERING *@
+                @* 2. SORTERING (Dropdown) *@
                 <div class="all-projects-sort-col">
                     <label class="all-projects-label text-muted fw-bold small">Sortera efter:</label>
+                    @* onchange="this.form.submit()" gör att sidan laddas om direkt när man byter alternativ *@
                     <select name="sortBy" class="form-select-custom all-projects-input" onchange="this.form.submit()">
                         <option value="">Standard (A-Ö)</option>
                         <optgroup label="Namn">
@@ -39,10 +42,10 @@
                     </select>
                 </div>
 
-                @* 3. KNAPP-KOLUMN (Bytt plats på Rensa och Sök) *@
+                @* 3. KNAPP-KOLUMN *@
                 <div class="all-projects-buttons-col">
 
-                    @* Rensa kommer nu FÖRE sök och visas bara om det finns en söksträng *@
+                    @* Rensa-knappen visas endast om en sökning är aktiv *@
                     @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
                     {
                         <a asp-action="AllProjects" class="btn-action all-projects-clear-btn">
@@ -51,6 +54,7 @@
                     }
                     else
                     {
+                        @* Placeholder för att behålla layouten om knappen saknas *@
                         <div class="all-projects-clear-spacer"></div>
                     }
 
@@ -62,6 +66,7 @@
             </div>
         </form>
 
+        @* --- PROJEKTLISTA --- *@
         @if (!Model.Any())
         {
             <div class="all-projects-empty">
@@ -85,17 +90,19 @@
             <div class="projects-grid all-projects-grid">
                 @foreach (var project in Model)
                 {
+                    // Kontrollera om inloggad användare redan är medlem i projektet
                     bool isMember = project.PersonProjects != null &&
                     ViewBag.CurrentPersonId != null &&
                     project.PersonProjects.Any(pp => pp.PersonId == (int)ViewBag.CurrentPersonId);
 
                     <div class="project-card all-projects-card">
+                        @* Hela kortets övre del är en länk till detaljsidan *@
                         <a asp-action="ProjectDetails" asp-route-id="@project.Id" class="all-projects-card-link">
                             <div class="project-card-image all-projects-card-image">
                                 <img class="all-projects-card-img"
                                      src="@Url.Content(string.IsNullOrEmpty(project.ImageUrl)
-                                                                                    ? "~/images/projects/defaultbildProjekt.jpg"
-                                                                                    : "~/images/projects/" + project.ImageUrl)"
+                                                                                                                     ? "~/images/projects/defaultbildProjekt.jpg"
+                                                                                                                     : "~/images/projects/" + project.ImageUrl)"
                              alt="@project.ProjectName" />
                     </div>
 
@@ -124,6 +131,7 @@
                                     <i class="fas fa-users"></i> @(project.PersonProjects?.Count ?? 0) deltagare
                                 </div>
 
+                                @* "Gå med"-knapp (endast för inloggade) *@
                         @if (User.Identity.IsAuthenticated)
                                 {
                                     if (isMember)
@@ -134,6 +142,7 @@
                                     }
                                     else
                                     {
+                                        // Denna knapp öppnar modalen _JoinRoleModal via JavaScript (site.js)
                                         <button type="button"
                                                 class="btn btn-success btn-sm all-projects-join-btn"
                                                 data-project-id="@project.Id"
@@ -151,6 +160,5 @@
     </div>
 </div>
 
-@* Modal *@
-@* Vi skickar med "Join" eftersom det är metoden som AllProjects använder *@
+
 <partial name="_JoinRoleModal" view-data='@new ViewDataDictionary(ViewData) { { "JoinAction", "Join" } }' />

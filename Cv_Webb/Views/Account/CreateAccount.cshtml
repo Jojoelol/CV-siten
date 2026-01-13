@@ -9,9 +9,13 @@
     <p>Fyll i dina uppgifter för att börja bygga din profil.</p>
     <hr />
 
+    @* Formuläret postas till AccountController. *@
     <form asp-controller="Account" asp-action="CreateAccount" method="post" enctype="multipart/form-data">
+
+        @* Visar övergripande felmeddelanden som inte hör till ett specifikt fält *@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+        @* Sektion för uppladdning av profilbild *@
         <div class="form-group mb-4 text-center">
             <label class="d-block mb-2 fw-bold">Profilbild</label>
 
@@ -19,15 +23,18 @@
                 Ingen bild
             </div>
 
+            @* Input för filval. 'accept' begränsar så användaren bara ser bildfiler *@
             <input type="file" asp-for="ImageFile" id="imageInput" class="form-control mt-2" accept="image/*" />
             <span id="imageFileError" class="text-danger" style="display:none;"></span>
             <small class="text-muted">Ladda upp en bild för att göra din profil mer personlig.</small>
         </div>
 
+        @* Namnuppgifter uppdelade i två kolumner för bättre layout *@
         <div class="row">
             <div class="col-md-6 form-group">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
+                @* Visar specifika valideringsfel för förnamn *@
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="col-md-6 form-group">
@@ -37,6 +44,7 @@
             </div>
         </div>
 
+        @* Kontaktuppgifter *@
         <div class="form-group mt-2">
             <label asp-for="Email" class="control-label"></label>
             <input asp-for="Email" class="form-control" />
@@ -68,6 +76,7 @@
             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
         </div>
 
+        @* Yrkestitel och beskrivning *@
         <div class="form-group mt-2">
             <label asp-for="JobTitle" class="control-label"></label>
             <input asp-for="JobTitle" class="form-control" placeholder="t.ex. Systemutvecklare" />
@@ -80,6 +89,7 @@
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
+        @* Lösenordshantering *@
         <div class="row mt-2">
             <div class="col-md-6 form-group">
                 <label asp-for="Password" class="control-label"></label>
@@ -103,6 +113,7 @@
     </div>
 </div>
 
+@* Laddar in skript för validering på klientsidan (ger direkt feedback utan omladdning) *@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

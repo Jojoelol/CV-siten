@@ -8,23 +8,28 @@
 <div class="main-box welcome-area login-card">
     <h2>Inloggning</h2>
 
+    @* Formuläret skickas via POST till AccountController, metoden Login *@
     <form asp-controller="Account" asp-action="Login" method="post">
-        @* Visar generella felmeddelanden *@
+
+        @* Visar övergripande fel som inte hör till ett specifikt fält (t.ex. "Felaktigt lösenord") *@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+        @* E-postfält: asp-for binder automatiskt till modellens 'Email'-property *@
         <div class="form-group mb-3">
             <label asp-for="Email" class="form-label"></label>
             <input asp-for="Email" class="form-control" />
+            @* Visar valideringsfel för E-post (t.ex. "Ogiltigt format") *@
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
+        @* Lösenordsfält: asp-for binder till 'Password' *@
         <div class="form-group mb-3">
-            @* 1. Ändrat från Losenord till Password *@
             <label asp-for="Password" class="form-label"></label>
             <input asp-for="Password" class="form-control" />
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
 
+        @* Checkbox för "Kom ihåg mig" (persistent cookie) *@
         <div class="form-check mb-3">
             <input asp-for="RememberMe" class="form-check-input" />
             <label asp-for="RememberMe" class="form-check-label"></label>
@@ -37,7 +42,7 @@
         <p>Saknar du konto? <a asp-controller="Account" asp-action="CreateAccount">Skapa ett konto här</a></p>
     </div>
 
-    @* Hantering av felmeddelanden *@
+    @* Visar eventuella felmeddelanden som skickats via ViewBag från controllern *@
     @if (ViewBag.Error != null)
     {
         <div class="alert alert-danger mt-3">
@@ -46,6 +51,7 @@
     }
 </div>
 
+@* Inkluderar script för validering på klientsidan (jQuery Validate) *@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");

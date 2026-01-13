@@ -22,7 +22,7 @@ namespace CV_siten.Data.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // --- Tvinga tabellnamn (för att undvika "Invalid object name"-fel) ---
+            // --- Tabellnamn ---
             modelBuilder.Entity<Person>().ToTable("Persons");
             modelBuilder.Entity<Project>().ToTable("Projects");
             modelBuilder.Entity<PersonProject>().ToTable("PersonProjects");
@@ -43,16 +43,16 @@ namespace CV_siten.Data.Data
                 .HasOne(pp => pp.Project)
                 .WithMany(p => p.PersonProjects)
                 .HasForeignKey(pp => pp.ProjectId)
-                .OnDelete(DeleteBehavior.NoAction); // FIX: Förhindrar cykliska raderingar
+                .OnDelete(DeleteBehavior.NoAction); 
 
             // --- Relation för Projektägare ---
             modelBuilder.Entity<Project>()
                 .HasOne(p => p.Owner)
                 .WithMany()
                 .HasForeignKey(p => p.OwnerId)
-                .OnDelete(DeleteBehavior.NoAction); // FIX: Förhindrar cykliska raderingar
+                .OnDelete(DeleteBehavior.NoAction); 
 
-            // --- Relationer för Meddelanden (Viktigt för att undvika felet du fick senast) ---
+            // --- Relationer för Meddelanden ---
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
                 .WithMany()
@@ -63,7 +63,7 @@ namespace CV_siten.Data.Data
                 .HasOne(m => m.Receiver)
                 .WithMany()
                 .HasForeignKey(m => m.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict); // FIX: Förhindrar cykliska raderingar
+                .OnDelete(DeleteBehavior.Restrict);
 
             // --- Seed Data: Användare ---
             var hasher = new PasswordHasher<ApplicationUser>();
