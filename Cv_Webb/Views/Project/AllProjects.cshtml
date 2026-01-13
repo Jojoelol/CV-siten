@@ -152,28 +152,5 @@
 </div>
 
 @* Modal *@
-<div class="modal fade" id="joinRoleModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header all-projects-modal-header">
-                <h5 class="modal-title">Ange din roll</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form asp-action="Join" asp-controller="Project" method="post">
-                @Html.AntiForgeryToken()
-                <div class="modal-body">
-                    <p id="modalProjectText" class="fw-bold"></p>
-                    <input type="hidden" name="projectId" id="modalProjectId" />
-                    <div class="mb-3">
-                        <label class="form-label">Vad är din roll i detta projekt?</label>
-                        <input type="text" name="role" class="form-control" placeholder="t.ex. Frontend-utvecklare..." required />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
-                    <button type="submit" class="btn btn-success">Gå med</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@* Vi skickar med "Join" eftersom det är metoden som AllProjects använder *@
+<partial name="_JoinRoleModal" view-data='@new ViewDataDictionary(ViewData) { { "JoinAction", "Join" } }' />
