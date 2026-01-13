@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CV_siten.Controllers
 {
+    // Hanterar autentisering, registrering och kontoinställningar
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -33,10 +34,11 @@ namespace CV_siten.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            // 1. Hantera bilduppladdning
+            // Steg 1: Hantera uppladdning av profilbild om sådan finns
             string? uniqueFileName = null;
             if (model.ImageFile is { Length: > 0 })
             {
+                // Skapa unikt filnamn för att undvika krockar och spara i wwwroot/images
                 uniqueFileName = Guid.NewGuid() + Path.GetExtension(model.ImageFile.FileName);
                 string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
 
@@ -47,13 +49,14 @@ namespace CV_siten.Controllers
                 await model.ImageFile.CopyToAsync(stream);
             }
 
-            // 2. Skapa Identity-användaren
+            // Steg 2: Skapa själva inloggningskontot i Identity-systemet
             var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
-                // 3. Skapa kopplad Person-profil
+                // Steg 3: Om kontot skapades, skapa nu den publika Person-profilen
+                // Kopplas till IdentityUser via user.Id (Foreign Key)
                 var person = new Person
                 {
                     FirstName = model.FirstName,
@@ -64,21 +67,21 @@ namespace CV_siten.Controllers
                     Address = model.Address,
                     PostalCode = model.PostalCode,
                     City = model.City,
-                    IdentityUserId = user.Id,
+                    IdentityUserId = user.Id, // Viktig koppling!
                     ImageUrl = uniqueFileName,
                     IsActive = true,
-                    IsPrivate = false
+                    IsPrivate = false // Profiler är offentliga som standard
                 };
 
                 _context.Persons.Add(person);
                 await _context.SaveChangesAsync();
 
-                // 4. Logga in och skicka vidare
+                // Steg 4: Logga in användaren direkt och skicka till startsidan
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToAction("Index", "Home");
             }
 
-            // Hantera eventuella fel vid registrering
+            // Om Identity misslyckades (t.ex. lösenordet var för svagt), visa felmeddelanden
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
 
@@ -95,6 +98,7 @@ namespace CV_siten.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
+            // Försök logga in med e-post och lösenord
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false);
             if (result.Succeeded) return RedirectToAction("Index", "Home");
 
@@ -104,7 +108,7 @@ namespace CV_siten.Controllers
 
         // --- UTLOGGNING ---
         [HttpPost]
-        [Authorize]
+        [Authorize] // Kräver att man faktiskt är inloggad för att kunna logga ut
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -123,9 +127,11 @@ namespace CV_siten.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return RedirectToAction("Login");
 
+            // Identity hanterar verifiering av det gamla lösenordet automatiskt
             var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
             if (result.Succeeded)
             {
+                // Uppdatera inloggnings-cookie så användaren inte loggas ut
                 await _signInManager.RefreshSignInAsync(user);
                 TempData["SuccessMessage"] = "Lösenordet har ändrats!";
                 return RedirectToAction("Edit", "Person");

@@ -29,6 +29,8 @@ namespace CV_siten.Controllers
         }
 
         // --- VISA PROFIL ---
+        // Hanterar visning av både egen och andras profiler. 
+        // Innehåller logik för sökning/sortering av projekt samt matchning av liknande profiler.
         [AllowAnonymous]
         public async Task<IActionResult> Profile(int? id, string searchString, string sortBy)
         {
@@ -37,10 +39,12 @@ namespace CV_siten.Controllers
                 ? await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id)
                 : null;
 
-            // Om inget ID anges, visa inloggads profil. Annars redirect till login.
+            // Om inget ID anges i URL:en, utgå från att användaren vill se sin egen profil.
+            // Om man inte är inloggad då, skicka till login.
             if (!id.HasValue && loggedInPerson == null) return RedirectToAction("Login", "Account");
             int targetId = id ?? loggedInPerson.Id;
 
+            // Hämta profilen med all relaterad data (IdentityUser, Projekt, Deltagare)
             var person = await _context.Persons
                 .Include(p => p.IdentityUser)
                 .Include(p => p.PersonProjects)
@@ -50,22 +54,23 @@ namespace CV_siten.Controllers
 
             if (person == null) return NotFound();
 
-            // Säkerhet: Kontrollera privat profil
+            // Säkerhetskontroll: Om profilen är privat får den inte visas för anonyma besökare.
             if (person.IsPrivate && user == null) return RedirectToAction("Login", "Account");
 
-            // ViewCount
+            // Öka visningsräknaren (enkelt sätt att se popularitet)
+            // Kollar headers för att undvika att räkna upp vid vissa typer av anrop om så önskas
             if (Request.Headers["Accept"].ToString().Contains("text/html"))
             {
                 person.ViewCount++;
                 await _context.SaveChangesAsync();
             }
 
-            // Metadata
+            // Sätt metadata för vyn (t.ex. för att visa/dölja redigeringsknappar)
             ViewBag.IsOwner = (loggedInPerson != null && targetId == loggedInPerson.Id);
             ViewBag.CurrentSort = sortBy;
             ViewBag.CurrentSearch = searchString;
 
-            // Sök/Sortering av Projekt
+            // Filtrering och sortering av personens PROJEKT-lista
             if (person.PersonProjects != null)
             {
                 var projects = person.PersonProjects.AsQueryable();
@@ -78,6 +83,7 @@ namespace CV_siten.Controllers
                     );
                 }
 
+                // Sorteringslogik via switch-expression
                 projects = sortBy switch
                 {
                     "name_asc" => projects.OrderBy(pp => pp.Project.ProjectName),
@@ -93,19 +99,20 @@ namespace CV_siten.Controllers
                 person.PersonProjects = projects.ToList();
             }
 
-            // --- LIKNANDE PERSONER (Matchning via Service) ---
+            // --- LIKNANDE PERSONER (Matchning) ---
+            // Hämta andra aktiva/offentliga profiler för att hitta potentiella kollegor
             var others = await _context.Persons
                 .Where(p => p.Id != targetId && p.IsActive && !p.IsPrivate)
                 .ToListAsync();
 
+            // Använd matchningstjänsten för att räkna ut poäng
             var matches = others.Select(p =>
             {
-                // HÄR ANROPAS DIN NYA SERVICE
                 var score = MatchingService.CalculateMatchScore(person, p);
                 var percent = Math.Min(score * 10, 100);
                 return new { Person = p, Score = score, MatchPercent = percent };
             })
-            .Where(x => x.MatchPercent >= 50) // Justera gränsen vid behov
+            .Where(x => x.MatchPercent >= 50) // Visa bara om matchningen är någorlunda bra
             .OrderByDescending(x => x.MatchPercent)
             .Take(4)
             .ToList();
@@ -123,6 +130,7 @@ namespace CV_siten.Controllers
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             if (person == null) return NotFound();
 
+            // Mappa databasmodellen till ViewModel för formuläret
             var model = new EditAccountViewModel
             {
                 FirstName = person.FirstName,
@@ -151,14 +159,14 @@ namespace CV_siten.Controllers
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             if (person == null) return NotFound();
 
-            // Använd hjälpmetoden för bild
+            // Hantera profilbild om en ny fil laddades upp
             if (model.ImageFile != null)
             {
-                // Spara i images/ProfilePicture
                 string fileName = await SaveFileAsync(model.ImageFile, Path.Combine("images", "ProfilePicture"));
                 if (fileName != null) person.ImageUrl = fileName;
             }
 
+            // Uppdatera person-information
             person.FirstName = model.FirstName;
             person.LastName = model.LastName;
             person.PhoneNumber = model.PhoneNumber;
@@ -169,6 +177,7 @@ namespace CV_siten.Controllers
             person.City = model.City;
             person.IsPrivate = model.IsPrivate;
 
+            // Uppdatera Identity-information (Email/Username)
             user.Email = model.Email;
             user.UserName = model.Email;
 
@@ -184,6 +193,8 @@ namespace CV_siten.Controllers
         {
             var person = await _context.Persons.FindAsync(id);
             var user = await _userManager.GetUserAsync(User);
+
+            // Kontrollera att det är rätt användare som försöker ändra
             if (person != null && person.IdentityUserId == user.Id)
             {
                 person.IsPrivate = !person.IsPrivate;
@@ -192,7 +203,8 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", new { id = id });
         }
 
-        // --- STATUS (Ersätter Activate/Inactivate) ---
+        // --- STATUS (Aktivera/Inaktivera) ---
+        // Sätter profilen som inaktiv (syns ej) eller aktiv (synlig)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetStatus(int id, bool isActive)
@@ -200,7 +212,7 @@ namespace CV_siten.Controllers
             var user = await _userManager.GetUserAsync(User);
             var person = await _context.Persons.FindAsync(id);
 
-            // Kontrollera ägare
+            // Strikt kontroll av ägarskap
             if (person != null && person.IdentityUserId == user?.Id)
             {
                 person.IsActive = isActive;
@@ -213,11 +225,14 @@ namespace CV_siten.Controllers
             return RedirectToAction("Profile", new { id = id });
         }
 
+        // Snabb-uppdatering av specifika textfält direkt från profilsidan
         [HttpPost]
         public async Task<IActionResult> UpdateProfileField(int id, string fieldName, string fieldValue)
         {
             var person = await _context.Persons.FindAsync(id);
             var user = await _userManager.GetUserAsync(User);
+
+            // Säkerställ att man bara kan redigera sin egen profil
             if (person == null || person.IdentityUserId != user.Id) return Forbid();
 
             switch (fieldName)
@@ -241,12 +256,14 @@ namespace CV_siten.Controllers
             var person = await _context.Persons.FirstOrDefaultAsync(p => p.IdentityUserId == user.Id);
             if (person == null || person.Id != personId) return Forbid();
 
+            // Validera att filen finns
             if (cvFile == null || cvFile.Length == 0)
             {
                 TempData["ErrorMessage"] = "Vänligen välj en fil att ladda upp.";
                 return RedirectToAction("Profile", new { id = personId });
             }
 
+            // Validera filtyp (endast PDF tillåts)
             if (Path.GetExtension(cvFile.FileName).ToLower() != ".pdf")
             {
                 TempData["ErrorMessage"] = "Kan enbart ta emot CV i PDF-format.";
@@ -255,8 +272,7 @@ namespace CV_siten.Controllers
 
             try
             {
-                // Använd hjälpmetoden för PDF
-                // Spara i uploads/cvs
+                // Spara filen fysiskt och uppdatera sökvägen i databasen
                 string fileName = await SaveFileAsync(cvFile, Path.Combine("uploads", "cvs"));
 
                 person.CvUrl = "/uploads/cvs/" + fileName;
@@ -280,12 +296,14 @@ namespace CV_siten.Controllers
 
             if (person != null && !string.IsNullOrEmpty(person.CvUrl))
             {
+                // Ta bort den fysiska filen från servern
                 var filePath = Path.Combine(_webHostEnvironment.WebRootPath, person.CvUrl.TrimStart('/'));
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
                 }
 
+                // Rensa referensen i databasen
                 person.CvUrl = null;
                 await _context.SaveChangesAsync();
                 TempData["StatusMessage"] = "Ditt CV har tagits bort.";
@@ -293,13 +311,19 @@ namespace CV_siten.Controllers
             return RedirectToAction(nameof(Profile));
         }
 
+        // Exporterar profildata till XML-format (VG-krav eller extra funktionalitet)
         [HttpGet]
         public async Task<IActionResult> ExportToXml()
         {
             var userId = _userManager.GetUserId(User);
-            var person = await _context.Persons.Include(p => p.PersonProjects).ThenInclude(pp => pp.Project).Include(p => p.IdentityUser).FirstOrDefaultAsync(p => p.IdentityUserId == userId);
+            var person = await _context.Persons
+                .Include(p => p.PersonProjects).ThenInclude(pp => pp.Project)
+                .Include(p => p.IdentityUser)
+                .FirstOrDefaultAsync(p => p.IdentityUserId == userId);
+
             if (person == null) return NotFound();
 
+            // Skapa export-modell
             var exportData = new ProfileExportModel
             {
                 FirstName = person.FirstName,
@@ -312,12 +336,17 @@ namespace CV_siten.Controllers
                 Projects = person.PersonProjects.Select(pp => new ProjectExportModel { ProjectName = pp.Project.ProjectName, Description = pp.Project.Description }).ToList()
             };
 
+            // Serialisera och returnera som filnedladdning
             var serializer = new XmlSerializer(typeof(ProfileExportModel));
-            using (var sw = new StringWriter()) { serializer.Serialize(sw, exportData); return File(Encoding.UTF8.GetBytes(sw.ToString()), "application/xml", $"CV_{person.FirstName}_{person.LastName}.xml"); }
+            using (var sw = new StringWriter())
+            {
+                serializer.Serialize(sw, exportData);
+                return File(Encoding.UTF8.GetBytes(sw.ToString()), "application/xml", $"CV_{person.FirstName}_{person.LastName}.xml");
+            }
         }
 
         // --- HJÄLPMETODER (Privat) ---
-
+        // Generisk metod för att spara filer med unika namn för att undvika dubbletter
         private async Task<string> SaveFileAsync(IFormFile file, string folderRelativePath)
         {
             if (file == null || file.Length == 0) return null;
