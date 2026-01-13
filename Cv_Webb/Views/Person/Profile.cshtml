@@ -1,446 +1,450 @@
 ﻿@model CV_siten.Data.Models.Person
 
 @{
-	ViewData["Title"] = "Profilsida";
+    ViewData["Title"] = "Profilsida";
 }
 
 <div class="profile-page-wrapper">
-	<aside class="profile-sidebar">
-		<div class="sidebar-card">
+    <aside class="profile-sidebar">
+        <div class="sidebar-card">
 
-			@* Profilbild *@
-			<div class="pic-placeholder">
-				<img class="u-img-cover-full"
-					 src="~/images/ProfilePicture/@(string.IsNullOrEmpty(Model.ImageUrl) ? "defaultPicture.jpg" : Model.ImageUrl)"
-					 alt="Profilbild" />
-			</div>
+            @* Profilbild *@
+            <div class="pic-placeholder">
+                <img class="u-img-cover-full"
+                     src="~/images/ProfilePicture/@(string.IsNullOrEmpty(Model.ImageUrl) ? "defaultPicture.jpg" : Model.ImageUrl)"
+                     alt="Profilbild" />
+            </div>
 
-			<div class="profile-info-text">
-				@* Namn och Roll *@
-				<h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
-				<p class="profile-title">@Model.JobTitle</p>
+            <div class="profile-info-text">
+                @* Namn och Roll *@
+                <h2 class="profile-name">@Model.FirstName @Model.LastName</h2>
+                <p class="profile-title">@Model.JobTitle</p>
 
-				@* Kontaktuppgifter *@
-				<div class="profile-contact-details">
-					<p class="contact-item">
-						<i class="fas fa-phone"></i> <strong>Tel:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Ej angivet" : Model.PhoneNumber)
-					</p>
-					<p class="contact-item">
-						<i class="fas fa-envelope"></i> <strong>Email:</strong> @(Model.IdentityUser?.Email ?? "test@test.se")
-					</p>
-					<p class="contact-item">
-						<i class="fas fa-map-marker-alt"></i> <strong>Adress:</strong><br />
-						@Model.Address<br />
-						@Model.PostalCode @Model.City
-					</p>
-				</div>
+                @* Kontaktuppgifter *@
+                <div class="profile-contact-details">
+                    <p class="contact-item">
+                        <i class="fas fa-phone"></i> <strong>Tel:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Ej angivet" : Model.PhoneNumber)
+                    </p>
+                    <p class="contact-item">
+                        <i class="fas fa-envelope"></i> <strong>Email:</strong> @(Model.IdentityUser?.Email ?? "test@test.se")
+                    </p>
+                    <p class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i> <strong>Adress:</strong><br />
+                        @Model.Address<br />
+                        @Model.PostalCode @Model.City
+                    </p>
+                </div>
 
-				@* Beskrivning *@
-				<div class="profile-bio">
-					<p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
-				</div>
+                @* Beskrivning *@
+                <div class="profile-bio">
+                    <p>@(string.IsNullOrEmpty(Model.Description) ? "Ingen beskrivning tillgänglig." : Model.Description)</p>
+                </div>
 
-				@if (!ViewBag.IsOwner)
-				{
-					<button type="button"
-							class="btn-action btn-primary u-btn-fullwidth-top"
-							data-bs-toggle="modal"
-							data-bs-target="#sendMessageModal"
-							data-receiver-id="@Model.Id"
-							data-receiver-name="@($"{Model.FirstName} {Model.LastName}")">
-						Skicka meddelande
-					</button>
+                @if (!ViewBag.IsOwner)
+                {
+                    <button type="button"
+                            class="btn-action btn-primary u-btn-fullwidth-top"
+                            data-bs-toggle="modal"
+                            data-bs-target="#sendMessageModal"
+                            data-receiver-id="@Model.Id"
+                            data-receiver-name="@($"{Model.FirstName} {Model.LastName}")">
+                        Skicka meddelande
+                    </button>
 
-					@if (!string.IsNullOrEmpty(Model.CvUrl))
-					{
-						<a href="@Model.CvUrl"
-						   target="_blank"
-						   class="btn-action btn-primary u-btn-fullwidth-top">
-							Visa @Model.FirstName @Model.LastName:s CV
-						</a>
-					}
-					else
-					{
-						<div class="u-btn-fullwidth-top text-center text-muted">
-							@Model.FirstName @Model.LastName har inte laddat upp något CV.
-						</div>
-					}
-				}
+                    @if (!string.IsNullOrEmpty(Model.CvUrl))
+                    {
+                        <a href="@Model.CvUrl"
+                           target="_blank"
+                           class="btn-action btn-primary u-btn-fullwidth-top">
+                            Visa @Model.FirstName @Model.LastName:s CV
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="u-btn-fullwidth-top text-center text-muted">
+                            @Model.FirstName @Model.LastName har inte laddat upp något CV.
+                        </div>
+                    }
+                }
+
+                @* Besöksstatistik *@
+                @if (ViewBag.IsOwner == true)
+                {
+                    <div class="profile-stats u-profile-stats">
+                        <p><i class="fas fa-eye"></i> Antal visningar: <strong>@Model.ViewCount</strong></p>
+                    </div>
+                }
+            </div>
+
+            @* Knappar i sidebar *@
+            <div class="sidebar-actions-container">
+                @if (ViewBag.IsOwner == true)
+                {
+                    @if (TempData["StatusMessage"] != null)
+                    {
+                        <div class="alert alert-info py-1 text-center u-status-alert">
+                            @TempData["StatusMessage"]
+                        </div>
+                    }
+
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger py-1 text-center u-error-alert">
+                            <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+                        </div>
+                    }
+
+                    @if (string.IsNullOrEmpty(Model.CvUrl))
+                    {
+                        <form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
+                            <input type="hidden" name="personId" value="@Model.Id" />
+                            <input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
+                        </form>
+                        <button type="button" class="btn-action btn-primary cv-full-btn" onclick="document.getElementById('cvFileInput').click();">Ladda upp mitt CV</button>
+                    }
+                    else
+                    {
+                        <div class="cv-button-row-container">
+                            <a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary cv-btn-view">
+                                Visa CV
+                            </a>
+
+                            <div class="cv-delete-form-wrap">
+                                <button type="button" class="btn-action btn-danger cv-btn-delete-text"
+                                        data-bs-toggle="modal" data-bs-target="#deleteCvModal">
+                                    <i class="fas fa-trash-alt"></i> Ta bort CV
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">Redigera profil</a>
+
+                    <a asp-controller="Person" asp-action="ExportToXml" class="btn-action u-export-xml-btn">
+                        <i class="fas fa-file-export u-export-xml-icon"></i> Exportera CV (XML)
+                    </a>
+
+                    <div class="u-account-settings">
+                        <div class="privacy-status @(Model.IsPrivate ? "is-private" : "is-public")">
+                            <p class="privacy-status-text">
+                                STATUS: @(Model.IsPrivate ? "PRIVAT" : "OFFENTLIG")
+                            </p>
+
+                            <form asp-controller="Person" asp-action="TogglePrivacy" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-sm @(Model.IsPrivate ? "btn-success" : "btn-warning") u-privacy-btn">
+                                    <i class="fas @(Model.IsPrivate ? "fa-toggle-off" : "fa-toggle-on")"></i> Ändra status
+                                </button>
+                            </form>
+                        </div>
+
+                        @* FIXAT HÄR: 
+                           Använder nu asp-action="SetStatus" och skickar med isActive=false eller true 
+                           för att matcha din Controller.
+                        *@
+                        @if (Model.IsActive)
+                        {
+                            <form asp-controller="Person" asp-action="SetStatus" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="isActive" value="false" />
+                                <button type="submit" class="btn-action btn-danger-outline u-inactivate-btn">
+                                    <i class="fas fa-user-slash"></i> Inaktivera profil
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="Person" asp-action="SetStatus" method="post">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="isActive" value="true" />
+                                <button type="submit" class="btn-action u-activate-btn">
+                                    <i class="fas fa-user-check"></i> Aktivera profil
+                                </button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </aside>
+
+    <section class="profile-main-content">
+        @* Kompetenser *@
+        <div class="cv-section" id="section-Skills">
+            <form asp-action="UpdateProfileField" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="fieldName" value="Skills" />
+                <div class="cv-header-row">
+                    <h3 class="section-title">Kompetenser</h3>
+                    @if (ViewBag.IsOwner == true)
+                    {
+                        <button type="button"
+                                class="btn-action btn-outline btn-edit-small edit-btn"
+                                data-edit-field="Skills">
+                            Redigera
+                        </button>
+
+                        <button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
+                    }
+                </div>
+                <p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Skills) ? "Inga kompetenser angivna." : Model.Skills)</p>
+                <textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Skills</textarea>
+            </form>
+        </div>
+
+        @* Utbildningar *@
+        <div class="cv-section" id="section-Education">
+            <form asp-action="UpdateProfileField" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="fieldName" value="Education" />
+                <div class="cv-header-row">
+                    <h3 class="section-title">Utbildningar</h3>
+                    @if (ViewBag.IsOwner == true)
+                    {
+                        <button type="button"
+                                class="btn-action btn-outline btn-edit-small edit-btn"
+                                data-edit-field="Education">
+                            Redigera
+                        </button>
+
+                        <button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
+                    }
+                </div>
+                <p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Education) ? "Ingen utbildningsinformation angiven." : Model.Education)</p>
+                <textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Education</textarea>
+            </form>
+        </div>
+
+        @* Erfarenheter *@
+        <div class="cv-section" id="section-Experience">
+            <form asp-action="UpdateProfileField" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="hidden" name="fieldName" value="Experience" />
+                <div class="cv-header-row">
+                    <h3 class="section-title">Tidigare erfarenheter</h3>
+                    @if (ViewBag.IsOwner == true)
+                    {
+                        <button type="button"
+                                class="btn-action btn-outline btn-edit-small edit-btn"
+                                data-edit-field="Experience">
+                            Redigera
+                        </button>
+
+                        <button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
+                    }
+                </div>
+                <p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Experience) ? "Ingen tidigare erfarenhet angiven." : Model.Experience)</p>
+                <textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Experience</textarea>
+            </form>
+        </div>
+
+        @* Projektblock *@
+        <div class="projects-block" id="projects-section">
+            <div class="cv-header-row">
+                <h3 class="section-title">Mina Projekt</h3>
+            </div>
+
+            @* Projekt: Sök/Sortering *@
+            <form asp-action="Profile" asp-fragment="projects-section" method="get" class="content-toolbar">
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <div class="toolbar-top-row u-toolbar-top-row">
+                    <input type="text" name="searchString" value="@ViewBag.CurrentSearch"
+                           placeholder="Sök projekt eller roll..." class="form-control-custom u-toolbar-search">
+
+                    <select name="sortBy" class="form-select-custom u-toolbar-sort" onchange="this.form.submit()">
+                        <option value="">Sortera efter...</option>
+                        <optgroup label="Namn">
+                            <option value="name_asc" selected="@(ViewBag.CurrentSort == "name_asc")">Projektnamn: A-Ö</option>
+                            <option value="name_desc" selected="@(ViewBag.CurrentSort == "name_desc")">Projektnamn: Ö-A</option>
+                        </optgroup>
+                        <optgroup label="Status (Visa först)">
+                            <option value="status_planerat" selected="@(ViewBag.CurrentSort == "status_planerat")">Status: Planerat</option>
+                            <option value="status_aktivt" selected="@(ViewBag.CurrentSort == "status_aktivt")">Status: Aktivt</option>
+                            <option value="status_pausat" selected="@(ViewBag.CurrentSort == "status_pausat")">Status: Pausat</option>
+                            <option value="status_avslutat" selected="@(ViewBag.CurrentSort == "status_avslutat")">Status: Avslutat</option>
+                        </optgroup>
+                        <optgroup label="Deltagare">
+                            <option value="members_asc" selected="@(ViewBag.CurrentSort == "members_asc")">Antal deltagare: Stigande</option>
+                            <option value="members_desc" selected="@(ViewBag.CurrentSort == "members_desc")">Antal deltagare: Fallande</option>
+                        </optgroup>
+                        <optgroup label="Tid">
+                            <option value="tid" selected="@(ViewBag.CurrentSort == "tid")">Tid (Nyast först)</option>
+                        </optgroup>
+                    </select>
+
+                    <button type="submit" class="btn-action btn-primary btn-small u-toolbar-search-btn">Sök</button>
+                </div>
+
+                <div class="right-buttons u-right-buttons">
+                    @if (ViewBag.IsOwner == true)
+                    {
+                        <a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline btn-small u-nowrap-btn">Lägg till projekt</a>
+                        <a asp-controller="Project" asp-action="AllProjects" class="btn-action btn-outline btn-small u-nowrap-btn">Gå med i projekt</a>
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch as string))
+                    {
+                        <a asp-action="Profile" asp-route-id="@Model.Id" asp-fragment="projects-section"
+                           class="btn-action btn-small u-clear-search-btn">
+                            Rensa sökning
+                        </a>
+                    }
+                </div>
+            </form>
+
+            @* Projektgrid *@
+            @if (Model.PersonProjects != null && Model.PersonProjects.Count > 0)
+            {
+                <div class="projects-grid u-projects-grid">
+                    @foreach (var pp in Model.PersonProjects)
+                    {
+                        bool isProjectOwner = pp.Project.OwnerId == Model.Id;
+
+                        <a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Project.Id"
+                           class="project-card u-project-card">
+
+                            @if (isProjectOwner)
+                            {
+                                <div class="u-project-owner-badge">ÄGARE</div>
+                            }
+
+                            <div class="project-card-image u-project-card-image">
+                                @if (!string.IsNullOrEmpty(pp.Project.ImageUrl))
+                                {
+                                    <img src="@Url.Content("~/images/projects/" + pp.Project.ImageUrl)"
+                                         alt="@pp.Project.ProjectName"
+                                         class="u-img-cover-full" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-project-diagram u-project-placeholder-icon"></i>
+                                }
+                            </div>
+
+                            <div class="u-project-card-body">
+                                <div class="u-project-title-block">
+                                    <span class="u-project-name">@pp.Project.ProjectName</span>
+                                    <span class="u-project-role">
+                                        <i class="fas fa-user-tag u-user-tag-icon"></i>
+                                        @(string.IsNullOrEmpty(pp.Role) ? "Deltagare" : pp.Role)
+                                    </span>
+                                </div>
+
+                                <div class="u-project-details-grid">
+                                    <div>
+                                        <i class="fas fa-layer-group u-detail-icon"></i>
+                                        <strong>Typ:</strong> @(pp.Project.Type ?? "Ej angiven")
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-circle u-status-dot @(pp.Project.Status == "Aktivt" ? "is-active" : "is-inactive")"></i>
+                                        <strong>Status:</strong> @(pp.Project.Status ?? "Aktivt")
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-calendar-alt u-detail-icon"></i>
+                                        <strong>Start:</strong> @pp.Project.StartDate.ToString("yyyy-MM-dd")
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-calendar-check u-detail-icon"></i>
+                                        <strong>Slut:</strong> @(pp.Project.EndDate?.ToString("yyyy-MM-dd") ?? "Pågående")
+                                    </div>
+                                </div>
+
+                                <div class="u-project-participants-row">
+                                    <div class="u-project-participants-badge">
+                                        <i class="fas fa-users u-participants-icon"></i>
+                                        @(pp.Project.PersonProjects?.Count ?? 0) deltagare
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+
+        @* Liknande personer *@
+        @if (ViewBag.SimilarPersons != null && ViewBag.SimilarPersons.Count > 0)
+        {
+            <div class="cv-section u-similar-section">
+                <div class="cv-header-row">
+                    <h3 class="section-title"><i class="fas fa-user-friends"></i> Hitta liknande personer</h3>
+                </div>
+
+                <div class="profile-grid-container home-profile-grid">
+                    @foreach (var match in ViewBag.SimilarPersons)
+                    {
+                        var person = match.Person;
+                        var percent = match.MatchPercent;
+
+                        <div class="profile-card home-profile-card">
+                            <div class="home-profile-card-topbar"></div>
+
+                            <div class="p-4 text-center">
+
+                                <img src="~/images/ProfilePicture/@(string.IsNullOrEmpty(person.ImageUrl) ? "defaultPicture.jpg" : person.ImageUrl)"
+                                     class="home-profile-img"
+                                     alt="Profilbild för @person.FirstName" />
+
+                                <h5 class="home-profile-name">
+                                    @person.FirstName @person.LastName
+                                </h5>
+
+                                <p class="home-profile-jobtitle">
+                                    @person.JobTitle
+                                </p>
+
+                                <div class="match-badge mb-3 home-match-badge">
+                                    <i class="fas fa-bullseye"></i> @percent% Matchning
+                                </div>
+
+                                <div class="home-profile-descbox">
+                                    <p class="text-muted small mb-0 home-profile-desc">
+                                        @(string.IsNullOrEmpty(person.Description)
+                                                                        ? "Ingen beskrivning tillgänglig."
+                                                                        : person.Description)
+                            </p>
+                        </div>
+
+                                <a asp-controller="Person"
+                                   asp-action="Profile"
+                                   asp-route-id="@person.Id"
+                                   class="btn btn-primary w-100 home-profile-btn">
+                                    Visa profil
+                                </a>
+
+                            </div>
+                        </div>
+                                }
+                </div>
+            </div>
+        }
 
 
+    </section>
+    <partial name="SendMessageModal" />
 
-				@* Besöksstatistik *@
-				@if (ViewBag.IsOwner == true)
-				{
-					<div class="profile-stats u-profile-stats">
-						<p><i class="fas fa-eye"></i> Antal visningar: <strong>@Model.ViewCount</strong></p>
-					</div>
-				}
-			</div>
+    @* Popup: Ta bort CV *@
+    <div class="modal fade" id="deleteCvModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Bekräfta borttagning</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                    <p>Är du säker på att du vill ta bort ditt CV? Detta går inte att ångra.</p>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
 
-			@* Knappar i sidebar *@
-			<div class="sidebar-actions-container">
-				@if (ViewBag.IsOwner == true)
-				{
-					@if (TempData["StatusMessage"] != null)
-					{
-						<div class="alert alert-info py-1 text-center u-status-alert">
-							@TempData["StatusMessage"]
-						</div>
-					}
-
-					@if (TempData["ErrorMessage"] != null)
-					{
-						<div class="alert alert-danger py-1 text-center u-error-alert">
-							<i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
-						</div>
-					}
-
-					@if (string.IsNullOrEmpty(Model.CvUrl))
-					{
-						<form id="cvUploadForm" asp-controller="Person" asp-action="UploadCv" method="post" enctype="multipart/form-data" style="display:none;">
-							<input type="hidden" name="personId" value="@Model.Id" />
-							<input type="file" id="cvFileInput" name="cvFile" accept=".pdf" onchange="document.getElementById('cvUploadForm').submit();" />
-						</form>
-						<button type="button" class="btn-action btn-primary cv-full-btn" onclick="document.getElementById('cvFileInput').click();">Ladda upp mitt CV</button>
-					}
-					else
-					{
-						<div class="cv-button-row-container">
-							<a href="@Model.CvUrl" target="_blank" class="btn-action btn-primary cv-btn-view">
-								Visa CV
-							</a>
-
-							<div class="cv-delete-form-wrap">
-								<button type="button" class="btn-action btn-danger cv-btn-delete-text"
-										data-bs-toggle="modal" data-bs-target="#deleteCvModal">
-									<i class="fas fa-trash-alt"></i> Ta bort CV
-								</button>
-							</div>
-						</div>
-					}
-
-					<a asp-controller="Person" asp-action="Edit" class="btn-action btn-secondary-outline">Redigera profil</a>
-
-					<a asp-controller="Person" asp-action="ExportToXml" class="btn-action u-export-xml-btn">
-						<i class="fas fa-file-export u-export-xml-icon"></i> Exportera CV (XML)
-					</a>
-
-					<div class="u-account-settings">
-						<div class="privacy-status @(Model.IsPrivate ? "is-private" : "is-public")">
-							<p class="privacy-status-text">
-								STATUS: @(Model.IsPrivate ? "PRIVAT" : "OFFENTLIG")
-							</p>
-
-							<form asp-controller="Person" asp-action="TogglePrivacy" method="post">
-								<input type="hidden" name="id" value="@Model.Id" />
-								<button type="submit" class="btn btn-sm @(Model.IsPrivate ? "btn-success" : "btn-warning") u-privacy-btn">
-									<i class="fas @(Model.IsPrivate ? "fa-toggle-off" : "fa-toggle-on")"></i> Ändra status
-								</button>
-							</form>
-						</div>
-
-						@if (Model.IsActive)
-						{
-							<form asp-controller="Person" asp-action="Inactivate" method="post">
-								<input type="hidden" name="id" value="@Model.Id" />
-								<button type="submit" class="btn-action btn-danger-outline u-inactivate-btn">
-									<i class="fas fa-user-slash"></i> Inaktivera profil
-								</button>
-							</form>
-						}
-						else
-						{
-							<form asp-controller="Person" asp-action="Activate" method="post">
-								<input type="hidden" name="id" value="@Model.Id" />
-								<button type="submit" class="btn-action u-activate-btn">
-									<i class="fas fa-user-check"></i> Aktivera profil
-								</button>
-							</form>
-						}
-					</div>
-				}
-			</div>
-		</div>
-	</aside>
-
-	<section class="profile-main-content">
-		@* Kompetenser *@
-		<div class="cv-section" id="section-Skills">
-			<form asp-action="UpdateProfileField" method="post">
-				<input type="hidden" name="id" value="@Model.Id" />
-				<input type="hidden" name="fieldName" value="Skills" />
-				<div class="cv-header-row">
-					<h3 class="section-title">Kompetenser</h3>
-					@if (ViewBag.IsOwner == true)
-					{
-						<button type="button"
-								class="btn-action btn-outline btn-edit-small edit-btn"
-								data-edit-field="Skills">
-							Redigera
-						</button>
-
-						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
-					}
-				</div>
-				<p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Skills) ? "Inga kompetenser angivna." : Model.Skills)</p>
-				<textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Skills</textarea>
-			</form>
-		</div>
-
-		@* Utbildningar *@
-		<div class="cv-section" id="section-Education">
-			<form asp-action="UpdateProfileField" method="post">
-				<input type="hidden" name="id" value="@Model.Id" />
-				<input type="hidden" name="fieldName" value="Education" />
-				<div class="cv-header-row">
-					<h3 class="section-title">Utbildningar</h3>
-					@if (ViewBag.IsOwner == true)
-					{
-						<button type="button"
-								class="btn-action btn-outline btn-edit-small edit-btn"
-								data-edit-field="Education">
-							Redigera
-						</button>
-
-						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
-					}
-				</div>
-				<p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Education) ? "Ingen utbildningsinformation angiven." : Model.Education)</p>
-				<textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Education</textarea>
-			</form>
-		</div>
-
-		@* Erfarenheter *@
-		<div class="cv-section" id="section-Experience">
-			<form asp-action="UpdateProfileField" method="post">
-				<input type="hidden" name="id" value="@Model.Id" />
-				<input type="hidden" name="fieldName" value="Experience" />
-				<div class="cv-header-row">
-					<h3 class="section-title">Tidigare erfarenheter</h3>
-					@if (ViewBag.IsOwner == true)
-					{
-						<button type="button"
-								class="btn-action btn-outline btn-edit-small edit-btn"
-								data-edit-field="Experience">
-							Redigera
-						</button>
-
-						<button type="submit" class="btn-action btn-primary btn-edit-small save-btn u-hidden">Spara</button>
-					}
-				</div>
-				<p class="cv-text display-mode">@(string.IsNullOrEmpty(Model.Experience) ? "Ingen tidigare erfarenhet angiven." : Model.Experience)</p>
-				<textarea name="fieldValue" class="form-control-custom edit-mode u-hidden u-textarea-100">@Model.Experience</textarea>
-			</form>
-		</div>
-
-		@* Projektblock *@
-		<div class="projects-block" id="projects-section">
-			<div class="cv-header-row">
-				<h3 class="section-title">Mina Projekt</h3>
-			</div>
-
-			@* Projekt: Sök/Sortering *@
-			<form asp-action="Profile" asp-fragment="projects-section" method="get" class="content-toolbar">
-				<input type="hidden" name="id" value="@Model.Id" />
-
-				<div class="toolbar-top-row u-toolbar-top-row">
-					<input type="text" name="searchString" value="@ViewBag.CurrentSearch"
-						   placeholder="Sök projekt eller roll..." class="form-control-custom u-toolbar-search">
-
-					<select name="sortBy" class="form-select-custom u-toolbar-sort" onchange="this.form.submit()">
-						<option value="">Sortera efter...</option>
-						<optgroup label="Namn">
-							<option value="name_asc" selected="@(ViewBag.CurrentSort == "name_asc")">Projektnamn: A-Ö</option>
-							<option value="name_desc" selected="@(ViewBag.CurrentSort == "name_desc")">Projektnamn: Ö-A</option>
-						</optgroup>
-						<optgroup label="Status (Visa först)">
-							<option value="status_planerat" selected="@(ViewBag.CurrentSort == "status_planerat")">Status: Planerat</option>
-							<option value="status_aktivt" selected="@(ViewBag.CurrentSort == "status_aktivt")">Status: Aktivt</option>
-							<option value="status_pausat" selected="@(ViewBag.CurrentSort == "status_pausat")">Status: Pausat</option>
-							<option value="status_avslutat" selected="@(ViewBag.CurrentSort == "status_avslutat")">Status: Avslutat</option>
-						</optgroup>
-						<optgroup label="Deltagare">
-							<option value="members_asc" selected="@(ViewBag.CurrentSort == "members_asc")">Antal deltagare: Stigande</option>
-							<option value="members_desc" selected="@(ViewBag.CurrentSort == "members_desc")">Antal deltagare: Fallande</option>
-						</optgroup>
-						<optgroup label="Tid">
-							<option value="tid" selected="@(ViewBag.CurrentSort == "tid")">Tid (Nyast först)</option>
-						</optgroup>
-					</select>
-
-					<button type="submit" class="btn-action btn-primary btn-small u-toolbar-search-btn">Sök</button>
-				</div>
-
-				<div class="right-buttons u-right-buttons">
-					@if (ViewBag.IsOwner == true)
-					{
-						<a asp-controller="Project" asp-action="AddProject" class="btn-action btn-outline btn-small u-nowrap-btn">Lägg till projekt</a>
-						<a asp-controller="Project" asp-action="AllProjects" class="btn-action btn-outline btn-small u-nowrap-btn">Gå med i projekt</a>
-					}
-
-					@if (!string.IsNullOrEmpty(ViewBag.CurrentSearch as string))
-					{
-						<a asp-action="Profile" asp-route-id="@Model.Id" asp-fragment="projects-section"
-						   class="btn-action btn-small u-clear-search-btn">
-							Rensa sökning
-						</a>
-					}
-				</div>
-			</form>
-
-			@* Projektgrid *@
-			@if (Model.PersonProjects != null && Model.PersonProjects.Count > 0)
-			{
-				<div class="projects-grid u-projects-grid">
-					@foreach (var pp in Model.PersonProjects)
-					{
-						bool isProjectOwner = pp.Project.OwnerId == Model.Id;
-
-						<a asp-controller="Project" asp-action="ProjectDetails" asp-route-id="@pp.Project.Id"
-						   class="project-card u-project-card">
-
-							@if (isProjectOwner)
-							{
-								<div class="u-project-owner-badge">ÄGARE</div>
-							}
-
-							<div class="project-card-image u-project-card-image">
-								@if (!string.IsNullOrEmpty(pp.Project.ImageUrl))
-								{
-									<img src="@Url.Content("~/images/projects/" + pp.Project.ImageUrl)"
-										 alt="@pp.Project.ProjectName"
-										 class="u-img-cover-full" />
-								}
-								else
-								{
-									<i class="fas fa-project-diagram u-project-placeholder-icon"></i>
-								}
-							</div>
-
-							<div class="u-project-card-body">
-								<div class="u-project-title-block">
-									<span class="u-project-name">@pp.Project.ProjectName</span>
-									<span class="u-project-role">
-										<i class="fas fa-user-tag u-user-tag-icon"></i>
-										@(string.IsNullOrEmpty(pp.Role) ? "Deltagare" : pp.Role)
-									</span>
-								</div>
-
-								<div class="u-project-details-grid">
-									<div>
-										<i class="fas fa-layer-group u-detail-icon"></i>
-										<strong>Typ:</strong> @(pp.Project.Type ?? "Ej angiven")
-									</div>
-									<div>
-										<i class="fas fa-circle u-status-dot @(pp.Project.Status == "Aktivt" ? "is-active" : "is-inactive")"></i>
-										<strong>Status:</strong> @(pp.Project.Status ?? "Aktivt")
-									</div>
-									<div>
-										<i class="fas fa-calendar-alt u-detail-icon"></i>
-										<strong>Start:</strong> @pp.Project.StartDate.ToString("yyyy-MM-dd")
-									</div>
-									<div>
-										<i class="fas fa-calendar-check u-detail-icon"></i>
-										<strong>Slut:</strong> @(pp.Project.EndDate?.ToString("yyyy-MM-dd") ?? "Pågående")
-									</div>
-								</div>
-
-								<div class="u-project-participants-row">
-									<div class="u-project-participants-badge">
-										<i class="fas fa-users u-participants-icon"></i>
-										@(pp.Project.PersonProjects?.Count ?? 0) deltagare
-									</div>
-								</div>
-							</div>
-						</a>
-					}
-				</div>
-			}
-		</div>
-
-		@* Liknande personer *@
-		@if (ViewBag.SimilarPersons != null && ViewBag.SimilarPersons.Count > 0)
-		{
-			<div class="cv-section u-similar-section">
-				<div class="cv-header-row">
-					<h3 class="section-title"><i class="fas fa-user-friends"></i> Hitta liknande personer</h3>
-				</div>
-
-				<div class="profile-grid-container home-profile-grid">
-					@foreach (var match in ViewBag.SimilarPersons)
-					{
-						var person = match.Person;
-						var percent = match.MatchPercent;
-
-						<div class="profile-card home-profile-card">
-							<div class="home-profile-card-topbar"></div>
-
-							<div class="p-4 text-center">
-
-								<img src="~/images/ProfilePicture/@(string.IsNullOrEmpty(person.ImageUrl) ? "defaultPicture.jpg" : person.ImageUrl)"
-									 class="home-profile-img"
-									 alt="Profilbild för @person.FirstName" />
-
-								<h5 class="home-profile-name">
-									@person.FirstName @person.LastName
-								</h5>
-
-								<p class="home-profile-jobtitle">
-									@person.JobTitle
-								</p>
-
-								<div class="match-badge mb-3 home-match-badge">
-									<i class="fas fa-bullseye"></i> @percent% Matchning
-								</div>
-
-								<div class="home-profile-descbox">
-									<p class="text-muted small mb-0 home-profile-desc">
-										@(string.IsNullOrEmpty(person.Description)
-																		? "Ingen beskrivning tillgänglig."
-																		: person.Description)
-									</p>
-								</div>
-
-								<a asp-controller="Person"
-								   asp-action="Profile"
-								   asp-route-id="@person.Id"
-								   class="btn btn-primary w-100 home-profile-btn">
-									Visa profil
-								</a>
-
-							</div>
-						</div>
-					}
-				</div>
-			</div>
-		}
-
-
-	</section>
-	<partial name="SendMessageModal" />
-
-	@* Popup: Ta bort CV *@
-	<div class="modal fade" id="deleteCvModal" tabindex="-1" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content border-0 shadow">
-				<div class="modal-header bg-danger text-white">
-					<h5 class="modal-title">Bekräfta borttagning</h5>
-					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body p-4 text-center">
-					<i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
-					<p>Är du säker på att du vill ta bort ditt CV? Detta går inte att ångra.</p>
-				</div>
-				<div class="modal-footer bg-light">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Avbryt</button>
-
-					<form asp-controller="Person" asp-action="DeleteCv" method="post">
-						<input type="hidden" name="personId" value="@Model.Id" />
-						<button type="submit" class="btn btn-danger">Ja, ta bort</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+                    <form asp-controller="Person" asp-action="DeleteCv" method="post">
+                        <input type="hidden" name="personId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger">Ja, ta bort</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

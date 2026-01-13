@@ -1,6 +1,7 @@
 using CV_siten.Data.Data;
 using CV_siten.Data.Models;
 using CV_siten.Models.ViewModels;
+using CV_siten.Services; // <-- Viktig: För att hitta din nya service
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +19,9 @@ namespace CV_siten.Controllers
             _context = context;
             _userManager = userManager;
         }
+
         // Startsidan, med sökfunktion och utvalda profiler
-        public async Task<IActionResult> Index(string search, string skill)
+        public async Task<IActionResult> Index()
         {
             // Hämta senaste projektet för ViewBag
             ViewBag.SenasteProjekt = await _context.Projects.OrderByDescending(p => p.Id).FirstOrDefaultAsync();
@@ -41,16 +43,19 @@ namespace CV_siten.Controllers
                 return View(await query.Take(5).ToListAsync()); //visar 5 profiler när utloggad
             }
 
-            // Matchningslogik för inloggad person (VG-Krav 5) - Nu synkad med PersonController
+            // Matchningslogik för inloggad person (VG-Krav 5)
+            // Vi exkluderar den inloggade personen från listan
             var others = await query.Where(p => p.Id != currentPerson.Id).ToListAsync();
 
             var matches = others.Select(p => {
-                var score = CalculateMatchScore(currentPerson, p);
+                // HÄR ANROPAS DIN NYA SERVICE ISTÄLLET FÖR LOKAL KOD
+                var score = MatchingService.CalculateMatchScore(currentPerson, p);
+
                 return new { Person = p, Score = score, MatchPercent = Math.Min(score * 10, 100) };
             })
-            .Where(x => x.Score >= 2) // Ändrat från 5 till 2 för att matcha PersonController
+            .Where(x => x.Score >= 2) // Filtrera bort de med mycket låg poäng
             .OrderByDescending(x => x.Score)
-            .Take(5) //visar 5 utvalda profiler när inloggad
+            .Take(5) // Max 5 profiler
             .ToList();
 
             ViewBag.MatchData = matches.ToDictionary(x => x.Person.Id, x => x.MatchPercent);
@@ -58,54 +63,6 @@ namespace CV_siten.Controllers
 
             return View(matches.Select(x => x.Person).ToList());
         }
-
-        // --- SYNKOADE HJÄLPMETODER (Identiska med PersonController) ---
-
-        private bool FuzzySkillMatch(string a, string b)
-        {
-            a = a.ToLower().Trim();
-            b = b.ToLower().Trim();
-            if (a == b || a.Contains(b) || b.Contains(a)) return true;
-
-            var synonyms = new Dictionary<string, string[]>
-            {
-                { "javascript", new[] { "js" } }, { "js", new[] { "javascript" } },
-                { "c#", new[] { "c sharp", "c-sharp" } }, { "c sharp", new[] { "c#", "c-sharp" } },
-                { "react", new[] { "react.js", "reactjs" } }, { "sql", new[] { "t-sql", "mysql" } }
-            };
-
-            if (synonyms.ContainsKey(a) && synonyms[a].Contains(b)) return true;
-            if (synonyms.ContainsKey(b) && synonyms[b].Contains(a)) return true;
-            return false;
-        }
-
-        private int CalculateMatchScore(Person a, Person b)
-        {
-            int score = 0;
-            // Jobbtitel ger 3 poäng
-            if (!string.IsNullOrEmpty(a.JobTitle) && a.JobTitle.Equals(b.JobTitle, StringComparison.OrdinalIgnoreCase)) score += 3;
-
-            // Skills ger 2 poäng per match
-            if (!string.IsNullOrEmpty(a.Skills) && !string.IsNullOrEmpty(b.Skills))
-            {
-                var skillsA = a.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToLower());
-                var skillsB = b.Skills.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim().ToLower());
-                foreach (var skA in skillsA)
-                {
-                    foreach (var skB in skillsB)
-                    {
-                        if (FuzzySkillMatch(skA, skB)) { score += 2; break; }
-                    }
-                }
-            }
-
-            // Utbildning ger 2 poäng (Tillägg för att matcha PersonController)
-            if (!string.IsNullOrEmpty(a.Education) && a.Education.Equals(b.Education, StringComparison.OrdinalIgnoreCase)) score += 2;
-
-            return score;
-        }
-
-        // --- ÖVRIGA METODER ---
 
         public async Task<IActionResult> Search(string search, string skill)
         {
@@ -149,10 +106,7 @@ namespace CV_siten.Controllers
 
             var projektResult = await projektQuery.ToListAsync();
 
-            // Om du vill att sökresultatet ska visas på startsidans design:
-            // return View("Index", personResult); 
-
-            // Om du vill visa både projekt och personer på en dedikerad sida:
+            // Returnera vyn SearchResult med projektlistan som modell (och personlistan i ViewBag)
             return View("SearchResult", projektResult);
         }
 
