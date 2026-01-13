@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("Cv_siten.Data")));
+        b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.GetName().Name)));
 
 // Konfigurerar Identity för användarhantering.
 // RequireConfirmedAccount = false tillåter inloggning direkt utan e-postverifiering.
