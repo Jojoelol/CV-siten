@@ -31,7 +31,6 @@ namespace CV_siten.Data.Models
         [Display(Name = "Projektbild")]
         public string? ImageUrl { get; set; }
 
-        // --- NY EGENSKAP FÖR ZIP-FILER ---
         [Display(Name = "Källkod (ZIP)")]
         public string? ZipUrl { get; set; }
 

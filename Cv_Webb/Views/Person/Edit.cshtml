@@ -27,11 +27,10 @@
         </div>
     }
 
-    @* Formulär för redigering. Måste ha enctype="multipart/form-data" för att kunna ladda upp ny profilbild. *@
+
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
 
-        @* VIKTIGT: Vi måste behålla den gamla bildsökvägen i ett dolt fält.
-           Om användaren INTE laddar upp en ny bild, skickas detta värde tillbaka så vi inte tappar bort bilden. *@
+
         <input type="hidden" asp-for="ImageUrl" />
 
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>

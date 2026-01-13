@@ -23,7 +23,7 @@ namespace CV_siten.Models.ViewModels
         [Required(ErrorMessage = "Startdatum är obligatoriskt.")]
         [DataType(DataType.Date)]
         [Display(Name = "Startdatum")]
-        public DateTime? StartDate { get; set; } // Lägg till ? här
+        public DateTime? StartDate { get; set; } 
 
         [DataType(DataType.Date)]
         [Display(Name = "Slutdatum")]

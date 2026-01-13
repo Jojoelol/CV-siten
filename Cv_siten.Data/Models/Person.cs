@@ -52,7 +52,7 @@ namespace CV_siten.Data.Models
         public int ViewCount { get; set; } = 0;
 
         [Display(Name = "Privat profil")]
-        public bool IsPrivate { get; set; } = false; // Standardvärdet är offentligt
+        public bool IsPrivate { get; set; } = false; 
 
         public virtual ICollection<PersonProject> PersonProjects { get; set; } = new List<PersonProject>();
 
