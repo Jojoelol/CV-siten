@@ -27,7 +27,7 @@ body {
     box-sizing: border-box;
 }
 
-.yellow-box {
+.main-box {
     /* Ändrad från gul till vit för en ren "papperskänsla" på CV:t */
     background-color: #ffffff;
     /* Mjukare kantfärg än ren svart */

@@ -1,7 +1,11 @@
 ﻿@using CV_siten.Models.ViewModels.Account
 @model LoginViewModel
 
-<div class="yellow-box welcome-area login-card">
+@{
+    ViewData["Title"] = "Inloggning";
+}
+
+<div class="main-box welcome-area login-card">
     <h2>Inloggning</h2>
 
     <form asp-controller="Account" asp-action="Login" method="post">
