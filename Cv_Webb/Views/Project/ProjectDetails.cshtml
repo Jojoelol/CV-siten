@@ -205,18 +205,29 @@
 @* Vi skickar med "JoinProject" här *@
 <partial name="_JoinRoleModal" view-data='@new ViewDataDictionary(ViewData) { { "JoinAction", "Join" } }' />
 
-@* --- POPUP VID LYCKAD ANMÄLAN --- *@
 @if (TempData["SuccessMessage"] != null)
 {
+    string msg = TempData["SuccessMessage"] as string;
+    bool isJoinMessage = msg.Contains("Välkommen") || msg.Contains("gått med");
+
     <div id="saveSuccessPopup"
          class="success-popup-overlay"
-         data-redirect-url="@Url.Action("ProjectDetails", new { id = Model.Id })">
+         data-redirect-url="">
+        @* Lämnar URL tom för att bara dölja popupen, inte ladda om *@
+
         <div class="success-popup-content animated-popup">
             <i class="fas fa-check-circle success-icon project-details-success-icon"></i>
-            <h3 class="project-details-success-title">Välkommen till projektet!</h3>
-            <p class="text-muted">@TempData["SuccessMessage"]</p>
-            <p class="small">Sidan uppdateras om ett ögonblick...</p>
-            <div class="spinner-border spinner-border-sm text-primary mt-2" role="status"></div>
+
+            @if (isJoinMessage)
+            {
+                <h3 class="project-details-success-title">Välkommen till projektet!</h3>
+            }
+            else
+            {
+                <h3 class="project-details-success-title">Ändringar sparade!</h3>
+            }
+
+            <p class="text-muted">@msg</p>
         </div>
     </div>
 }

@@ -27,19 +27,32 @@
             <div class="col-md-12 mb-4 text-center">
                 <label class="d-block mb-2 fw-bold">Projektbild</label>
 
-                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                {
-                    <img src="@Url.Content("~/images/projects/" + Model.ImageUrl)"
-                         class="img-thumbnail mb-2 edit-project-image" />
-                }
-                else
-                {
-                    <div class="mb-2 edit-project-image-placeholder">
-                        Ingen bild vald
-                    </div>
-                }
+                @* Container för bilden *@
+                <div class="mb-2 d-flex justify-content-center">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img id="projectImagePreview"
+                             src="@Url.Content("~/images/projects/" + Model.ImageUrl)"
+                             class="img-thumbnail edit-project-image"
+                             style="max-width: 100%; height: auto; max-height: 300px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        @* Om ingen bild finns, visa placeholder ELLER en dold bild som JS kan tända *@
+                        <img id="projectImagePreview"
+                             src=""
+                             class="img-thumbnail edit-project-image"
+                             style="display:none; max-width: 100%; height: auto; max-height: 300px; object-fit: cover;" />
 
-                <input type="file" asp-for="ImageFile" class="form-control mt-2" accept="image/*" />
+                        <div id="projectImagePlaceholder" class="edit-project-image-placeholder p-4 border rounded bg-light text-muted">
+                            <i class="bi bi-image fs-1"></i>
+                            <p class="mb-0">Ingen bild vald</p>
+                        </div>
+                    }
+                </div>
+
+                @* Filväljare med rätt ID för JavaScript *@
+                <input type="file" asp-for="ImageFile" id="projectImageInput" class="form-control mt-2" accept="image/*" />
             </div>
 
             @* --- GRUNDUPPGIFTER --- *@
@@ -108,3 +121,26 @@
         </div>
     </form>
 </div>
+
+@* --- POPUP FÖR SPARADE ÄNDRINGAR --- *@
+@* Vi kollar efter SuccessMessage och visar popupen om det finns *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="saveSuccessPopup"
+         class="success-popup-overlay"
+         style="display:flex;">
+        @* Tvinga visning direkt eftersom vi laddar om sidan *@
+
+        <div class="success-popup-content">
+            <i class="bi bi-check-circle-fill add-project-success-icon"></i>
+            <h3>Projektet har uppdaterats!</h3>
+            <p>Du skickas nu tillbaka till projektsidan...</p>
+        </div>
+    </div>
+
+    @* Sätter redirect-url till detaljsidan *@
+    <div id="popup-data"
+         data-show="true"
+         data-url="@Url.Action("ProjectDetails", new { id = Model.Id })">
+    </div>
+}
